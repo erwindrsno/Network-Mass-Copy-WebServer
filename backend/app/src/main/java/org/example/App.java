@@ -3,12 +3,34 @@
  */
 package org.example;
 
+import io.javalin.Javalin;
+import static io.javalin.apibuilder.ApiBuilder.*;
+import org.slf4j.*;
+
 public class App {
-    public String getGreeting() {
-        return "Hello World!";
-    }
+    private static Logger logger = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        Javalin app = Javalin.create(config -> {
+            config.router.apiBuilder(() -> {
+                path("/users", () -> {
+                    // get(UserController::getAllUsers);
+                    // path("/{id}", () -> {
+                    // get(UserController::getUserWithId);
+                    // });
+                });
+                path("/computers", () -> {
+                    get(ComputerController::insertComputer);
+                });
+            });
+        });
+
+        app.error(404, ctx -> {
+            ctx.result("Not found bit*h");
+        });
+
+        app.get("/", ctx -> ctx.result("Hello world!!!"));
+        app.start(7070);
+        logger.info("Server has started!");
     }
 }
