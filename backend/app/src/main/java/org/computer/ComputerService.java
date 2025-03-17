@@ -7,5 +7,5 @@ public interface ComputerService {
 
     void createComputer(Computer computer);
 
-    List<Computer> getAllComputersByLabNum();
+    List<Computer> getAllComputersByLabNum(int lab_num);
 }

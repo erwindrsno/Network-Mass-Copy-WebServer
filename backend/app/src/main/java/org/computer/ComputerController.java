@@ -30,6 +30,7 @@ public class ComputerController {
     }
 
     public void getComputersByLabNum(Context ctx) {
-
+        int lab_num = Integer.parseInt(ctx.pathParam("num"));
+        ctx.json(this.computerService.getAllComputersByLabNum(lab_num));
     }
 }

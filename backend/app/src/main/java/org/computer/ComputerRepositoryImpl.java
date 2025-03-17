@@ -48,10 +48,9 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
     @Override
     public void save(Computer computer) {
         try (Connection conn = super.getConnection()) {
+
             String query = "INSERT INTO computer(ip_address, host_name, lab_num) VALUES (?::INET,?,?);";
             PreparedStatement ps = conn.prepareStatement(query);
-
-            // InetAddress inet = InetAddress.getByName(computer.getIp_address());
 
             ps.setString(1, computer.getIp_address());
             ps.setString(2, computer.getHost_name());
@@ -65,7 +64,27 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
     }
 
     @Override
-    public List<Computer> findByLabNum() {
-        return new ArrayList<Computer>();
+    public List<Computer> findByLabNum(int lab_num) {
+        List<Computer> listResultSet = new ArrayList<>();
+        try (Connection conn = super.getConnection()) {
+            String query = "SELECT * FROM computer WHERE lab_num = ?";
+
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setInt(1, lab_num);
+
+            ResultSet resultSet = ps.executeQuery();
+
+            while (resultSet.next()) {
+                Long id = resultSet.getLong("id");
+                String ip_address = resultSet.getString("ip_address");
+                String host_name = resultSet.getString("host_name");
+                int res_lab_num = resultSet.getInt("lab_num");
+                Computer computer = new Computer(id, ip_address, host_name, res_lab_num);
+                listResultSet.add(computer);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+        return listResultSet;
     }
 }

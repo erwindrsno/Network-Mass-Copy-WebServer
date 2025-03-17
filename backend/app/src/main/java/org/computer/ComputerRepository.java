@@ -7,5 +7,5 @@ public interface ComputerRepository {
 
     void save(Computer computer);
 
-    List<Computer> findByLabNum();
+    List<Computer> findByLabNum(int lab_num);
 }

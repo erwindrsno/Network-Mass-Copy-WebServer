@@ -24,7 +24,7 @@ public class ComputerServiceImpl implements ComputerService {
     }
 
     @Override
-    public List<Computer> getAllComputersByLabNum() {
-        return this.computerRepository.findByLabNum();
+    public List<Computer> getAllComputersByLabNum(int lab_num) {
+        return this.computerRepository.findByLabNum(lab_num);
     }
 }
