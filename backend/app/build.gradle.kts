@@ -25,6 +25,9 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:2.0.17")
     implementation("org.postgresql:postgresql:42.7.5")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
+    implementation("com.google.inject:guice:7.0.0")
+    compileOnly("org.projectlombok:lombok:1.18.36")
+    annotationProcessor("org.projectlombok:lombok:1.18.36")
     // This dependency is used by the application.
     implementation(libs.guava)
 }
@@ -32,13 +35,13 @@ dependencies {
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(23)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
 application {
     // Define the main class for the application.
-    mainClass = "org.example.App"
+    mainClass = "org.main.App"
 }
 
 tasks.named<Test>("test") {
