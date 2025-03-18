@@ -9,6 +9,8 @@ import org.computer.ComputerController;
 import org.computer.ComputerModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.user.UserController;
+import org.user.UserModule;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -20,15 +22,16 @@ public class App {
     private static Logger logger = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) {
-        Injector injector = Guice.createInjector(new ComputerModule());
+        Injector injector = Guice.createInjector(new ComputerModule(), new UserModule());
 
         ComputerController computerController = injector.getInstance(ComputerController.class);
-
+        UserController userController = injector.getInstance(UserController.class);
         Javalin app = Javalin.create(config -> {
             config.jsonMapper(new JavalinJackson());
             config.router.apiBuilder(() -> {
                 path("/users", () -> {
-                    // get(UserController::getAllUsers);
+                    get(userController::getAllUsers);
+                    post(userController::insertUser);
                     // path("/{id}", () -> {
                     // get(UserController::getUserWithId);
                     // });

@@ -26,6 +26,7 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.5")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
     implementation("com.google.inject:guice:7.0.0")
+    implementation("at.favre.lib:bcrypt:0.10.2")
     compileOnly("org.projectlombok:lombok:1.18.36")
     annotationProcessor("org.projectlombok:lombok:1.18.36")
     // This dependency is used by the application.

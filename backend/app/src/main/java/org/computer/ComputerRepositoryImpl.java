@@ -1,6 +1,5 @@
 package org.computer;
 
-import java.net.InetAddress;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+@Singleton
 public class ComputerRepositoryImpl extends BaseRepository<Computer> implements ComputerRepository {
     private Logger logger = LoggerFactory.getLogger(ComputerRepositoryImpl.class);
 

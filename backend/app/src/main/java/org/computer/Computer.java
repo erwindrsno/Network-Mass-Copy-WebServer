@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Computer {
-    Long id;
-    String ip_address;
-    String host_name;
-    int lab_num;
+    private Long id;
+    private String ip_address;
+    private String host_name;
+    private int lab_num;
 }

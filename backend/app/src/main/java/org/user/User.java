@@ -8,8 +8,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
-    Long id;
-    String ip_address;
-    String host_name;
-    int lab_num;
+    private Long id;
+    private String username;
+    private String password;
+    private String display_name;
+
+    public User(Long id, String username, String display_name) {
+        this.id = id;
+        this.username = username;
+        this.display_name = display_name;
+    }
 }
