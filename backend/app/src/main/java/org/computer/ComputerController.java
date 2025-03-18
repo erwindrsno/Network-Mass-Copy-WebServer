@@ -33,4 +33,14 @@ public class ComputerController {
         int lab_num = Integer.parseInt(ctx.pathParam("num"));
         ctx.json(this.computerService.getAllComputersByLabNum(lab_num));
     }
+
+    public void getComputersById(Context ctx) {
+        int id = Integer.parseInt(ctx.pathParam("id"));
+        ctx.json(this.computerService.getComputersById(id));
+    }
+
+    public void getComputersByIpAddress(Context ctx) {
+        String ip = ctx.pathParam("ip");
+        ctx.json(this.computerService.getComputersByIpAddress(ip));
+    }
 }

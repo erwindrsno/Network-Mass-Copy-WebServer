@@ -8,4 +8,8 @@ public interface ComputerService {
     void createComputer(Computer computer);
 
     List<Computer> getAllComputersByLabNum(int lab_num);
+
+    Computer getComputersById(int id);
+
+    Computer getComputersByIpAddress(String ip);
 }

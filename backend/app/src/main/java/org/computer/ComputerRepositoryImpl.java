@@ -87,4 +87,52 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
         }
         return listResultSet;
     }
+
+    @Override
+    public Computer findById(int id) {
+        Computer computer = null;
+        try (Connection conn = super.getConnection()) {
+            String query = "SELECT * FROM computer WHERE id = ?";
+
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setInt(1, id);
+
+            ResultSet resultSet = ps.executeQuery();
+
+            while (resultSet.next()) {
+                Long res_id = resultSet.getLong("id");
+                String ip_address = resultSet.getString("ip_address");
+                String host_name = resultSet.getString("host_name");
+                int res_lab_num = resultSet.getInt("lab_num");
+                computer = new Computer(res_id, ip_address, host_name, res_lab_num);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+        return computer;
+    }
+
+    @Override
+    public Computer findByIpAddress(String ip) {
+        Computer computer = null;
+        try (Connection conn = super.getConnection()) {
+            String query = "SELECT * FROM computer WHERE ip_address = ?::INET";
+
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setString(1, ip);
+
+            ResultSet resultSet = ps.executeQuery();
+
+            while (resultSet.next()) {
+                Long res_id = resultSet.getLong("id");
+                String ip_address = resultSet.getString("ip_address");
+                String host_name = resultSet.getString("host_name");
+                int res_lab_num = resultSet.getInt("lab_num");
+                computer = new Computer(res_id, ip_address, host_name, res_lab_num);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+        return computer;
+    }
 }

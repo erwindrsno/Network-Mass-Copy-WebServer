@@ -39,6 +39,12 @@ public class App {
                     path("/lab/{num}", () -> {
                         get(computerController::getComputersByLabNum);
                     });
+                    path("/id/{id}", () -> {
+                        get(computerController::getComputersById);
+                    });
+                    path("/ip_addr/{ip}", () -> {
+                        get(computerController::getComputersByIpAddress);
+                    });
                 });
             });
 

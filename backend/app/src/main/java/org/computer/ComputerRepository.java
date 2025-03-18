@@ -8,4 +8,8 @@ public interface ComputerRepository {
     void save(Computer computer);
 
     List<Computer> findByLabNum(int lab_num);
+
+    Computer findById(int id);
+
+    Computer findByIpAddress(String ip);
 }
