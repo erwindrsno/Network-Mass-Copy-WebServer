@@ -34,7 +34,7 @@ public class UserController {
     }
 
     public void getUsersById(Context ctx) {
-        int id = Integer.parseInt(ctx.formParam("id"));
+        Integer id = Integer.parseInt(ctx.formParam("id"));
         ctx.json(this.userService.getUsersById(id));
         ctx.status(200);
     }
@@ -43,7 +43,7 @@ public class UserController {
         String username = ctx.formParam("username");
         String password = ctx.formParam("password");
         User user = new User(username, password);
-        Long user_id = this.userService.authUser(user);
+        Integer user_id = this.userService.authUser(user);
 
         if (user_id != null) {
             ctx.sessionAttribute("user_id", user_id);
@@ -54,7 +54,7 @@ public class UserController {
     }
 
     public void invalidateUser(Context ctx) {
-        Long id = ctx.sessionAttribute("user_id");
+        Integer id = ctx.sessionAttribute("user_id");
         ctx.req().getSession().invalidate();
         ctx.result("Log out OK " + id).status(200);
     }

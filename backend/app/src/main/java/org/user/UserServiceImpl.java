@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import at.favre.lib.crypto.bcrypt.*;
+import at.favre.lib.crypto.bcrypt.BCrypt.Result;
 
 @Singleton
 public class UserServiceImpl implements UserService {
@@ -28,12 +29,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUsersById(int id) {
+    public User getUsersById(Integer id) {
         return this.userRepository.findById(id);
     }
 
     @Override
-    public Long authUser(User user) {
-        return this.userRepository.auth(user);
+    public Integer authUser(User user) {
+        User retrievedUser = this.userRepository.findUserByUsername(user.getUsername());
+
+        if (retrievedUser == null)
+            return null;
+
+        Result result = BCrypt.verifyer().verify(user.getPassword().toCharArray(), retrievedUser.getPassword());
+        if (result.verified == true) {
+            return retrievedUser.getId();
+        }
+        return null;
     }
 }

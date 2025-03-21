@@ -9,7 +9,7 @@ public interface ComputerRepository {
 
     List<Computer> findByLabNum(int lab_num);
 
-    Computer findById(int id);
+    Computer findById(Integer id);
 
     Computer findByIpAddress(String ip);
 }

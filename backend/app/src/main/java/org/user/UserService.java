@@ -7,7 +7,7 @@ public interface UserService {
 
     boolean createUser(User user);
 
-    User getUsersById(int id);
+    User getUsersById(Integer id);
 
-    Long authUser(User user);
+    Integer authUser(User user);
 }

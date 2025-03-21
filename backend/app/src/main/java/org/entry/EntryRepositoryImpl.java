@@ -29,7 +29,10 @@ public class EntryRepositoryImpl extends BaseRepository<Entry> implements EntryR
 
             ps.setString(1, entry.getTitle());
             ps.setString(2, entry.getCompleteness());
-            // ps.setInt(3, entry;
+            ps.setInt(3, entry.getUserId());
+
+            int insertCount = ps.executeUpdate();
+            logger.info(insertCount + " rows inserted");
         } catch (Exception e) {
             logger.error(e.getMessage());
         }

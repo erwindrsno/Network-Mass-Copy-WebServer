@@ -35,7 +35,7 @@ public class ComputerController {
     }
 
     public void getComputersById(Context ctx) {
-        int id = Integer.parseInt(ctx.pathParam("id"));
+        Integer id = Integer.parseInt(ctx.pathParam("id"));
         ctx.json(this.computerService.getComputersById(id));
     }
 

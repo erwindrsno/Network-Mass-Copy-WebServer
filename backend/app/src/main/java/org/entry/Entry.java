@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Entry {
-    private Long id;
+    private Integer id;
     private String title;
     private String completeness;
-    private Long userId;
+    private Integer userId;
 }

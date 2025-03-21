@@ -30,7 +30,7 @@ public class ComputerServiceImpl implements ComputerService {
     }
 
     @Override
-    public Computer getComputersById(int id) {
+    public Computer getComputersById(Integer id) {
         return this.computerRepository.findById(id);
     }
 

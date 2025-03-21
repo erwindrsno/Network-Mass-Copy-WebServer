@@ -13,9 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.main.BaseRepository;
 
-import at.favre.lib.crypto.bcrypt.*;
-import at.favre.lib.crypto.bcrypt.BCrypt.Result;
-
 public class UserRepositoryImpl extends BaseRepository<User> implements UserRepository {
     private Logger logger = LoggerFactory.getLogger(UserRepositoryImpl.class);
 
@@ -35,7 +32,7 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
             ResultSet resultSet = ps.executeQuery();
 
             while (resultSet.next()) {
-                Long id = resultSet.getLong("id");
+                Integer id = resultSet.getInt("id");
                 String username = resultSet.getString("username");
                 String display_name = resultSet.getString("display_name");
                 User user = new User(id, username, display_name);
@@ -75,8 +72,7 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
     }
 
     @Override
-    public User findById(int id) {
-        User user = null;
+    public User findById(Integer id) {
         try (Connection conn = super.getConnection()) {
             String query = "SELECT * FROM users WHERE id = ?";
             PreparedStatement ps = conn.prepareStatement(query);
@@ -85,38 +81,39 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
             ResultSet resultSet = ps.executeQuery();
 
             while (resultSet.next()) {
-                Long res_id = resultSet.getLong("id");
+                Integer res_id = resultSet.getInt("id");
                 String username = resultSet.getString("username");
                 String display_name = resultSet.getString("display_name");
-                user = new User(res_id, username, display_name);
+                User user = new User(res_id, username, display_name);
+                return user;
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-        return user;
+        return null;
     }
 
     @Override
-    public Long auth(User user) {
-        Long user_id = null;
+    public User findUserByUsername(String username) {
         try (Connection conn = super.getConnection()) {
             String query = "SELECT * FROM users WHERE username = ?";
             PreparedStatement ps = conn.prepareStatement(query);
 
-            ps.setString(1, user.getUsername());
+            ps.setString(1, username);
 
             ResultSet resultSet = ps.executeQuery();
             while (resultSet.next()) {
+                Integer retrievedId = resultSet.getInt("id");
+                String retrievedUsername = resultSet.getString("username");
                 String retrievedPassword = resultSet.getString("password");
-                Result result = BCrypt.verifyer().verify(user.getPassword().toCharArray(), retrievedPassword);
+                String retrievedDisplayName = resultSet.getString("display_name");
 
-                if (result.verified == true) {
-                    user_id = resultSet.getLong("id");
-                }
+                User retrievedUser = new User(retrievedId, retrievedUsername, retrievedPassword, retrievedDisplayName);
+                return retrievedUser;
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-        return user_id;
+        return null;
     }
 }

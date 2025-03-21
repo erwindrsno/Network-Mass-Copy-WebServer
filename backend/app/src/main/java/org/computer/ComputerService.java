@@ -9,7 +9,7 @@ public interface ComputerService {
 
     List<Computer> getAllComputersByLabNum(int lab_num);
 
-    Computer getComputersById(int id);
+    Computer getComputersById(Integer id);
 
     Computer getComputersByIpAddress(String ip);
 }

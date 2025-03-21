@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
-    private Long id;
+    private Integer id;
     private String username;
     private String password;
     private String display_name;
 
-    public User(Long id, String username, String display_name) {
+    public User(Integer id, String username, String display_name) {
         this.id = id;
         this.username = username;
         this.display_name = display_name;

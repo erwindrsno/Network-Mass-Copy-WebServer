@@ -7,7 +7,7 @@ public interface UserRepository {
 
     boolean save(User user);
 
-    User findById(int id);
+    User findById(Integer id);
 
-    Long auth(User user);
+    User findUserByUsername(String username);
 }

@@ -33,7 +33,7 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
             ResultSet resultSet = ps.executeQuery();
 
             while (resultSet.next()) {
-                Long id = resultSet.getLong("id");
+                Integer id = resultSet.getInt("id");
                 String ip_address = resultSet.getString("ip_address");
                 String host_name = resultSet.getString("host_name");
                 int lab_num = resultSet.getInt("lab_num");
@@ -76,7 +76,7 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
             ResultSet resultSet = ps.executeQuery();
 
             while (resultSet.next()) {
-                Long id = resultSet.getLong("id");
+                Integer id = resultSet.getInt("id");
                 String ip_address = resultSet.getString("ip_address");
                 String host_name = resultSet.getString("host_name");
                 int res_lab_num = resultSet.getInt("lab_num");
@@ -90,8 +90,7 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
     }
 
     @Override
-    public Computer findById(int id) {
-        Computer computer = null;
+    public Computer findById(Integer id) {
         try (Connection conn = super.getConnection()) {
             String query = "SELECT * FROM computer WHERE id = ?";
 
@@ -101,21 +100,20 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
             ResultSet resultSet = ps.executeQuery();
 
             while (resultSet.next()) {
-                Long res_id = resultSet.getLong("id");
+                Integer res_id = resultSet.getInt("id");
                 String ip_address = resultSet.getString("ip_address");
                 String host_name = resultSet.getString("host_name");
                 int res_lab_num = resultSet.getInt("lab_num");
-                computer = new Computer(res_id, ip_address, host_name, res_lab_num);
+                Computer computer = new Computer(res_id, ip_address, host_name, res_lab_num);
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-        return computer;
+        return null;
     }
 
     @Override
     public Computer findByIpAddress(String ip) {
-        Computer computer = null;
         try (Connection conn = super.getConnection()) {
             String query = "SELECT * FROM computer WHERE ip_address = ?::INET";
 
@@ -125,15 +123,15 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
             ResultSet resultSet = ps.executeQuery();
 
             while (resultSet.next()) {
-                Long res_id = resultSet.getLong("id");
+                Integer res_id = resultSet.getInt("id");
                 String ip_address = resultSet.getString("ip_address");
                 String host_name = resultSet.getString("host_name");
                 int res_lab_num = resultSet.getInt("lab_num");
-                computer = new Computer(res_id, ip_address, host_name, res_lab_num);
+                Computer computer = new Computer(res_id, ip_address, host_name, res_lab_num);
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-        return computer;
+        return null;
     }
 }

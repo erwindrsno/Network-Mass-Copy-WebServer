@@ -20,8 +20,8 @@ public class EntryController {
 
     public void insertEntry(Context ctx) {
         String title = ctx.formParam("title");
-        String completeness = "N/A";
-        Entry entry = new Entry(null, title, completeness, null);
+        String completeness = "TBD";
+        Entry entry = new Entry(null, title, completeness, ctx.sessionAttribute("user_id"));
         this.entryService.createEntry(entry);
     }
 }
