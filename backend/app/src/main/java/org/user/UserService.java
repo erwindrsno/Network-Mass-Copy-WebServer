@@ -5,6 +5,9 @@ import java.util.List;
 public interface UserService {
     List<User> getAllUsers();
 
-    void createUser(User user);
+    boolean createUser(User user);
 
+    User getUsersById(int id);
+
+    Long authUser(User user);
 }

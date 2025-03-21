@@ -21,9 +21,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void createUser(User user) {
+    public boolean createUser(User user) {
         String hashedPassword = BCrypt.withDefaults().hashToString(12, user.getPassword().toCharArray());
         user.setPassword(hashedPassword);
-        this.userRepository.save(user);
+        return this.userRepository.save(user);
+    }
+
+    @Override
+    public User getUsersById(int id) {
+        return this.userRepository.findById(id);
+    }
+
+    @Override
+    public Long authUser(User user) {
+        return this.userRepository.auth(user);
     }
 }

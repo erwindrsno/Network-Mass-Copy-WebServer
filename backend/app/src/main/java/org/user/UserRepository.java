@@ -5,5 +5,9 @@ import java.util.List;
 public interface UserRepository {
     List<User> findAll();
 
-    void save(User user);
+    boolean save(User user);
+
+    User findById(int id);
+
+    Long auth(User user);
 }

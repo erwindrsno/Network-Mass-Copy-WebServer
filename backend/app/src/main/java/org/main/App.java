@@ -26,15 +26,22 @@ public class App {
 
         ComputerController computerController = injector.getInstance(ComputerController.class);
         UserController userController = injector.getInstance(UserController.class);
+
         Javalin app = Javalin.create(config -> {
             config.jsonMapper(new JavalinJackson());
             config.router.apiBuilder(() -> {
                 path("/users", () -> {
                     get(userController::getAllUsers);
                     post(userController::insertUser);
-                    // path("/{id}", () -> {
-                    // get(UserController::getUserWithId);
-                    // });
+                    path("/id/{id}", () -> {
+                        get(userController::getUsersById);
+                    });
+                    path("/login", () -> {
+                        post(userController::authUser);
+                    });
+                    path("/logout", () -> {
+                        delete(userController::invalidateUser);
+                    });
                 });
                 path("/computers", () -> {
                     get(computerController::getComputers);

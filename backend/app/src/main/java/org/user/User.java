@@ -18,4 +18,9 @@ public class User {
         this.username = username;
         this.display_name = display_name;
     }
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 }
