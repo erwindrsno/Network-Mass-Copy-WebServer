@@ -23,6 +23,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean createUser(User user) {
+        User retrievedUser = this.userRepository.findUserByUsername(user.getUsername());
+
+        if (retrievedUser != null)
+            return false;
+
         String hashedPassword = BCrypt.withDefaults().hashToString(12, user.getPassword().toCharArray());
         user.setPassword(hashedPassword);
         return this.userRepository.save(user);
@@ -37,6 +42,7 @@ public class UserServiceImpl implements UserService {
     public Integer authUser(User user) {
         User retrievedUser = this.userRepository.findUserByUsername(user.getUsername());
 
+        // jika username yang diinput tidak ada di db
         if (retrievedUser == null)
             return null;
 

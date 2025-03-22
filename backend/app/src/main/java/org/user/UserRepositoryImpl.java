@@ -47,14 +47,6 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
     @Override
     public boolean save(User user) {
         try (Connection conn = super.getConnection()) {
-            String checkUsernameExistenceQuery = "SELECT * FROM users WHERE username = ?";
-            PreparedStatement checkUsernameExistencePs = conn.prepareStatement(checkUsernameExistenceQuery);
-            ResultSet checkUsernameExistenceRs = checkUsernameExistencePs.executeQuery();
-
-            while (checkUsernameExistenceRs.next()) {
-                return false;
-            }
-
             String query = "INSERT INTO users(username, password, display_name) VALUES (?,?,?);";
             PreparedStatement ps = conn.prepareStatement(query);
 
