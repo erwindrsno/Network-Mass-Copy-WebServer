@@ -23,11 +23,12 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
 
     @Override
     public List<User> findAll() {
+        logger.info("Entered find all");
         List<User> listResultSet = new ArrayList<>();
 
         try (Connection conn = super.getConnection()) {
 
-            String query = "SELECT * FROM user";
+            String query = "SELECT * FROM users";
             PreparedStatement ps = conn.prepareStatement(query);
             ResultSet resultSet = ps.executeQuery();
 

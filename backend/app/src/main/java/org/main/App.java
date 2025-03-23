@@ -16,6 +16,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import io.javalin.Javalin;
+import io.javalin.http.Context;
+import io.javalin.http.UnauthorizedResponse;
 import io.javalin.json.JavalinJackson;
 
 public class App {
@@ -30,6 +32,12 @@ public class App {
         Javalin app = Javalin.create(config -> {
             config.jsonMapper(new JavalinJackson());
             config.router.apiBuilder(() -> {
+                before(ctx -> {
+                    if (!ctx.path().equals("/users/login") && !isAuthenticated(ctx)) {
+                        throw new UnauthorizedResponse("Unauthorized! Please log in first.");
+                    }
+                });
+
                 path("/users", () -> {
                     get(userController::getAllUsers);
                     post(userController::insertUser);
@@ -43,6 +51,7 @@ public class App {
                         delete(userController::invalidateUser);
                     });
                 });
+
                 path("/computers", () -> {
                     get(computerController::getComputers);
                     post(computerController::insertComputer);
@@ -61,11 +70,21 @@ public class App {
         });
 
         app.error(404, ctx -> {
-            ctx.result("Not found bit*h");
+            ctx.result("Not found.");
         });
 
         app.get("/", ctx -> ctx.result("Hello world!!!"));
         app.start(7070);
         logger.info("Server has started!");
     }
+
+    public static boolean isAuthenticated(Context ctx) {
+        Integer userId = ctx.sessionAttribute("user_id");
+
+        if (userId != null) {
+            return true;
+        }
+        return false;
+    }
+
 }
