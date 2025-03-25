@@ -1,8 +1,12 @@
 import RecordTable from '../components/RecordTable.jsx'
+import Header from '../components/Header.jsx'
 
 function Home(){
     return (
-        <RecordTable />
+    <div class="w-full h-full">
+      <Header />
+      <RecordTable />
+    </div>
     )
 }
 

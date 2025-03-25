@@ -7,8 +7,6 @@ import App from './App';
 
 import Login from './pages/Login.jsx';
 import Home from './pages/Home.jsx';
-import LoginTest from './pages/LoginTest.jsx';
-import LoginMock from './pages/LoginMock.jsx';
 
 const wrapper = document.getElementById('root');
 
@@ -26,8 +24,6 @@ render(
         <Router>
             <Route path="/" component={Login} />
             <Route path="/home" component={Home}/>
-            <Route path="/test" component={LoginTest}/>
-            <Route path="/mock" component={LoginMock}/>
         </Router>
     ),
     wrapper

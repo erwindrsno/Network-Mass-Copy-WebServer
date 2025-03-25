@@ -21,70 +21,71 @@ import io.javalin.http.UnauthorizedResponse;
 import io.javalin.json.JavalinJackson;
 
 public class App {
-    private static Logger logger = LoggerFactory.getLogger(App.class);
+  private static Logger logger = LoggerFactory.getLogger(App.class);
 
-    public static void main(String[] args) {
-        Injector injector = Guice.createInjector(new ComputerModule(), new UserModule());
+  public static void main(String[] args) {
+    Injector injector = Guice.createInjector(new ComputerModule(), new UserModule());
 
-        ComputerController computerController = injector.getInstance(ComputerController.class);
-        UserController userController = injector.getInstance(UserController.class);
+    ComputerController computerController = injector.getInstance(ComputerController.class);
+    UserController userController = injector.getInstance(UserController.class);
 
-        Javalin app = Javalin.create(config -> {
-            config.jsonMapper(new JavalinJackson());
-            config.router.apiBuilder(() -> {
-                before(ctx -> {
-                    if (!ctx.path().equals("/users/login") && !isAuthenticated(ctx)) {
-                        throw new UnauthorizedResponse("Unauthorized! Please log in first.");
-                    }
-                });
-
-                path("/users", () -> {
-                    get(userController::getAllUsers);
-                    post(userController::insertUser);
-                    path("/id/{id}", () -> {
-                        get(userController::getUsersById);
-                    });
-                    path("/login", () -> {
-                        post(userController::authUser);
-                    });
-                    path("/logout", () -> {
-                        delete(userController::invalidateUser);
-                    });
-                });
-
-                path("/computers", () -> {
-                    get(computerController::getComputers);
-                    post(computerController::insertComputer);
-                    path("/lab/{num}", () -> {
-                        get(computerController::getComputersByLabNum);
-                    });
-                    path("/id/{id}", () -> {
-                        get(computerController::getComputersById);
-                    });
-                    path("/ip_addr/{ip}", () -> {
-                        get(computerController::getComputersByIpAddress);
-                    });
-                });
-            });
-
+    Javalin app = Javalin.create(config -> {
+      config.jsonMapper(new JavalinJackson());
+      config.router.apiBuilder(() -> {
+        before(ctx -> {
+          ctx.header("Access-Control-Allow-Origin", "http://localhost:3000");
+          if (!ctx.path().equals("/users/login") && !isAuthenticated(ctx)) {
+            throw new UnauthorizedResponse("Unauthorized! Please log in first.");
+          }
         });
 
-        app.error(404, ctx -> {
-            ctx.result("Not found.");
+        path("/users", () -> {
+          get(userController::getAllUsers);
+          post(userController::insertUser);
+          path("/id/{id}", () -> {
+            get(userController::getUsersById);
+          });
+          path("/login", () -> {
+            post(userController::authUser);
+          });
+          path("/logout", () -> {
+            delete(userController::invalidateUser);
+          });
         });
 
-        app.get("/", ctx -> ctx.result("Hello world!!!"));
-        app.start(7070);
-        logger.info("Server has started!");
-    }
+        path("/computers", () -> {
+          get(computerController::getComputers);
+          post(computerController::insertComputer);
+          path("/lab/{num}", () -> {
+            get(computerController::getComputersByLabNum);
+          });
+          path("/id/{id}", () -> {
+            get(computerController::getComputersById);
+          });
+          path("/ip_addr/{ip}", () -> {
+            get(computerController::getComputersByIpAddress);
+          });
+        });
+      });
 
-    public static boolean isAuthenticated(Context ctx) {
-        Integer userId = ctx.sessionAttribute("user_id");
+    });
 
-        if (userId != null) {
-            return true;
-        }
-        return false;
+    app.error(404, ctx -> {
+      ctx.result("Not found b*tch.");
+    });
+
+    app.get("/", ctx -> ctx.result("Hello world!!!"));
+    app.start(7070);
+    logger.info("Server has started!");
+  }
+
+  public static boolean isAuthenticated(Context ctx) {
+    Integer userId = ctx.sessionAttribute("user_id");
+
+    if (userId != null) {
+      return true;
     }
+    return false;
+  }
 
 }
