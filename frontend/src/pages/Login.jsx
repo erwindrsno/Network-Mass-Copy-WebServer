@@ -2,7 +2,9 @@ import LoginForm from '../components/LoginForm.jsx'
 
 function Login(){
     return (
-        <LoginForm /> 
+        <div class="w-full h-full flex justify-center items-center">
+            <LoginForm />
+        </div>
     );
 }
 

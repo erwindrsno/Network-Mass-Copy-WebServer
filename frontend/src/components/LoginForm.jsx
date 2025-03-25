@@ -1,57 +1,54 @@
-import { createSignal } from 'solid-js'
+import { OpenedEye, ClosedEye } from "./EyeIcon.jsx"
+import { createSignal } from "solid-js"
 
 function LoginForm(){
-    const [showPassword, setShowPassword] = createSignal(false) 
-    const [username, setUsername] = createSignal('')
-    const [password, setPassword] = createSignal('')
+  const [showPassword, setShowPassword] = createSignal(false)
 
-    const onClickShowPassword = event => {
-        event.preventDefault()
-        setShowPassword(!showPassword())
-    }
+  function toggleShowPassword(event){
+    event.preventDefault()
+    setShowPassword(!showPassword())
+  }
 
-    return(
-        <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-          <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-            <h1 class="mt-10 text-center text-3xl/9 font-medium tracking-tight text-gray-900">Net Copy Login</h1>
-          </div>
-        
-          <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form class="space-y-6" method="POST">
-              <div>
-                <label for="username" class="block text-sm/6 font-medium text-gray-900">Username</label>
-                <div class="mt-2">
-                  <input type="text" name="username" id="username" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-800 sm:text-sm/6"/>
-                </div>
-              </div>
-        
-              <div>
-                <div class="flex items-center justify-between">
-                  <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
-                  <div class="text-sm">
-                    <button onClick={onClickShowPassword} class="font-semibold text-indigo-600 hover:text-indigo-500">Show password</button>
-                  </div>
-                </div>
-                <div class="mt-2">
-                  <input type={showPassword() ? "text" : "password"} name="password" id="password" autocomplete="current-password" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-blue-800 sm:text-sm/6"/>
-                </div>
-              </div>
-        
-              <div>
-                <button type="submit" class="flex w-full justify-center cursor-pointer rounded-md bg-blue-800 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Log in</button>
-              </div>
-            </form>
-        
-            <div class="mt-5 text-center text-sm/6 text-gray-500">
-                <p> 
-                  Laboratorium Komputasi Fakultas Sains
-                </p>
-                <p>Gedung 9 Lt. 1</p>
-            </div>
+  function handleLogin(event){
+    event.preventDefault()
+    const username = event.target.elements.username.value
+    const password = event.target.elements.password.value
+
+  }
+
+  async function fetchAuth(){
+    const response = await fetch()
+    
+  }
+
+  return (
+    <div class="flex flex-col gap-5 border border-gray-300 rounded-md px-4 py-6 w-md justify-between">
+      <div>
+        <h1 class="text-center text-4xl font-semibold">Net Copy</h1>
+        <h4 class="text-center text-md font-normal text-gray-400">Login page</h4>
+      </div>
+      <form action="" method="get" onSubmit={handleLogin} class="flex flex-col gap-5">
+        <div class="flex flex-col gap-1.5 font-medium">
+          <label for="username">Username</label>
+          <input type="text" name="username" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal" required />
+        </div>
+        <div class="flex flex-col gap-1.5 font-medium">
+          <label for="password">Password</label>
+          <div class="flex flex-row relative">
+            <input type={showPassword() ? "text" : "password"} name="password" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal w-full" required />
+            <button type="button" onClick={toggleShowPassword} class="absolute inset-y-0 right-3 flex items-center">{showPassword() ? <ClosedEye/> : <OpenedEye/>}</button>
           </div>
         </div>
-    )
+        <div class="form-example">
+          <input type="submit" value="Log in" class="w-full bg-blue-800 border rounded-md py-1 text-blue-50 font-semibold hover:bg-blue-900 cursor-pointer" />
+        </div>
+      </form>
+      <div class="flex flex-col items-center text-sm text-gray-400">
+        <p>Laboratorium Komputasi Fakultas Sains</p>
+        <p>Gedung 9 Lt. 1</p>
+      </div>
+    </div>
+  )
 }
-
 
 export default LoginForm
