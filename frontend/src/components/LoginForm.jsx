@@ -50,7 +50,7 @@ function LoginForm(){
           </div>
         </div>
         <div class="form-example">
-          <input type="submit" value="Log in" class="w-full bg-blue-800 border rounded-md py-1 text-blue-50 font-semibold hover:bg-blue-900 cursor-pointer" />
+          <input type="submit" value="Log in" class="w-full bg-blue-600 border rounded-md py-1 text-blue-50 font-semibold hover:bg-blue-700 cursor-pointer" />
         </div>
       </form>
       <div class="flex flex-col items-center text-sm text-gray-400">
