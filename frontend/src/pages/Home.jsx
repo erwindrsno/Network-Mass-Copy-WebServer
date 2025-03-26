@@ -1,5 +1,5 @@
 import RecordTable from '../components/RecordTable.jsx'
-import Header from '../components/Header.jsx'
+import Header from '../components/header/Header.jsx'
 
 function Home(){
     return (

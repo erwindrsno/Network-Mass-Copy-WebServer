@@ -3,10 +3,12 @@ import { render } from 'solid-js/web';
 import { Router, Route } from '@solidjs/router';
 
 import './index.css';
-import App from './App';
+// import App from './App';
 
 import Login from './pages/Login.jsx';
 import Home from './pages/Home.jsx';
+import CopyOxam from './pages/CopyOxam.jsx';
+import Copy from './pages/Copy.jsx';
 
 const wrapper = document.getElementById('root');
 
@@ -22,8 +24,10 @@ if(!wrapper){
 render(
     () => (
         <Router>
-            <Route path="/" component={Login} />
-            <Route path="/home" component={Home}/>
+            <Route path="/" component={Home} />
+            // <Route path="/home" component={Home}/>
+            <Route path="/copy-oxam" component={CopyOxam}/>
+            <Route path="/copy" component={Copy}/>
         </Router>
     ),
     wrapper
