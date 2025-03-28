@@ -21,10 +21,12 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 if(!wrapper){
     throw new Error("wrapper div not found")
 }
+
 render(
     () => (
         <Router>
             <Route path="/" component={Home} />
+            <Route path="/login"login component={Login}/>
             // <Route path="/home" component={Home}/>
             <Route path="/copy-oxam" component={CopyOxam}/>
             <Route path="/copy" component={Copy}/>
