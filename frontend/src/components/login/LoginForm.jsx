@@ -12,9 +12,9 @@ function LoginForm(){
   }
 
   const handleLogin = action(async (formData) => {
-    const response = await fetch('http://localhost:7070/users/login', {
+    const response = await fetch('http://192.168.0.101:7070/users/login', {
       method: "POST",
-    credentials: "include",
+      credentials: "include",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },

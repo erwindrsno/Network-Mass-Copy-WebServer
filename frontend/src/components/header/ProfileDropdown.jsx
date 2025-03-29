@@ -4,16 +4,14 @@ function ProfileDropdown(){
   const navigate = useNavigate()
 
   const handleLogout = async () =>{
-    // const response = await fetch('http://localhost:7070/users/logout', {
-    //   method: "DELETE",
-    //   headers: {
-    //     "Content-Type": "application/x-www-form-urlencoded",
-    //   },
-    //   body: new URLSearchParams({
-    //     username: formData.get('username'),
-    //     password: formData.get('password'),
-    //   }),
-    // })
+    console.log("REACHED")
+    const response = await fetch('http://192.168.0.101:7070/users/logout', {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      }
+    })
     navigate("/login", { replace: true })
   }
 
