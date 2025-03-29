@@ -33,8 +33,9 @@ public class App {
             config.jsonMapper(new JavalinJackson());
             config.router.apiBuilder(() -> {
                 before(ctx -> {
-                    ctx.header("Access-Control-Allow-Origin", "*");
+                    ctx.header("Access-Control-Allow-Origin", "http://192.168.0.110:3000");
                     ctx.header("Access-Control-Allow-Credentials", "true");
+                    ctx.header("Access-Control-Allow-Headers", "http://192.168.0.110:3000");
                     if (!ctx.path().equals("/users/login") && !isAuthenticated(ctx)) {
                         throw new UnauthorizedResponse("Unauthorized! Please log in first.");
                     }

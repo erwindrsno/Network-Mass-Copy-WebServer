@@ -56,6 +56,7 @@ public class UserController {
     }
 
     public void invalidateUser(Context ctx) {
+        logger.info("Logging out...");
         Integer id = ctx.sessionAttribute("user_id");
         ctx.req().getSession().invalidate();
         ctx.result("Log out OK " + id).status(200);
