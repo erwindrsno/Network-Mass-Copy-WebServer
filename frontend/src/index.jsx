@@ -1,6 +1,7 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
 import { Router, Route } from '@solidjs/router';
+import 'solid-devtools';
 
 import './index.css';
 // import App from './App';
@@ -25,7 +26,7 @@ if(!wrapper){
 render(
     () => (
         <Router>
-            <Route path="/" component={Home} />
+            <Route path="/" component={Login} />
             <Route path="/login"login component={Login}/>
             // <Route path="/home" component={Home}/>
             <Route path="/copy-oxam" component={CopyOxam}/>
