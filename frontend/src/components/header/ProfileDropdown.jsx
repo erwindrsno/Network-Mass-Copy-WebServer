@@ -6,12 +6,15 @@ function ProfileDropdown(){
   const handleLogout = async () =>{
     console.log("REACHED")
     const response = await fetch('http://192.168.0.101:7070/users/logout', {
-      method: "DELETE",
+      method: "POST",
       credentials: "include",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      }
     })
+    if(!response.ok){
+      console.log("BAD");
+      console.log(response)
+    } else{
+      console.log(response)
+    }
     navigate("/login", { replace: true })
   }
 
