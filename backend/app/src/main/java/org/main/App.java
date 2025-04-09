@@ -40,11 +40,12 @@ public class App {
             // });
             config.router.apiBuilder(() -> {
                 before(ctx -> {
+                    ctx.header("Access-Control-Allow-Origin", "http://localhost:3000");
+                    ctx.header("Access-Control-Allow-Credentials", "true");
+
                     if (!ctx.path().equals("/users/login") && !isAuthenticated(ctx)) {
                         throw new UnauthorizedResponse("Unauthorized! Please log in first.");
                     }
-                    ctx.header("Access-Control-Allow-Origin", "http://localhost:3000");
-                    ctx.header("Access-Control-Allow-Credentials", "true");
                 });
 
                 path("/users", () -> {
