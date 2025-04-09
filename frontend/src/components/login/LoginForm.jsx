@@ -12,7 +12,7 @@ function LoginForm(){
   }
 
   const handleLogin = action(async (formData) => {
-    const response = await fetch('http://192.168.0.101:7070/users/login', {
+    const response = await fetch('http://localhost:7070/users/login', {
       method: "POST",
       credentials: "include",
       headers: {
@@ -26,6 +26,7 @@ function LoginForm(){
     if(!response.ok && response.status === 401){
       console.log("UNAUTH!")
     } else{
+        console.log(response)
       navigate("/home", { replace: true })
     }
     console.log("Username " + formData.get('username'))
