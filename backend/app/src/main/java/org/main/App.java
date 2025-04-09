@@ -31,14 +31,20 @@ public class App {
 
         Javalin app = Javalin.create(config -> {
             config.jsonMapper(new JavalinJackson());
+            // config.bundledPlugins.enableCors(cors -> {
+            // cors.addRule(it -> {
+            // it.allowHost("http://192.168.0.110:3000");
+            // it.allowCredentials = true;
+            // it.exposeHeader("x-server");
+            // });
+            // });
             config.router.apiBuilder(() -> {
                 before(ctx -> {
-                    ctx.header("Access-Control-Allow-Origin", "http://192.168.0.110:3000");
-                    ctx.header("Access-Control-Allow-Credentials", "true");
-                    ctx.header("Access-Control-Allow-Headers", "http://192.168.0.110:3000");
                     if (!ctx.path().equals("/users/login") && !isAuthenticated(ctx)) {
                         throw new UnauthorizedResponse("Unauthorized! Please log in first.");
                     }
+                    ctx.header("Access-Control-Allow-Origin", "http://localhost:3000");
+                    ctx.header("Access-Control-Allow-Credentials", "true");
                 });
 
                 path("/users", () -> {
@@ -51,7 +57,7 @@ public class App {
                         post(userController::authUser);
                     });
                     path("/logout", () -> {
-                        delete(userController::invalidateUser);
+                        post(userController::invalidateUser);
                     });
                 });
 
@@ -72,6 +78,10 @@ public class App {
 
         });
 
+        app.options("/*", ctx -> {
+            ctx.status(204);
+        });
+
         app.error(404, ctx -> {
             ctx.result("Not found b*tch.");
         });
@@ -83,6 +93,7 @@ public class App {
 
     public static boolean isAuthenticated(Context ctx) {
         Integer userId = ctx.sessionAttribute("user_id");
+        logger.info("The user ID is " + userId);
 
         if (userId != null) {
             return true;
