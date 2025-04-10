@@ -12,6 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.user.UserController;
 import org.user.UserModule;
 
+import org.main.session.SessionConfig;
+import org.main.session.SessionModule;
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -24,20 +27,17 @@ public class App {
     private static Logger logger = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) {
-        Injector injector = Guice.createInjector(new ComputerModule(), new UserModule());
+        Injector injector = Guice.createInjector(new ComputerModule(), new UserModule(), new DatabaseModule(),
+                new SessionModule());
 
         ComputerController computerController = injector.getInstance(ComputerController.class);
         UserController userController = injector.getInstance(UserController.class);
+        SessionConfig sessionConfig = injector.getInstance(SessionConfig.class);
 
         Javalin app = Javalin.create(config -> {
+            config.jetty.modifyServletContextHandler(
+                    handler -> handler.setSessionHandler(sessionConfig.sqlSessionHandler()));
             config.jsonMapper(new JavalinJackson());
-            // config.bundledPlugins.enableCors(cors -> {
-            // cors.addRule(it -> {
-            // it.allowHost("http://192.168.0.110:3000");
-            // it.allowCredentials = true;
-            // it.exposeHeader("x-server");
-            // });
-            // });
             config.router.apiBuilder(() -> {
                 before(ctx -> {
                     ctx.header("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -101,5 +101,4 @@ public class App {
         }
         return false;
     }
-
 }

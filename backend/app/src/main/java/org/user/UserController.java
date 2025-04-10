@@ -53,6 +53,7 @@ public class UserController {
         } else {
             ctx.result("Log in FAILED").status(401);
         }
+
     }
 
     public void invalidateUser(Context ctx) {
