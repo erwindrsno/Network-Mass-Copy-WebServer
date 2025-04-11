@@ -35,6 +35,13 @@ public class App {
         SessionConfig sessionConfig = injector.getInstance(SessionConfig.class);
 
         Javalin app = Javalin.create(config -> {
+            // config.bundledPlugins.enableCors(cors -> {
+            // cors.addRule(it -> {
+            // it.allowHost("*.example.com");
+            // it.allowCredentials = true;
+            // it.exposeHeader("x-server");
+            // });
+            // });
             config.jetty.modifyServletContextHandler(
                     handler -> handler.setSessionHandler(sessionConfig.sqlSessionHandler()));
             config.jsonMapper(new JavalinJackson());
@@ -56,6 +63,9 @@ public class App {
                     });
                     path("/login", () -> {
                         post(userController::authUser);
+                    });
+                    path("/test", () -> {
+                        get(userController::testUser);
                     });
                     path("/logout", () -> {
                         post(userController::invalidateUser);
@@ -84,7 +94,7 @@ public class App {
         });
 
         app.error(404, ctx -> {
-            ctx.result("Not found b*tch.");
+            ctx.result("Not found 404.");
         });
 
         app.get("/", ctx -> ctx.result("Hello world!!!"));
@@ -93,7 +103,8 @@ public class App {
     }
 
     public static boolean isAuthenticated(Context ctx) {
-        Integer userId = ctx.sessionAttribute("user_id");
+        // Integer userId = ctx.sessionAttribute("user_id");
+        Integer userId = (Integer) ctx.req().getSession().getAttribute("user_id");
         logger.info("The user ID is " + userId);
 
         if (userId != null) {

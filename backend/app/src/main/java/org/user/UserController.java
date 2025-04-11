@@ -48,7 +48,10 @@ public class UserController {
         Integer user_id = this.userService.authUser(user);
 
         if (user_id != null) {
-            ctx.sessionAttribute("user_id", user_id);
+            ctx.req().getSession(true);
+            ctx.req().getSession().setAttribute("user_id", user_id);
+            // ctx.sessionAttribute("user_id", user_id);
+            logger.info("user id in session with req is " + ctx.req().getSession().getAttribute("user_id"));
             ctx.result("Log in OK").status(200);
         } else {
             ctx.result("Log in FAILED").status(401);
@@ -58,8 +61,13 @@ public class UserController {
 
     public void invalidateUser(Context ctx) {
         logger.info("Logging out...");
-        Integer id = ctx.sessionAttribute("user_id");
+        Integer id = (Integer) ctx.req().getSession().getAttribute("user_id");
+        // Integer id = ctx.sessionAttribute("user_id");
         ctx.req().getSession().invalidate();
         ctx.result("Log out OK " + id).status(200);
+    }
+
+    public void testUser(Context ctx) {
+        logger.info("session : " + ctx.req().getSession().getAttribute("user_id"));
     }
 }

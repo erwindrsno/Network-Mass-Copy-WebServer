@@ -1,5 +1,6 @@
 package org.main.session;
 
+import org.eclipse.jetty.http.HttpCookie;
 import org.eclipse.jetty.server.session.DatabaseAdaptor;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
 import org.eclipse.jetty.server.session.JDBCSessionDataStoreFactory;
@@ -24,6 +25,8 @@ public class SessionConfig {
                 jdbcDataStoreFactory().getSessionDataStore(sessionHandler));
         sessionHandler.setSessionCache(sessionCache);
         sessionHandler.setHttpOnly(true);
+        sessionHandler.setSameSite(HttpCookie.SameSite.LAX);
+        sessionHandler.setMaxInactiveInterval(3600);
         // make additional changes to your SessionHandler here
         return sessionHandler;
     }
