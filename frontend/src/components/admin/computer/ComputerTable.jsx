@@ -55,37 +55,40 @@ function ComputerTable(props){
   }
 
   return(
-    <div>
-      <table class="table-auto">
-        <thead>
-        <tr>
-          <th>No.</th>
-          <th>Name</th>
-          <th>IP address</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {paginatedComputers()?.map(computer => (
-          <tr key={computer.id}> 
-            <td>{computer.id}</td>
-            <td>{computer.host_name}</td>
-            <td>{computer.ip_address}</td>
-            <td>
-              <button onClick={() => handleDelete(computer.id)}>Delete</button>
-            </td>
+    <div class = "w-full flex flex-col justify-center items-center gap-3">
+      <div class="shadow-md rounded-lg overflow-hidden">
+        <table class="text-sm rtl:text-right text-gray-500">
+          <thead class="text-xs text-gray-700 bg-gray-300">
+          <tr>
+            <th scope="col" class="px-4 w-1/6 py-3 text-left">No.</th>
+            <th scope="col" class="w-md py-3 text-left">Name</th>
+            <th scope="col" class="w-md py-3 text-left">IP address</th>
+            <th scope="col" class="py-3 w-1/6">Action</th>
           </tr>
-        ))}
-      </tbody>
-      </table>
+        </thead>
+        <tbody>
+          {paginatedComputers()?.map((computer,index) => (
+            <tr key={computer.id} class="bg-white border-b border-gray-200 hover:bg-gray-50"> 
+              <td class="px-4 py-3 text-left">{(currentPage() - 1) * itemsPerPage + index + 1}</td>
+              <td class="py-3 text-left whitespace-nowrap">{computer.host_name}</td>
+              <td class="py-3 text-left whitespace-nowrap">{computer.ip_address}</td>
+              <td class="text-center text-sm px-0.5">
+                <button onClick={() => handleDelete(computer.id)} class="bg-red-500 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+        </table>
 
-      <div>
-        <button onClick={() => handlePageChange(currentPage() - 1)} disabled={currentPage() === 1}>
-          Previous
+      </div>
+
+      <div class="w-full flex flex-row justify-between">
+        <button onClick={() => handlePageChange(currentPage() - 1)} disabled={currentPage() === 1} class="ml-0.5 cursor-pointer">
+            Previous
         </button>
         <span>Page {currentPage()} of {totalPages()}</span>
-        <button onClick={() => handlePageChange(currentPage() + 1)} disabled={currentPage() === totalPages()}>
-          Next
+        <button onClick={() => handlePageChange(currentPage() + 1)} disabled={currentPage() === totalPages()} class="cursor-pointer">
+            Next
         </button>
       </div>
     </div>

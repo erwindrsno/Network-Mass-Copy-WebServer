@@ -26,26 +26,25 @@ function AddUserForm(){
       console.log(formData)
     })
     return(
-        <div>
-            <form action={handleAddUser} method="POST">
-                <div>
-                    <label for="username">Username: </label>
-                    <input type="text" name="username" placeholder="admin" />
-                </div>
-                <div>
-                    <label for="password">Password: </label>
-                    <input type="password" name="password" placeholder="kakikukeko" />
-                </div>
-                <div>
-                    <label for="display_name">Display name:</label>
-                    <input type="text" name="display_name" placeholder="Administrator01" />
-                </div>
-
-                <div class="form-example">
-                  <input type="submit" value="Add" class="w-full bg-blue-600 border rounded-md py-1 text-blue-50 font-semibold hover:bg-blue-700 cursor-pointer" />
-                </div>
-            </form>
+    <div class="flex flex-col gap-5 border border-gray-300 rounded-md px-4 py-4 w-lg justify-between">
+      <form action={handleAddUser} method="post" class="flex flex-col gap-5">
+        <div class="flex flex-col gap-1.5 font-medium">
+          <label for="username">Username</label>
+          <input type="text" name="username" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal" placeholder="admin" required />
         </div>
+        <div class="flex flex-col gap-1.5 font-medium">
+          <label for="password">Password</label>
+          <input type="password" name="password" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal w-full" placeholder="Secret" required />
+        </div>
+        <div class="flex flex-col gap-1.5 font-medium">
+          <label for="display_name">Display name</label>
+          <input type="text" name="display_name" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal w-full" placeholder="Administrator" required />
+        </div>
+        <div class="form-example">
+          <input type="submit" value="Add" class="w-full bg-blue-600 border rounded-md py-1 text-blue-50 font-semibold hover:bg-blue-700 cursor-pointer" />
+        </div>
+      </form>
+    </div>
     )
 }
 

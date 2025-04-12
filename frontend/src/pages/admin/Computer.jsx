@@ -4,12 +4,12 @@ import ComputerCRUD from '../../components/admin/computer/ComputerCRUD.jsx'
 
 function Computer(){
   return(
-    <div class="w-full h-full">
+    <div class="w-full h-full flex flex-col bg-gray-100">
       <Header />
-        <div class="w-full h-full flex">
-            <Navbar />
-            <ComputerCRUD />
-        </div>
+      <div class="w-full flex flex-col justify-self-center items-center">
+        <Navbar />
+        <ComputerCRUD />
+      </div>
     </div>
   )
 }
