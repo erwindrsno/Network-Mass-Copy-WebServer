@@ -1,17 +1,18 @@
 import Header from '../../components/header/Header.jsx'
 import Navbar from '../../components/admin/Navbar.jsx'
-import UserCRUD from '../../components/admin/user/UserCRUD.jsx'
+import ComputerCRUD from '../../components/admin/computer/ComputerCRUD.jsx'
+import AddComputerForm from '../../components/admin/computer/AddComputerForm.jsx'
 
-function User(){
+function AddComputer(){
   return(
     <div class="w-full h-full">
       <Header />
         <div class="w-full h-full flex">
             <Navbar />
-            <UserCRUD />
+            <AddComputerForm />
         </div>
     </div>
   )
 }
 
-export default User
+export default AddComputer

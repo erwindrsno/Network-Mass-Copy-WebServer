@@ -12,7 +12,7 @@ function LoginForm(){
   }
 
   const handleLogin = action(async (formData) => {
-    const response = await fetch('http://localhost:7070/users/login', {
+    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/users/login`, {
       method: "POST",
       credentials: "include",
       headers: {

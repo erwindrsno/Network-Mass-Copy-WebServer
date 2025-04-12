@@ -1,6 +1,6 @@
 import Header from '../../components/header/Header.jsx'
 import Navbar from '../../components/admin/Navbar.jsx'
-import ComputerCRUD from '../../components/admin/ComputerCRUD.jsx'
+import ComputerCRUD from '../../components/admin/computer/ComputerCRUD.jsx'
 
 function Computer(){
   return(

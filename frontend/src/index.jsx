@@ -13,6 +13,8 @@ import Copy from './pages/Copy.jsx';
 
 import Computer from './pages/admin/Computer.jsx';
 import User from './pages/admin/User.jsx';
+import AddComputer from './pages/admin/AddComputer.jsx';
+import AddUser from './pages/admin/AddUser.jsx';
 
 const wrapper = document.getElementById('root');
 
@@ -35,8 +37,15 @@ render(
             <Route path="/copy-oxam" component={CopyOxam}/>
             <Route path="/copy" component={Copy}/>
             <Route path="/admin">
-                <Route path="/computer" component={Computer}/>
-                <Route path="/user" component={User}/>
+                <Route path="/computer">
+                    <Route path="/" component={Computer} />
+                    <Route path="/add" component={AddComputer} />
+                </Route>
+
+                <Route path="/user">
+                  <Route path="/" component={User} />
+                  <Route path="/add" component={AddUser} />
+                </Route>
             </Route>
         </Router>
     ),
