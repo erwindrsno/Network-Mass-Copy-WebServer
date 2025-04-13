@@ -20,96 +20,98 @@ import com.google.inject.Injector;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+import io.javalin.http.HandlerType;
 import io.javalin.http.UnauthorizedResponse;
 import io.javalin.json.JavalinJackson;
 
 public class App {
-    private static Logger logger = LoggerFactory.getLogger(App.class);
+  private static Logger logger = LoggerFactory.getLogger(App.class);
 
-    public static void main(String[] args) {
-        Injector injector = Guice.createInjector(new ComputerModule(), new UserModule(), new DatabaseModule(),
-                new SessionModule());
+  public static void main(String[] args) {
+    Injector injector = Guice.createInjector(new ComputerModule(), new UserModule(), new DatabaseModule(),
+        new SessionModule());
 
-        ComputerController computerController = injector.getInstance(ComputerController.class);
-        UserController userController = injector.getInstance(UserController.class);
-        SessionConfig sessionConfig = injector.getInstance(SessionConfig.class);
+    ComputerController computerController = injector.getInstance(ComputerController.class);
+    UserController userController = injector.getInstance(UserController.class);
+    SessionConfig sessionConfig = injector.getInstance(SessionConfig.class);
 
-        Javalin app = Javalin.create(config -> {
-            // config.bundledPlugins.enableCors(cors -> {
-            // cors.addRule(it -> {
-            // it.allowHost("*.example.com");
-            // it.allowCredentials = true;
-            // it.exposeHeader("x-server");
-            // });
-            // });
-            config.jetty.modifyServletContextHandler(
-                    handler -> handler.setSessionHandler(sessionConfig.sqlSessionHandler()));
-            config.jsonMapper(new JavalinJackson());
-            config.router.apiBuilder(() -> {
-                before(ctx -> {
-                    ctx.header("Access-Control-Allow-Origin", "http://localhost:3000");
-                    ctx.header("Access-Control-Allow-Credentials", "true");
-
-                    if (!ctx.path().equals("/users/login") && !isAuthenticated(ctx)) {
-                        throw new UnauthorizedResponse("Unauthorized! Please log in first.");
-                    }
-                });
-
-                path("/users", () -> {
-                    get(userController::getAllUsers);
-                    post(userController::insertUser);
-                    path("/id/{id}", () -> {
-                        get(userController::getUsersById);
-                    });
-                    path("/login", () -> {
-                        post(userController::authUser);
-                    });
-                    path("/test", () -> {
-                        get(userController::testUser);
-                    });
-                    path("/logout", () -> {
-                        post(userController::invalidateUser);
-                    });
-                });
-
-                path("/computers", () -> {
-                    get(computerController::getComputers);
-                    post(computerController::insertComputer);
-                    path("/lab/{num}", () -> {
-                        get(computerController::getComputersByLabNum);
-                    });
-                    path("/id/{id}", () -> {
-                        get(computerController::getComputersById);
-                    });
-                    path("/ip_addr/{ip}", () -> {
-                        get(computerController::getComputersByIpAddress);
-                    });
-                });
-            });
-
-        });
-
-        app.options("/*", ctx -> {
+    Javalin app = Javalin.create(config -> {
+      config.jetty.modifyServletContextHandler(
+          handler -> handler.setSessionHandler(sessionConfig.sqlSessionHandler()));
+      config.jsonMapper(new JavalinJackson());
+      config.router.apiBuilder(() -> {
+        before(ctx -> {
+          logger.info("router level before");
+          ctx.header("Access-Control-Allow-Origin", "http://localhost:3000");
+          ctx.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+          ctx.header("Access-Control-Allow-Credentials", "true");
+          ctx.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+          if (ctx.method() == HandlerType.OPTIONS) {
+            logger.info("before OPTIONS");
             ctx.status(204);
+            ctx.skipRemainingHandlers();
+          } else {
+            if (!ctx.path().equals("/users/login") && !isAuthenticated(ctx)) {
+              throw new UnauthorizedResponse("Unauthorized! Please log in first.");
+            }
+          }
+
         });
 
-        app.error(404, ctx -> {
-            ctx.result("Not found 404.");
+        path("/users", () -> {
+          get(userController::getAllUsers);
+          post(userController::insertUser);
+          path("/id/{id}", () -> {
+            get(userController::getUsersById);
+            delete(userController::deleteUserById);
+          });
+          path("/login", () -> {
+            post(userController::authUser);
+          });
+          path("/logout", () -> {
+            post(userController::invalidateUser);
+          });
         });
 
-        app.get("/", ctx -> ctx.result("Hello world!!!"));
-        app.start(7070);
-        logger.info("Server has started!");
-    }
+        path("/computers", () -> {
+          get(computerController::getComputers);
+          post(computerController::insertComputer);
+          path("/lab/{num}", () -> {
+            get(computerController::getComputersByLabNum);
+          });
+          path("/id/{id}", () -> {
+            get(computerController::getComputersById);
+            delete(computerController::deleteComputerById);
+          });
+          path("/ip_addr/{ip}", () -> {
+            get(computerController::getComputersByIpAddress);
+          });
+        });
+      });
+    });
 
-    public static boolean isAuthenticated(Context ctx) {
-        // Integer userId = ctx.sessionAttribute("user_id");
-        Integer userId = (Integer) ctx.req().getSession().getAttribute("user_id");
-        logger.info("The user ID is " + userId);
+    app.error(404, ctx -> {
+      ctx.result("Not found 404.");
+    });
 
-        if (userId != null) {
-            return true;
-        }
-        return false;
+    app.get("/", ctx -> {
+      logger.info("At / now!");
+      ctx.result("Hello world!!!");
+    });
+    app.start(7070);
+    logger.info("Server has started!");
+  }
+
+  public static boolean isAuthenticated(Context ctx) {
+    // Integer userId = ctx.sessionAttribute("user_id");
+    ctx.req().getSession(false);
+    Integer userId = (Integer) ctx.sessionAttribute("user_id");
+    logger.info("Authenticating...");
+    if (userId != null) {
+      logger.info("User is authenticated with id " + userId);
+      return true;
     }
+    logger.info("User is NOT authenticated");
+    return false;
+  }
 }

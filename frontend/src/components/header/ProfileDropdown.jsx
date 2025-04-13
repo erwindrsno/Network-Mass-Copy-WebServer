@@ -4,7 +4,7 @@ function ProfileDropdown(){
   const navigate = useNavigate()
 
   const handleLogout = async () => {
-    console.log("REACHED!!!!!!")
+    if (!confirm(`Are you sure you want to log out?`)) return;
     const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/users/logout`, {
       method: "POST",
       credentials: "include",
@@ -15,23 +15,8 @@ function ProfileDropdown(){
     } else{
       console.log(response)
     }
-    navigate("/login", { replace: true })
+    navigate("/", { replace: true })
   }
-
-  // const handleLogout = async () =>{
-  //   console.log("REACHED")
-  //   const response = await fetch('http://89.116.121.247:7070/users/logout', {
-  //     method: "POST",
-  //     credentials: "include"
-  //   })
-  //   if(!response.ok){
-  //     console.log("BAD");
-  //     console.log(response)
-  //   } else{
-  //     console.log(response)
-  //   }
-  //   navigate("/login", { replace: true })
-  // }
 
   return(
     <div class="mt-11 mr-4 absolute bg-slate-50 w-40 border rounded-md right-0 border-gray-300">

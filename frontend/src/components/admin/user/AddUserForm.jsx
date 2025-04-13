@@ -26,7 +26,7 @@ function AddUserForm(){
       console.log(formData)
     })
     return(
-    <div class="flex flex-col gap-5 border border-gray-300 rounded-md px-4 py-4 w-lg justify-between">
+    <div class="flex flex-col gap-5 border border-gray-300 rounded-md px-4 py-4 w-lg justify-between bg-gray-50">
       <form action={handleAddUser} method="post" class="flex flex-col gap-5">
         <div class="flex flex-col gap-1.5 font-medium">
           <label for="username">Username</label>

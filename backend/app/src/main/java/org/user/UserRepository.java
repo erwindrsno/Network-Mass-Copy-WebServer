@@ -3,11 +3,13 @@ package org.user;
 import java.util.List;
 
 public interface UserRepository {
-    List<User> findAll();
+  List<User> findAll();
 
-    boolean save(User user);
+  boolean save(User user);
 
-    User findById(Integer id);
+  User findById(Integer id);
 
-    User findUserByUsername(String username);
+  User findUserByUsername(String username);
+
+  boolean destroyById(Integer id);
 }

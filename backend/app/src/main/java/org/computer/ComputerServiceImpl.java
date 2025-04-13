@@ -38,4 +38,9 @@ public class ComputerServiceImpl implements ComputerService {
     public Computer getComputersByIpAddress(String ip) {
         return this.computerRepository.findByIpAddress(ip);
     }
+
+    @Override
+    public boolean deleteComputersById(Integer id) {
+        return this.computerRepository.destroyById(id);
+    }
 }

@@ -1,6 +1,8 @@
 import { createResource, createSignal } from 'solid-js';
 import { useNavigate } from '@solidjs/router'
 
+import Pagination from '../../utils/Pagination.jsx'
+
 const fetchUser = async () => {
   const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/users`, {
     method: "GET",
@@ -15,14 +17,15 @@ const fetchUser = async () => {
 
 function UserTable(){
   const navigate = useNavigate()
-
-  const [currentPage, setCurrentPage] = createSignal(1)
-  const itemsPerPage = 10
-
   const [users, {mutate, refetch}] = createResource(fetchUser)
+  const [paginated, setPaginated] = createSignal({
+    currentPage: 1,
+    items: [],
+    totalPages: 1
+  });
 
   const handleDelete = async (userId) => {
-    // if (!confirm("Are you sure you want to delete this computer?")) return;
+    if (!confirm(`Are you sure you want to delete this user with name ${userId}?`)) return;
     console.log("To be deleted is  : " + userId)
     const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/users/id/${userId}`, {
       method: "DELETE",
@@ -36,21 +39,6 @@ function UserTable(){
     console.log(response)
   }
 
-  const totalPages = () => {
-    return Math.ceil(users()?.length / itemsPerPage);
-  }
-
-  const paginatedUsers = () => {
-    const startIndex = (currentPage() - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return users()?.slice(startIndex, endIndex);
-  }
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages()) {
-      setCurrentPage(page);
-    }
-  }
   return(
     <div class = "w-full flex flex-col justify-center items-center gap-3">
       <div class = "shadow-md rounded-lg overflow-hidden">
@@ -64,9 +52,9 @@ function UserTable(){
           </tr>
         </thead>
         <tbody>
-          {paginatedUsers()?.map((user,index) => (
+          {paginated().items?.map((user,index) => (
             <tr key={user.id} class="bg-white border-b border-gray-200 hover:bg-gray-50">
-              <td class="px-4 py-3 text-left">{(currentPage() - 1) * itemsPerPage + index + 1}</td>
+              <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * 10 + index + 1}</td>
               <td class="py-3 text-left whitespace-nowrap">{user.username}</td>
               <td class="py-3 text-left whitespace-nowrap">{user.display_name}</td>
               <td class="text-center text-sm px-0.5">
@@ -78,15 +66,7 @@ function UserTable(){
         </table>
       </div>
 
-      <div class="w-full flex flex-row justify-between">
-        <button onClick={() => handlePageChange(currentPage() - 1)} disabled={currentPage() === 1} class="ml-0.5 cursor-pointer">
-          Previous
-        </button>
-        <span>Page {currentPage()} of {totalPages()}</span>
-        <button onClick={() => handlePageChange(currentPage() + 1)} disabled={currentPage() === totalPages()} class="cursor-pointer">
-          Next
-        </button>
-      </div>
+      <Pagination items={users()} onPageChange={setPaginated} />
     </div>
   )
 }

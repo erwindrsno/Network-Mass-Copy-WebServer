@@ -12,4 +12,6 @@ public interface ComputerRepository {
     Computer findById(Integer id);
 
     Computer findByIpAddress(String ip);
+
+    boolean destroyById(Integer id);
 }

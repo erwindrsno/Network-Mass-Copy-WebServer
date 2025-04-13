@@ -3,11 +3,13 @@ package org.user;
 import java.util.List;
 
 public interface UserService {
-    List<User> getAllUsers();
+  List<User> getAllUsers();
 
-    boolean createUser(User user);
+  boolean createUser(User user);
 
-    User getUsersById(Integer id);
+  User getUsersById(Integer id);
 
-    Integer authUser(User user);
+  Integer authUser(User user);
+
+  boolean deleteUsersById(Integer id);
 }

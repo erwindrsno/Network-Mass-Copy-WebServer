@@ -30,6 +30,9 @@ function FileManager(){
     setFiles(files().filter((_, i) => i !== index));
   }
 
+  //ref={elm => dropzoneRef = elm}. Elm berasal dari props.ref yang ada di component dropfilezone, kemudian assign elm ke dropzoneRef 
+  //digunakan untuk menginteraksi DOM secara langsung
+
   return (
     <>
       <DropFileZone ref={elm => dropzoneRef = elm} onDrop={onDrop} onDragOver={onDragOver} onChange={onChange}/>

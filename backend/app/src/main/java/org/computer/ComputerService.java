@@ -12,4 +12,6 @@ public interface ComputerService {
     Computer getComputersById(Integer id);
 
     Computer getComputersByIpAddress(String ip);
+
+    boolean deleteComputersById(Integer id);
 }

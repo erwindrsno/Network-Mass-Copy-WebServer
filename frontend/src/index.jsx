@@ -16,6 +16,9 @@ import User from './pages/admin/User.jsx';
 import AddComputer from './pages/admin/AddComputer.jsx';
 import AddUser from './pages/admin/AddUser.jsx';
 
+import ProtectedRouteWrapper from './components/utils/ProtectedRouteWrapper.jsx';
+import ProtectedRoute from './components/utils/ProtectedRoute.jsx';
+
 const wrapper = document.getElementById('root');
 
 if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
@@ -31,22 +34,25 @@ if(!wrapper){
 render(
     () => (
         <Router>
-            <Route path="/" component={Login} />
-            <Route path="/login"login component={Login}/>
-            <Route path="/home" component={Home}/>
-            <Route path="/copy-oxam" component={CopyOxam}/>
-            <Route path="/copy" component={Copy}/>
-            <Route path="/admin">
-                <Route path="/computer">
-                    <Route path="/" component={Computer} />
-                    <Route path="/add" component={AddComputer} />
-                </Route>
-
-                <Route path="/user">
-                  <Route path="/" component={User} />
-                  <Route path="/add" component={AddUser} />
-                </Route>
+          <Route path="/" component={Login} />
+          <ProtectedRoute>
+            <Route path="/home">
+              <Route path="/" component={Home} />
+              <Route path="/copy-oxam" component={CopyOxam} />
+              <Route path="/copy" component={Copy} />
             </Route>
+            
+            <Route path="/admin">
+              <Route path="/computer">
+                <Route path="/" component={Computer} />
+                <Route path="/add" component={AddComputer} />
+              </Route>
+              <Route path="/user">
+                <Route path="/" component={User} />
+                <Route path="/add" component={AddUser} />
+              </Route>
+            </Route>
+          </ProtectedRoute>
         </Router>
     ),
     wrapper
