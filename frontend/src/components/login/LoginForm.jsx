@@ -4,7 +4,7 @@ import { action, useNavigate } from "@solidjs/router";
 import { useAuthContext } from "../utils/AuthContextProvider.jsx";
 
 function LoginForm(){
-  const { isAuth, setIsAuth } = useAuthContext();
+  const { userStore, setUserStore } = useAuthContext();
 
   const [showPassword, setShowPassword] = createSignal(false);
   const navigate = useNavigate();
@@ -29,8 +29,9 @@ function LoginForm(){
     if(!response.ok && response.status === 401){
       console.log("UNAUTH!");
     } else{
-      console.log(response);
-      setIsAuth(true);
+      const result = await response.json();
+      console.log(result);
+      setUserStore({ isAuth: true, display_name: result.username });
       navigate("/home", { replace: true });
     }
     console.log("Username " + formData.get('username'));

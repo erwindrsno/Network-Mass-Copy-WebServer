@@ -3,18 +3,24 @@
  */
 package org.main;
 
-import static io.javalin.apibuilder.ApiBuilder.*;
+import static io.javalin.apibuilder.ApiBuilder.before;
+import static io.javalin.apibuilder.ApiBuilder.delete;
+import static io.javalin.apibuilder.ApiBuilder.get;
+import static io.javalin.apibuilder.ApiBuilder.path;
+import static io.javalin.apibuilder.ApiBuilder.post;
 
 import org.computer.ComputerController;
 import org.computer.ComputerModule;
+import org.main.session.SessionConfig;
+import org.main.session.SessionModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.user.UserController;
 import org.user.UserModule;
+import org.file.FileModule;
+import org.file.FileController;
 
-import org.main.session.SessionConfig;
-import org.main.session.SessionModule;
-
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -29,16 +35,19 @@ public class App {
 
   public static void main(String[] args) {
     Injector injector = Guice.createInjector(new ComputerModule(), new UserModule(), new DatabaseModule(),
-        new SessionModule());
+        new SessionModule(), new FileModule());
 
     ComputerController computerController = injector.getInstance(ComputerController.class);
     UserController userController = injector.getInstance(UserController.class);
+    FileController fileController = injector.getInstance(FileController.class);
     SessionConfig sessionConfig = injector.getInstance(SessionConfig.class);
 
     Javalin app = Javalin.create(config -> {
       config.jetty.modifyServletContextHandler(
           handler -> handler.setSessionHandler(sessionConfig.sqlSessionHandler()));
-      config.jsonMapper(new JavalinJackson());
+      config.jsonMapper(new JavalinJackson().updateMapper(mapper -> {
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+      }));
       config.router.apiBuilder(() -> {
         before(ctx -> {
           logger.info("router level before");
@@ -86,6 +95,10 @@ public class App {
           path("/ip_addr/{ip}", () -> {
             get(computerController::getComputersByIpAddress);
           });
+        });
+
+        path("/files", () -> {
+          post(fileController::insertFiles);
         });
       });
     });

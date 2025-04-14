@@ -1,10 +1,12 @@
 import { createSignal } from "solid-js"
 import FilePreview from "./FilePreview.jsx"
-import DropFileZone from "./DropFileZone.jsx" 
+import DropFileZone from "./DropFileZone.jsx"
+import { useFileUploadContext } from "../utils/FileUploadContextProvider.jsx";
 
 function FileManager(){
   let dropzoneRef
-  const [files, setFiles] = createSignal([])
+  // const [files, setFiles] = createSignal([])
+  const { files, setFiles } = useFileUploadContext();
 
   const onDrop = (event) => {
     event.preventDefault()
@@ -36,7 +38,7 @@ function FileManager(){
   return (
     <>
       <DropFileZone ref={elm => dropzoneRef = elm} onDrop={onDrop} onDragOver={onDragOver} onChange={onChange}/>
-      <FilePreview files={files} removeFile={removeFile} />
+      <FilePreview removeFile={removeFile} />
     </>
   )
 }

@@ -1,4 +1,8 @@
+import { useFileUploadContext } from "../utils/FileUploadContextProvider.jsx";
+
 function FilePreview(props){
+  const { files, setFiles } = useFileUploadContext();
+
   const onDelete = (event) => {
     event.preventDefault()
     props.removeFile(index)
@@ -6,9 +10,9 @@ function FilePreview(props){
 
   return(
     <>      
-      <Show when={props.files().length !== 0} fallback={<p class="text-center">No File yet.</p>}>
+      <Show when={files().length !== 0} fallback={<p class="text-center">No File yet.</p>}>
         <div id="fileList" class="mt-1 h-35 overflow-y-auto border border-gray-300 rounded-lg p-2 bg-gray-50">
-          {props.files().map((file, index) => (
+          {files().map((file, index) => (
             <div class="flex items-center justify-between p-2 mb-1 bg-gray-200 rounded-lg font-medium">
 
               <span class="text-sm text-gray-700">{index + 1}. {file.name}</span>

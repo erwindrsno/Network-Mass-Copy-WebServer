@@ -9,7 +9,7 @@ public interface UserService {
 
   User getUsersById(Integer id);
 
-  Integer authUser(User user);
+  User authUser(User user);
 
   boolean deleteUsersById(Integer id);
 }

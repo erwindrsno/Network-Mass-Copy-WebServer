@@ -43,11 +43,11 @@ public class UserController {
     String username = ctx.formParam("username");
     String password = ctx.formParam("password");
     User user = new User(username, password);
-    Integer userId = this.userService.authUser(user);
+    User authedUser = this.userService.authUser(user);
 
-    if (userId != null) {
-      ctx.sessionAttribute("user_id", userId);
-      ctx.result("Log in OK").status(200);
+    if (authedUser != null) {
+      ctx.sessionAttribute("user_id", authedUser.getId());
+      ctx.json(authedUser).status(200);
     } else {
       ctx.result("Log in FAILED").status(401);
     }

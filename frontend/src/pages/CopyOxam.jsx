@@ -1,5 +1,6 @@
 import Header from '../components/header/Header.jsx'
 import UploadFileForm from '../components/copy-oxam/UploadFileForm.jsx'
+import { FileUploadContextProvider, useFileUploadContext } from "../components/utils/FileUploadContextProvider.jsx";
 
 function CopyOxam(){
   return(
@@ -7,7 +8,9 @@ function CopyOxam(){
       <Header />
       <main class="flex-1 flex flex-col mt-30 items-center space-y-3 bg-gray-50">
         <h1 class="text-2xl font-semibold">Copy from OXAM generated</h1>
-        <UploadFileForm />
+        <FileUploadContextProvider>
+          <UploadFileForm />
+        </FileUploadContextProvider>
       </main>
     </div>
   )

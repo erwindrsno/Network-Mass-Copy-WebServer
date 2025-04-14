@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public Integer authUser(User user) {
+  public User authUser(User user) {
     User retrievedUser = this.userRepository.findUserByUsername(user.getUsername());
 
     // jika username yang diinput tidak ada di db
@@ -53,7 +53,14 @@ public class UserServiceImpl implements UserService {
 
     Result result = BCrypt.verifyer().verify(user.getPassword().toCharArray(), retrievedUser.getPassword());
     if (result.verified == true) {
-      return retrievedUser.getId();
+      Integer id = retrievedUser.getId();
+      String username = retrievedUser.getUsername();
+      String display_name = retrievedUser.getDisplay_name();
+
+      // destroy retrievedUser agar user baru yang dikirimkan tidak mengandung atribut
+      // yang tidak perlu, seperti passsword
+      retrievedUser = null;
+      return new User(id, username, display_name);
     }
     return null;
   }
