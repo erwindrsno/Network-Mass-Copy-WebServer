@@ -1,9 +1,10 @@
+import { Show } from "solid-js";
 import ProtectedRoute from './ProtectedRoute.jsx';
 
-function ProtectedRouteWrapper(props){
+function ProtectedRouteWrapper(Component){
   return(
     <ProtectedRoute>
-      {props.children}
+      <Component />
     </ProtectedRoute>
   )
 }

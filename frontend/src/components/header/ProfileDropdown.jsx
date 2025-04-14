@@ -1,6 +1,8 @@
-import { A, useNavigate, action } from '@solidjs/router'
+import { A, useNavigate, action } from "@solidjs/router";
+import { useAuthContext } from "../utils/AuthContextProvider.jsx";
 
 function ProfileDropdown(){
+  const { isAuth, setIsAuth } = useAuthContext();
   const navigate = useNavigate()
 
   const handleLogout = async () => {
@@ -13,6 +15,7 @@ function ProfileDropdown(){
       console.log("BAD");
       console.log(response)
     } else{
+      setIsAuth(false);
       console.log(response)
     }
     navigate("/", { replace: true })

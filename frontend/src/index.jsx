@@ -17,7 +17,7 @@ import AddComputer from './pages/admin/AddComputer.jsx';
 import AddUser from './pages/admin/AddUser.jsx';
 
 import ProtectedRouteWrapper from './components/utils/ProtectedRouteWrapper.jsx';
-import ProtectedRoute from './components/utils/ProtectedRoute.jsx';
+import { AuthContextProvider } from './components/utils/AuthContextProvider.jsx';
 
 const wrapper = document.getElementById('root');
 
@@ -33,27 +33,27 @@ if(!wrapper){
 
 render(
     () => (
+    <AuthContextProvider>
         <Router>
-          <Route path="/" component={Login} />
-          <ProtectedRoute>
+            <Route path="/" component={Login} />
             <Route path="/home">
-              <Route path="/" component={Home} />
-              <Route path="/copy-oxam" component={CopyOxam} />
-              <Route path="/copy" component={Copy} />
+              <Route path="/" component={() => ProtectedRouteWrapper(Home)} />
+              <Route path="/copy-oxam" component={() => ProtectedRouteWrapper(CopyOxam)} />
+              <Route path="/copy" component={() => ProtectedRouteWrapper(Copy)} />
             </Route>
             
             <Route path="/admin">
               <Route path="/computer">
-                <Route path="/" component={Computer} />
-                <Route path="/add" component={AddComputer} />
+                <Route path="/" component={() => ProtectedRouteWrapper(Computer)} />
+                <Route path="/add" component={() => ProtectedRouteWrapper(AddComputer)} />
               </Route>
               <Route path="/user">
-                <Route path="/" component={User} />
-                <Route path="/add" component={AddUser} />
+                <Route path="/" component={() => ProtectedRouteWrapper(User)} />
+                <Route path="/add" component={() => ProtectedRouteWrapper(AddUser)} />
               </Route>
             </Route>
-          </ProtectedRoute>
         </Router>
+    </AuthContextProvider>
     ),
     wrapper
 );

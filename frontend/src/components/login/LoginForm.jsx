@@ -1,14 +1,17 @@
 import { OpenedEye, ClosedEye } from "./EyeIcon.jsx";
 import { createSignal } from "solid-js";
 import { action, useNavigate } from "@solidjs/router";
+import { useAuthContext } from "../utils/AuthContextProvider.jsx";
 
 function LoginForm(){
-  const [showPassword, setShowPassword] = createSignal(false)
-  const navigate = useNavigate()
+  const { isAuth, setIsAuth } = useAuthContext();
+
+  const [showPassword, setShowPassword] = createSignal(false);
+  const navigate = useNavigate();
 
   function toggleShowPassword(event){
-    event.preventDefault()
-    setShowPassword(!showPassword())
+    event.preventDefault();
+    setShowPassword(!showPassword());
   }
 
   const handleLogin = action(async (formData) => {
@@ -22,15 +25,16 @@ function LoginForm(){
         username: formData.get('username'),
         password: formData.get('password'),
       }),
-    })
+    });
     if(!response.ok && response.status === 401){
-      console.log("UNAUTH!")
+      console.log("UNAUTH!");
     } else{
-        console.log(response)
-      navigate("/home", { replace: true })
+      console.log(response);
+      setIsAuth(true);
+      navigate("/home", { replace: true });
     }
-    console.log("Username " + formData.get('username'))
-    console.log("Response status is : " + response.status)
+    console.log("Username " + formData.get('username'));
+    console.log("Response status is : " + response.status);
   })
 
   return (
