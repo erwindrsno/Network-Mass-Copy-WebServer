@@ -1,5 +1,7 @@
 package org.user;
 
+import java.util.Map;
+
 import org.slf4j.*;
 import io.javalin.http.Context;
 
@@ -45,23 +47,36 @@ public class UserController {
     User user = new User(username, password);
     User authedUser = this.userService.authUser(user);
 
+    logger.info("hehe");
+
     if (authedUser != null) {
-      ctx.sessionAttribute("user_id", authedUser.getId());
-      ctx.json(authedUser).status(200);
+      String token = this.userService.generateToken(authedUser);
+      // ctx.status(200).result(token);
+      ctx.json(Map.of("token", token)).status(200);
     } else {
       ctx.result("Log in FAILED").status(401);
     }
+  }
 
+  public boolean validateUser(Context ctx) {
+    String authHeader = ctx.header("Authorization");
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      ctx.status(401).result("Missing or invalid Authorization header");
+      return false;
+    }
+
+    String token = authHeader.substring("Bearer ".length());
+    boolean isValidated = this.userService.validateToken(token, 2, "yayay");
+    return isValidated;
   }
 
   public void deleteUserById(Context ctx) {
     Integer id = Integer.parseInt(ctx.pathParam("id"));
-    logger.info("deleteusersById the id is : " + id);
     boolean isDeleted = this.userService.deleteUsersById(id);
     if (isDeleted) {
       ctx.status(200).result("OK");
     } else {
-      ctx.status(200).result("NOTOK");
+      ctx.status(200).result("NOT OK");
     }
   }
 

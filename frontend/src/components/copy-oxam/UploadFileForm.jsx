@@ -6,6 +6,7 @@ function UploadFileForm(){
   const { files, setFiles } = useFileUploadContext();
 
   const handleUploadFiles = action(async (formData) => {
+    console.log(files());
     console.log(formData.get("acl"));
     console.log(formData.get("target"));
     const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/files`, {

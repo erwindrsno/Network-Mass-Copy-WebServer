@@ -12,4 +12,8 @@ public interface UserService {
   User authUser(User user);
 
   boolean deleteUsersById(Integer id);
+
+  String generateToken(User authedUser);
+
+  boolean validateToken(String token, Integer id, String display_name);
 }

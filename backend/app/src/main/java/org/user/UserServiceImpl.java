@@ -1,15 +1,27 @@
 package org.user;
 
+import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import at.favre.lib.crypto.bcrypt.*;
+
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import at.favre.lib.crypto.bcrypt.BCrypt.Result;
 
 @Singleton
 public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
+  private Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
   @Inject
   public UserServiceImpl(UserRepository userRepository) {
@@ -63,5 +75,37 @@ public class UserServiceImpl implements UserService {
       return new User(id, username, display_name);
     }
     return null;
+  }
+
+  @Override
+  public String generateToken(User authedUser) {
+    try {
+      Algorithm algorithm = Algorithm.HMAC512("Secr3t");
+      String token = JWT.create()
+          .withIssuer("auth0")
+          .withClaim("id", authedUser.getId())
+          .withClaim("display_name", authedUser.getDisplay_name())
+          .withExpiresAt(new Date(System.currentTimeMillis() + 1 * 60 * 60 * 1000)) // 1 hours
+          .sign(algorithm);
+      return token;
+    } catch (JWTCreationException exception) {
+      return null;
+    }
+  }
+
+  @Override
+  public boolean validateToken(String token, Integer userId, String display_name) {
+    DecodedJWT decodedJWT;
+    try {
+      Algorithm algorithm = Algorithm.HMAC512("Secr3t");
+      JWTVerifier verifier = JWT.require(algorithm)
+          .withIssuer("auth0")
+          .build();
+      decodedJWT = verifier.verify(token);
+      return true;
+    } catch (JWTVerificationException exception) {
+      logger.error(exception.getMessage());
+      return false;
+    }
   }
 }

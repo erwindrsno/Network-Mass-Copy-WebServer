@@ -3,11 +3,7 @@
  */
 package org.main;
 
-import static io.javalin.apibuilder.ApiBuilder.before;
-import static io.javalin.apibuilder.ApiBuilder.delete;
-import static io.javalin.apibuilder.ApiBuilder.get;
-import static io.javalin.apibuilder.ApiBuilder.path;
-import static io.javalin.apibuilder.ApiBuilder.post;
+import static io.javalin.apibuilder.ApiBuilder.*;
 
 import org.computer.ComputerController;
 import org.computer.ComputerModule;
@@ -25,7 +21,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import io.javalin.Javalin;
-import io.javalin.http.Context;
 import io.javalin.http.HandlerType;
 import io.javalin.http.UnauthorizedResponse;
 import io.javalin.json.JavalinJackson;
@@ -60,11 +55,10 @@ public class App {
             ctx.status(204);
             ctx.skipRemainingHandlers();
           } else {
-            if (!ctx.path().equals("/users/login") && !isAuthenticated(ctx)) {
+            if (!ctx.path().equals("/users/login") && !userController.validateUser(ctx)) {
               throw new UnauthorizedResponse("Unauthorized! Please log in first.");
             }
           }
-
         });
 
         path("/users", () -> {
@@ -113,18 +107,5 @@ public class App {
     });
     app.start(7070);
     logger.info("Server has started!");
-  }
-
-  public static boolean isAuthenticated(Context ctx) {
-    // Integer userId = ctx.sessionAttribute("user_id");
-    ctx.req().getSession(false);
-    Integer userId = (Integer) ctx.sessionAttribute("user_id");
-    logger.info("Authenticating...");
-    if (userId != null) {
-      logger.info("User is authenticated with id " + userId);
-      return true;
-    }
-    logger.info("User is NOT authenticated");
-    return false;
   }
 }

@@ -27,6 +27,8 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
     implementation("com.google.inject:guice:7.0.0")
     implementation("at.favre.lib:bcrypt:0.10.2")
+    implementation("com.auth0:java-jwt:4.5.0")
+    implementation("com.github.kmehrunes:javalin-jwt:0.7.0")
     compileOnly("org.projectlombok:lombok:1.18.36")
     annotationProcessor("org.projectlombok:lombok:1.18.36")
     // This dependency is used by the application.

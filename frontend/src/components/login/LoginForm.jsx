@@ -29,6 +29,7 @@ function LoginForm(){
     if(!response.ok && response.status === 401){
       console.log("UNAUTH!");
     } else{
+      console.log(response);
       const result = await response.json();
       console.log(result);
       setUserStore({ isAuth: true, display_name: result.username });
