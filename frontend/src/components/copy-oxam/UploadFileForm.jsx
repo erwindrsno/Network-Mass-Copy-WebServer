@@ -1,6 +1,7 @@
 import FileManager from "./FileManager.jsx"
 import { FileUploadContextProvider, useFileUploadContext } from "../utils/FileUploadContextProvider.jsx";
 import { action, useNavigate } from "@solidjs/router";
+import { extractDataFromTxt } from "../utils/DataExtraction.jsx";
 
 function UploadFileForm(){
   const { files, setFiles } = useFileUploadContext();
@@ -9,17 +10,26 @@ function UploadFileForm(){
     console.log(files());
     console.log(formData.get("acl"));
     console.log(formData.get("target"));
-    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/files`, {
-      method: "POST",
-      credentials: "include",
-      body: formData,
-    });
-    if(!response.ok && response.status === 401){
-      console.log("UNAUTH!");
-    } else{
-      const result = await response.json();
-      console.log(result);
+
+    const file = formData.get("acl");
+
+    try {
+      const array = await extractDataFromTxt(file);
+    } catch (err) {
+      console.error('File reading failed:', err);
     }
+
+    // const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/files`, {
+    //   method: "POST",
+    //   credentials: "include",
+    //   body: formData,
+    // });
+    // if(!response.ok && response.status === 401){
+    //   console.log("UNAUTH!");
+    // } else{
+    //   const result = await response.json();
+    //   console.log(result);
+    // }
   })
 
   return(

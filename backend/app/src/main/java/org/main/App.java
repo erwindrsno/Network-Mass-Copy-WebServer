@@ -16,6 +16,8 @@ import org.user.UserModule;
 import org.file.FileModule;
 import org.file.FileController;
 
+import org.entry.*;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -30,11 +32,12 @@ public class App {
 
   public static void main(String[] args) {
     Injector injector = Guice.createInjector(new ComputerModule(), new UserModule(), new DatabaseModule(),
-        new SessionModule(), new FileModule());
+        new SessionModule(), new FileModule(), new EntryModule());
 
     ComputerController computerController = injector.getInstance(ComputerController.class);
     UserController userController = injector.getInstance(UserController.class);
     FileController fileController = injector.getInstance(FileController.class);
+    EntryController entryController = injector.getInstance(EntryController.class);
     SessionConfig sessionConfig = injector.getInstance(SessionConfig.class);
 
     Javalin app = Javalin.create(config -> {
@@ -45,7 +48,7 @@ public class App {
       }));
       config.router.apiBuilder(() -> {
         before(ctx -> {
-          logger.info("router level before");
+          logger.info("router level before1");
           ctx.header("Access-Control-Allow-Origin", "http://localhost:3000");
           ctx.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
           ctx.header("Access-Control-Allow-Credentials", "true");
@@ -89,6 +92,11 @@ public class App {
           path("/ip_addr/{ip}", () -> {
             get(computerController::getComputersByIpAddress);
           });
+        });
+
+        path("/entries", () -> {
+          get(entryController::getAllEntries);
+          post(entryController::insertEntry);
         });
 
         path("/files", () -> {

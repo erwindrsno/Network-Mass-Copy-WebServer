@@ -10,18 +10,22 @@ import io.javalin.http.Context;
 
 @Singleton
 public class EntryController {
-    private Logger logger = LoggerFactory.getLogger(EntryController.class);
-    private final EntryService entryService;
+  private Logger logger = LoggerFactory.getLogger(EntryController.class);
+  private final EntryService entryService;
 
-    @Inject
-    public EntryController(EntryService entryService) {
-        this.entryService = entryService;
-    }
+  @Inject
+  public EntryController(EntryService entryService) {
+    this.entryService = entryService;
+  }
 
-    public void insertEntry(Context ctx) {
-        String title = ctx.formParam("title");
-        String completeness = "TBD";
-        Entry entry = new Entry(null, title, completeness, ctx.sessionAttribute("user_id"));
-        this.entryService.createEntry(entry);
-    }
+  public void insertEntry(Context ctx) {
+    String title = ctx.formParam("title");
+    String completeness = null;
+    Entry entry = new Entry(null, title, completeness, 1);
+    this.entryService.createEntry(entry);
+  }
+
+  public void getAllEntries(Context ctx) {
+    ctx.json(this.entryService.getAllEntries());
+  }
 }
