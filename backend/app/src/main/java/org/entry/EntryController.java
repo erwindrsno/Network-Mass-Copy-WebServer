@@ -20,9 +20,10 @@ public class EntryController {
 
   public void insertEntry(Context ctx) {
     String title = ctx.formParam("title");
-    String completeness = null;
-    Entry entry = new Entry(null, title, completeness, 1);
-    this.entryService.createEntry(entry);
+    logger.info("Title is: " + title);
+    // String completeness = null;
+    // Entry entry = new Entry(null, title, completeness, 1);
+    // this.entryService.createEntry(entry);
   }
 
   public void getAllEntries(Context ctx) {

@@ -6,8 +6,11 @@ const fetchComputer = async (selectedLab) => {
   const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/computers/lab/${selectedLab}`, {
     method: "GET",
     credentials: "include",
+    headers: {
+      "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+    },
   })
-  if(!response.ok && response.status === 401){
+  if (!response.ok && response.status === 401) {
     console.log("UNAUTH!")
   }
 
@@ -15,11 +18,11 @@ const fetchComputer = async (selectedLab) => {
 }
 
 
-function ComputerTable(props){
+function ComputerTable(props) {
   const navigate = useNavigate()
   //harus pake arrow function di props.selectedLab supaya solidJS dapat melacak reaktivitas props.selectedLab dan
   //melakukan refetch setiap kali nilainya berubah
-  const [computers , {mutate, refetch}] = createResource(() => props.selectedLab, fetchComputer)
+  const [computers, { mutate, refetch }] = createResource(() => props.selectedLab, fetchComputer)
 
   const [paginated, setPaginated] = createSignal({
     currentPage: 1,
@@ -33,43 +36,46 @@ function ComputerTable(props){
     const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/computers/id/${computerId}`, {
       method: "DELETE",
       credentials: "include",
+      headers: {
+        "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+      },
     })
-    if(!response.ok && response.status === 401){
+    if (!response.ok && response.status === 401) {
       console.log("UNATUH!")
-    } else{
+    } else {
       refetch()
     }
     console.log(response)
   }
 
-  return(
-    <div class = "w-full flex flex-col justify-center items-center gap-3">
+  return (
+    <div class="w-full flex flex-col justify-center items-center gap-3">
       <div class="shadow-md rounded-lg overflow-hidden">
         <table class="text-sm rtl:text-right text-gray-500">
           <thead class="text-xs text-gray-700 bg-gray-300">
-          <tr>
-            <th scope="col" class="px-4 w-1/6 py-3 text-left">No.</th>
-            <th scope="col" class="w-md py-3 text-left">Name</th>
-            <th scope="col" class="w-md py-3 text-left">IP address</th>
-            <th scope="col" class="py-3 w-1/6">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginated().items?.map((computer,index) => (
-            <tr key={computer.id} class="bg-white border-b border-gray-200 hover:bg-gray-50"> 
-              <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * 10 + index + 1}</td>
-              <td class="py-3 text-left whitespace-nowrap">{computer.host_name}</td>
-              <td class="py-3 text-left whitespace-nowrap">{computer.ip_address}</td>
-              <td class="text-center text-sm px-0.5">
-                <button onClick={() => handleDelete(computer.id)} class="bg-red-500 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">Delete</button>
-              </td>
+            <tr>
+              <th scope="col" class="px-4 w-1/6 py-3 text-left">No.</th>
+              <th scope="col" class="w-md py-3 text-left">Name</th>
+              <th scope="col" class="w-md py-3 text-left">IP address</th>
+              <th scope="col" class="py-3 w-1/6">Action</th>
             </tr>
-          ))}
-        </tbody>
+          </thead>
+          <tbody>
+            {paginated().items?.map((computer, index) => (
+              <tr key={computer.id} class="bg-white border-b border-gray-200 hover:bg-gray-50">
+                <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * 10 + index + 1}</td>
+                <td class="py-3 text-left whitespace-nowrap">{computer.host_name}</td>
+                <td class="py-3 text-left whitespace-nowrap">{computer.ip_address}</td>
+                <td class="text-center text-sm px-0.5">
+                  <button onClick={() => handleDelete(computer.id)} class="bg-red-500 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
 
       </div>
-      
+
       <Pagination items={computers()} onPageChange={setPaginated} />
     </div>
   )

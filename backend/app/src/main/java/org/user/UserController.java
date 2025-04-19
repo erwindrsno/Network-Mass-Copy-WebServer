@@ -47,8 +47,6 @@ public class UserController {
     User user = new User(username, password);
     User authedUser = this.userService.authUser(user);
 
-    logger.info("hehe");
-
     if (authedUser != null) {
       String token = this.userService.generateToken(authedUser);
       // ctx.status(200).result(token);
@@ -62,6 +60,7 @@ public class UserController {
     String authHeader = ctx.header("Authorization");
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
       ctx.status(401).result("Missing or invalid Authorization header");
+      logger.info("Invalid token");
       return false;
     }
 
@@ -82,9 +81,9 @@ public class UserController {
 
   public void invalidateUser(Context ctx) {
     logger.info("Logging out...");
-    Integer id = ctx.sessionAttribute("user_id");
-    ctx.req().getSession().invalidate();
-    ctx.result("Log out OK " + id).status(200);
+    ctx.result("Log out OK ").status(200);
+    // Integer id = ctx.sessionAttribute("user_id");
+    // ctx.req().getSession().invalidate();
+    // ctx.result("Log out OK " + id).status(200);
   }
-
 }

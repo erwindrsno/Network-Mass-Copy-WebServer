@@ -3,13 +3,14 @@ import { createSignal } from "solid-js";
 import { action, useNavigate } from "@solidjs/router";
 import { useAuthContext } from "../utils/AuthContextProvider.jsx";
 
-function LoginForm(){
-  const { userStore, setUserStore } = useAuthContext();
+function LoginForm() {
+  // const { userStore, setUserStore } = useAuthContext();
+  const { token, setToken } = useAuthContext();
 
   const [showPassword, setShowPassword] = createSignal(false);
   const navigate = useNavigate();
 
-  function toggleShowPassword(event){
+  function toggleShowPassword(event) {
     event.preventDefault();
     setShowPassword(!showPassword());
   }
@@ -26,13 +27,14 @@ function LoginForm(){
         password: formData.get('password'),
       }),
     });
-    if(!response.ok && response.status === 401){
+    if (!response.ok && response.status === 401) {
       console.log("UNAUTH!");
-    } else{
+    } else {
       console.log(response);
       const result = await response.json();
-      console.log(result);
-      setUserStore({ isAuth: true, display_name: result.username });
+      sessionStorage.setItem("token", result.token);
+      setToken(result.token);
+      // setUserStore({ isAuth: true, display_name: result.username });
       navigate("/home", { replace: true });
     }
     console.log("Username " + formData.get('username'));
@@ -54,7 +56,7 @@ function LoginForm(){
           <label for="password">Password</label>
           <div class="flex flex-row relative">
             <input type={showPassword() ? "text" : "password"} name="password" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal w-full" required />
-            <button type="button" onClick={toggleShowPassword} class="absolute inset-y-0 right-3 flex items-center">{showPassword() ? <ClosedEye/> : <OpenedEye/>}</button>
+            <button type="button" onClick={toggleShowPassword} class="absolute inset-y-0 right-3 flex items-center">{showPassword() ? <ClosedEye /> : <OpenedEye />}</button>
           </div>
         </div>
         <div class="form-example">

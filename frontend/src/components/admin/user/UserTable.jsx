@@ -7,17 +7,20 @@ const fetchUser = async () => {
   const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/users`, {
     method: "GET",
     credentials: "include",
+    headers: {
+      "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+    },
   })
-  if(!response.ok && response.status === 401){
+  if (!response.ok && response.status === 401) {
     console.log("UNAUTH!")
   }
 
   return response.json();
 }
 
-function UserTable(){
+function UserTable() {
   const navigate = useNavigate()
-  const [users, {mutate, refetch}] = createResource(fetchUser)
+  const [users, { mutate, refetch }] = createResource(fetchUser)
   const [paginated, setPaginated] = createSignal({
     currentPage: 1,
     items: [],
@@ -30,39 +33,42 @@ function UserTable(){
     const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/users/id/${userId}`, {
       method: "DELETE",
       credentials: "include",
+      headers: {
+        "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+      },
     })
-    if(!response.ok && response.status === 401){
+    if (!response.ok && response.status === 401) {
       console.log("UNATUH!")
-    } else{
+    } else {
       refetch()
     }
     console.log(response)
   }
 
-  return(
-    <div class = "w-full flex flex-col justify-center items-center gap-3">
-      <div class = "shadow-md rounded-lg overflow-hidden">
+  return (
+    <div class="w-full flex flex-col justify-center items-center gap-3">
+      <div class="shadow-md rounded-lg overflow-hidden">
         <table class="text-sm rtl:text-right text-gray-500">
           <thead class="text-xs text-gray-700 bg-gray-300">
-          <tr>
-            <th scope="col" class="px-4 w-1/6 py-3 text-left">No.</th>
-            <th scope="col" class="w-md py-3 text-left">Name</th>
-            <th scope="col" class="w-md py-3 text-left">User name</th>
-            <th scope="col" class="py-3 w-1/6">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginated().items?.map((user,index) => (
-            <tr key={user.id} class="bg-white border-b border-gray-200 hover:bg-gray-50">
-              <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * 10 + index + 1}</td>
-              <td class="py-3 text-left whitespace-nowrap">{user.username}</td>
-              <td class="py-3 text-left whitespace-nowrap">{user.display_name}</td>
-              <td class="text-center text-sm px-0.5">
-                <button onClick={() => handleDelete(user.id)} class="bg-red-500 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">Delete</button>
-              </td>
+            <tr>
+              <th scope="col" class="px-4 w-1/6 py-3 text-left">No.</th>
+              <th scope="col" class="w-md py-3 text-left">Name</th>
+              <th scope="col" class="w-md py-3 text-left">User name</th>
+              <th scope="col" class="py-3 w-1/6">Action</th>
             </tr>
-          ))}
-        </tbody>
+          </thead>
+          <tbody>
+            {paginated().items?.map((user, index) => (
+              <tr key={user.id} class="bg-white border-b border-gray-200 hover:bg-gray-50">
+                <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * 10 + index + 1}</td>
+                <td class="py-3 text-left whitespace-nowrap">{user.username}</td>
+                <td class="py-3 text-left whitespace-nowrap">{user.display_name}</td>
+                <td class="text-center text-sm px-0.5">
+                  <button onClick={() => handleDelete(user.id)} class="bg-red-500 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
 

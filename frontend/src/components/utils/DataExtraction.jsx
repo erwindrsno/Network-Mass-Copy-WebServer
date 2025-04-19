@@ -3,12 +3,18 @@ export const extractDataFromTxt = (file) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const text = e.target.result;
-      const array = text
-        .split(/\r?\n/)
-        .map(line => line.trim().replace(/,$/, ''))
-        .filter(line => line !== '');
+      const lines = text
+        .split(/\r?\n/) // Split by new lines
+        .map(line => line.trim())
+        .filter(line => line !== '') // Remove empty lines
+       
+      const title = lines[0]; // first line
+      const entries = lines.slice(1).map(line => {
+        const [hostname, owner, permissions] = line.split('|').map(field => field.trim());
+        return { hostname, owner, permissions };
+      });
 
-      resolve(array);
+      resolve({title, entries});
     };
 
     reader.onerror = (err) => {

@@ -1,6 +1,6 @@
 import { createResource, createSignal, createEffect } from 'solid-js';
 
-function Pagination(props){
+function Pagination(props) {
   const [currentPage, setCurrentPage] = createSignal(1)
   const itemsPerPage = 10
 
@@ -32,15 +32,15 @@ function Pagination(props){
     });
   });
 
-  return(
+  return (
     <div class="w-full flex flex-row justify-between">
-        <button onClick={() => handlePageChange(currentPage() - 1)} disabled={currentPage() === 1} class="ml-0.5 cursor-pointer">
-          &lt; Previous
-        </button>
-        <span>Page {currentPage()} of {totalPages()}</span>
-        <button onClick={() => handlePageChange(currentPage() + 1)} disabled={currentPage() === totalPages()} class="cursor-pointer">
-          Next >
-        </button>
+      <button onClick={() => handlePageChange(currentPage() - 1)} disabled={currentPage() === 1} class="ml-0.5 cursor-pointer">
+        &lt; Previous
+      </button>
+      <span>Page {currentPage()} of {totalPages()}</span>
+      <button onClick={() => handlePageChange(currentPage() + 1)} disabled={currentPage() === totalPages()} class="cursor-pointer">
+        Next &gt;
+      </button>
     </div>
   )
 }

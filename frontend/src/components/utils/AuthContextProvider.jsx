@@ -3,21 +3,18 @@ import { createStore } from "solid-js/store";
 
 const AuthContext = createContext();
 
-export function AuthContextProvider(props){
-  const [userStore, setUserStore] = createStore({
-    isAuth: false,
-    display_name: null,
-  });
+export function AuthContextProvider(props) {
+  const [token, setToken] = createSignal(sessionStorage.getItem("token") || "");
 
-  const value = { userStore, setUserStore };
+  const value = { token, setToken };
 
-  return(
+  return (
     <AuthContext.Provider value={value}>
       {props.children}
     </AuthContext.Provider>
   )
 }
 
-export function useAuthContext(){
-  return useContext(AuthContext); 
+export function useAuthContext() {
+  return useContext(AuthContext);
 }

@@ -1,31 +1,32 @@
 import { createSignal } from "solid-js";
 import { action, useNavigate } from "@solidjs/router";
 
-function AddUserForm(){
-    const navigate = useNavigate()
+function AddUserForm() {
+  const navigate = useNavigate()
 
-    const handleAddUser = action(async (formData) => {
-      const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/users`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-          username: formData.get('username'),
-          password: formData.get('password'),
-          display_name: formData.get('display_name')
-        }),
-      })
-      if(!response.ok && response.status === 401){
-        console.log("UNAUTH!")
-      } else if(response.ok && response.status === 201){
-        console.log("OKKKK")
-        navigate('/admin/user')  
-      }       
-      console.log(formData)
+  const handleAddUser = action(async (formData) => {
+    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/users`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+      },
+      body: new URLSearchParams({
+        username: formData.get('username'),
+        password: formData.get('password'),
+        display_name: formData.get('display_name')
+      }),
     })
-    return(
+    if (!response.ok && response.status === 401) {
+      console.log("UNAUTH!")
+    } else if (response.ok && response.status === 201) {
+      console.log("OKKKK")
+      navigate('/admin/user')
+    }
+    console.log(formData)
+  })
+  return (
     <div class="flex flex-col gap-5 border border-gray-300 rounded-md px-4 py-4 w-lg justify-between bg-gray-50">
       <form action={handleAddUser} method="post" class="flex flex-col gap-5">
         <div class="flex flex-col gap-1.5 font-medium">
@@ -45,7 +46,7 @@ function AddUserForm(){
         </div>
       </form>
     </div>
-    )
+  )
 }
 
 export default AddUserForm

@@ -48,7 +48,6 @@ public class App {
       }));
       config.router.apiBuilder(() -> {
         before(ctx -> {
-          logger.info("router level before1");
           ctx.header("Access-Control-Allow-Origin", "http://localhost:3000");
           ctx.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
           ctx.header("Access-Control-Allow-Credentials", "true");
