@@ -1,4 +1,4 @@
-package org.file;
+package org.file_record;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,11 +10,11 @@ import io.javalin.http.Context;
 import io.javalin.util.FileUtil;
 
 @Singleton
-public class FileController {
-  private Logger logger = LoggerFactory.getLogger(FileController.class);
+public class FileRecordController {
+  private Logger logger = LoggerFactory.getLogger(FileRecordController.class);
 
   @Inject
-  public FileController() {
+  public FileRecordController() {
 
   }
 

@@ -15,24 +15,24 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public class FileRepositoryImpl extends BaseRepository<File> implements FileRepository {
-  private Logger logger = LoggerFactory.getLogger(FileRepositoryImpl.class);
+public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> implements FileRecordRepository {
+  private Logger logger = LoggerFactory.getLogger(FileRecordRepositoryImpl.class);
 
   @Inject
-  public FileRepositoryImpl(DatabaseConfig databaseConfig) {
+  public FileRecordRepositoryImpl(DatabaseConfig databaseConfig) {
     super(databaseConfig);
   }
 
   @Override
-  public Integer save(File file, Integer entryId) {
+  public Integer save(FileRecord fileRecord, Integer entryId) {
     try (Connection conn = super.getConnection()) {
 
-      String query = "INSERT INTO file(path, owner, permissions, copied_at, takeowned_at, entry_id) VALUES(?, ?, ?, ?, ?, ?)";
+      String query = "INSERT INTO file_record(path, owner, permissions, copied_at, takeowned_at, entry_id) VALUES(?, ?, ?, ?, ?, ?)";
       PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
-      ps.setString(1, file.getPath());
-      ps.setString(2, file.getOwner());
-      ps.setInt(3, file.getPermissions());
+      ps.setString(1, fileRecord.getPath());
+      ps.setString(2, fileRecord.getOwner());
+      ps.setInt(3, fileRecord.getPermissions());
       ps.setString(4, null);
       ps.setString(5, null);
       ps.setInt(6, entryId);
@@ -54,7 +54,7 @@ public class FileRepositoryImpl extends BaseRepository<File> implements FileRepo
   }
 
   @Override
-  public List<File> findAll() {
+  public List<FileRecord> findAll() {
     return null;
   }
 }

@@ -22,7 +22,10 @@ function UploadFileForm() {
       });
 
       formData.append("title", title);
-      formData.append("entries", entries);
+      formData.append("entries", JSON.stringify(entries));
+      for (const file of files()) {
+        formData.append("files", file);
+      }
       formData.delete("access_list");
       for (const [key, value] of formData.entries()) {
         console.log(`${key}:`, value);

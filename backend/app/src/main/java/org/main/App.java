@@ -13,10 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.user.UserController;
 import org.user.UserModule;
-import org.file.FileModule;
-import org.file.FileController;
-
-import org.entry.*;
+import org.entry.EntryController;
+import org.entry.EntryModule;
+import org.file_record.FileRecordController;
+import org.file_record.FileRecordModule;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.inject.Guice;
@@ -32,17 +32,17 @@ public class App {
 
   public static void main(String[] args) {
     Injector injector = Guice.createInjector(new ComputerModule(), new UserModule(), new DatabaseModule(),
-        new SessionModule(), new FileModule(), new EntryModule());
+        new SessionModule(), new FileRecordModule(), new EntryModule());
 
     ComputerController computerController = injector.getInstance(ComputerController.class);
     UserController userController = injector.getInstance(UserController.class);
-    FileController fileController = injector.getInstance(FileController.class);
+    FileRecordController fileController = injector.getInstance(FileRecordController.class);
     EntryController entryController = injector.getInstance(EntryController.class);
     SessionConfig sessionConfig = injector.getInstance(SessionConfig.class);
 
     Javalin app = Javalin.create(config -> {
-      config.jetty.modifyServletContextHandler(
-          handler -> handler.setSessionHandler(sessionConfig.sqlSessionHandler()));
+      // config.jetty.modifyServletContextHandler(
+      // handler -> handler.setSessionHandler(sessionConfig.sqlSessionHandler()));
       config.jsonMapper(new JavalinJackson().updateMapper(mapper -> {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
       }));
