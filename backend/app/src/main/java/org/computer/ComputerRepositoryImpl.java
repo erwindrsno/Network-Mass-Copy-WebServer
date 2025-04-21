@@ -138,6 +138,30 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
   }
 
   @Override
+  public Computer findByHostname(String hostname) {
+    try (Connection conn = super.getConnection()) {
+      String query = "SELECT * FROM computer WHERE host_name = ?";
+
+      PreparedStatement ps = conn.prepareStatement(query);
+      ps.setString(1, hostname);
+
+      ResultSet resultSet = ps.executeQuery();
+
+      while (resultSet.next()) {
+        Integer res_id = resultSet.getInt("id");
+        String ip_address = resultSet.getString("ip_address");
+        String host_name = resultSet.getString("host_name");
+        int res_lab_num = resultSet.getInt("lab_num");
+        Computer computer = new Computer(res_id, ip_address, host_name, res_lab_num);
+        return computer;
+      }
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+    }
+    return null;
+  }
+
+  @Override
   public boolean destroyById(Integer id) {
     try (Connection conn = super.getConnection()) {
       String query = "DELETE FROM computer WHERE id = ?";

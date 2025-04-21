@@ -1,7 +1,5 @@
 package org.file_record;
 
-import java.security.Timestamp;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,4 +15,11 @@ public class FileRecord {
   private String copiedAt;
   private String takeownedAt;
   private Integer entryId;
+
+  public FileRecord(String owner, int permissions, String path, Integer entryId) {
+    this.owner = owner;
+    this.permissions = permissions;
+    this.path = path;
+    this.entryId = entryId;
+  }
 }

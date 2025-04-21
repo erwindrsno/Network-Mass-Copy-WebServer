@@ -3,15 +3,17 @@ package org.computer;
 import java.util.List;
 
 public interface ComputerRepository {
-    List<Computer> findAll();
+  List<Computer> findAll();
 
-    void save(Computer computer);
+  void save(Computer computer);
 
-    List<Computer> findByLabNum(int lab_num);
+  List<Computer> findByLabNum(int lab_num);
 
-    Computer findById(Integer id);
+  Computer findById(Integer id);
 
-    Computer findByIpAddress(String ip);
+  Computer findByIpAddress(String ip);
 
-    boolean destroyById(Integer id);
+  Computer findByHostname(String hostname);
+
+  boolean destroyById(Integer id);
 }

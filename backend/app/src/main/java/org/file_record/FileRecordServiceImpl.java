@@ -15,7 +15,7 @@ public class FileRecordServiceImpl implements FileRecordService {
   }
 
   @Override
-  public Integer createFileRecord(FileRecord fileRecord, Integer entryId) {
-    return this.fileRecordRepository.save(fileRecord, entryId);
+  public Integer createFileRecord(FileRecord fileRecord) {
+    return this.fileRecordRepository.save(fileRecord);
   }
 }

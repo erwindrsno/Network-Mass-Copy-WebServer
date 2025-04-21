@@ -30,15 +30,15 @@ function AddComputerForm() {
       <form action={handleAddComputer} method="POST" class="flex flex-col gap-5">
         <div class="flex flex-col gap-1.5 font-medium">
           <label for="host_name">Host name: </label>
-          <input type="text" name="host_name" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal" placeholder="LB01-" />
+          <input type="text" name="host_name" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal" placeholder="Example: LAB01-01" />
         </div>
         <div class="flex flex-col gap-1.5 font-medium">
           <label for="ip_address">IP Address</label>
-          <input type="text" name="ip_address" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal" placeholder="LB01-" />
+          <input type="text" name="ip_address" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal" placeholder="Example: 10.100.71.101" />
         </div>
         <div class="flex flex-col gap-1.5 font-medium">
           <label for="lab_num">Lab Num</label>
-          <input type="text" name="lab_num" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal" placeholder="LB01-" />
+          <input type="text" name="lab_num" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal" placeholder="Example: 1" />
         </div>
 
         <div class="form-example">

@@ -1,5 +1,5 @@
 package org.file_record;
 
 public interface FileRecordService {
-  Integer createFileRecord(FileRecord fileRecord, Integer entryId);
+  Integer createFileRecord(FileRecord fileRecord);
 }

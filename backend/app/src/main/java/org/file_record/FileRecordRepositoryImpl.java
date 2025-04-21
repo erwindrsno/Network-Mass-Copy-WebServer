@@ -24,10 +24,10 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
   }
 
   @Override
-  public Integer save(FileRecord fileRecord, Integer entryId) {
+  public Integer save(FileRecord fileRecord) {
     try (Connection conn = super.getConnection()) {
 
-      String query = "INSERT INTO file_record(path, owner, permissions, copied_at, takeowned_at, entry_id) VALUES(?, ?, ?, ?, ?, ?)";
+      String query = "INSERT INTO file_record(path, owner, permissions, copied_at, takeowned_at, entry_id) VALUES(?, ?, ?, ?::timestamp, ?::timestamp, ?)";
       PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
       ps.setString(1, fileRecord.getPath());
@@ -35,7 +35,7 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
       ps.setInt(3, fileRecord.getPermissions());
       ps.setString(4, null);
       ps.setString(5, null);
-      ps.setInt(6, entryId);
+      ps.setInt(6, fileRecord.getEntryId());
 
       int insertCount = ps.executeUpdate();
       logger.info(insertCount + " rows inserted");
