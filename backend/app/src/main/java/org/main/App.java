@@ -17,6 +17,7 @@ import org.entry.EntryController;
 import org.entry.EntryModule;
 import org.file_record.FileRecordController;
 import org.file_record.FileRecordModule;
+import org.file_record_computer.FileRecordComputerModule;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.inject.Guice;
@@ -32,7 +33,7 @@ public class App {
 
   public static void main(String[] args) {
     Injector injector = Guice.createInjector(new ComputerModule(), new UserModule(), new DatabaseModule(),
-        new SessionModule(), new FileRecordModule(), new EntryModule());
+        new SessionModule(), new FileRecordModule(), new EntryModule(), new FileRecordComputerModule());
 
     ComputerController computerController = injector.getInstance(ComputerController.class);
     UserController userController = injector.getInstance(UserController.class);

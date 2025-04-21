@@ -11,6 +11,6 @@ public class FileRecordComputer {
   private Integer id;
   private String timestamp;
   private boolean status;
-  private Integer fileId;
+  private Integer fileRecordId;
   private Integer computerId;
 }

@@ -1,12 +1,11 @@
-
-package org.file_record;
+package org.file_record_computer;
 
 import com.google.inject.AbstractModule;
 
-public class FileRecordModule extends AbstractModule {
+public class FileRecordComputerModule extends AbstractModule {
   @Override
   protected void configure() {
-    bind(FileRecordService.class).to(FileRecordServiceImpl.class);
-    bind(FileRecordRepository.class).to(FileRecordRepositoryImpl.class);
+    bind(FileRecordComputerService.class).to(FileRecordComputerServiceImpl.class);
+    bind(FileRecordComputerRepository.class).to(FileRecordComputerRepositoryImpl.class);
   }
 }

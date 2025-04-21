@@ -1,6 +1,7 @@
 package org.user;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.main.BaseRepository;
 
+@Singleton
 public class UserRepositoryImpl extends BaseRepository<User> implements UserRepository {
   private Logger logger = LoggerFactory.getLogger(UserRepositoryImpl.class);
 

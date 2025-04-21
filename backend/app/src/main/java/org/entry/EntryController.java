@@ -1,6 +1,8 @@
 package org.entry;
 
 import org.file_record.FileRecordService;
+import org.file_record_computer.FileRecordComputer;
+import org.file_record_computer.FileRecordComputerService;
 import org.computer.ComputerService;
 import org.file_record.FileRecord;
 import org.slf4j.Logger;
@@ -21,13 +23,15 @@ public class EntryController {
   private final EntryService entryService;
   private final FileRecordService fileRecordService;
   private final ComputerService computerService;
+  private final FileRecordComputerService fileRecordComputerService;
 
   @Inject
   public EntryController(EntryService entryService, FileRecordService fileRecordService,
-      ComputerService computerService) {
+      ComputerService computerService, FileRecordComputerService fileRecordComputerService) {
     this.entryService = entryService;
     this.fileRecordService = fileRecordService;
     this.computerService = computerService;
+    this.fileRecordComputerService = fileRecordComputerService;
   }
 
   public void insertEntry(Context ctx) {
@@ -62,7 +66,9 @@ public class EntryController {
           Integer fileRecordId = this.fileRecordService.createFileRecord(fileRecord);
           // logger.info("file record id is: " + fileRecordId);
           Integer computerId = this.computerService.getComputersByHostname(hostname).getId();
-          this.fileRecordCompu
+
+          FileRecordComputer fileRecordComputer = new FileRecordComputer(null, null, false, fileRecordId, computerId);
+          this.fileRecordComputerService.createFileRecordComputer(fileRecordComputer);
         }
         // logger.info("hostname : " + hostname);
         // logger.info("owner : " + owner);

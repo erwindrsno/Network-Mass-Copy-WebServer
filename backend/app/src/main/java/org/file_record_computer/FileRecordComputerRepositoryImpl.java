@@ -12,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+@Singleton
 public class FileRecordComputerRepositoryImpl extends BaseRepository<FileRecordComputer>
     implements FileRecordComputerRepository {
 
@@ -33,7 +35,7 @@ public class FileRecordComputerRepositoryImpl extends BaseRepository<FileRecordC
       ps.setString(1, fileRecordComputer.getTimestamp());
       // harus menggunakan isStatus, bukan getStatus(), karena aturan dari lombok;
       ps.setBoolean(2, fileRecordComputer.isStatus());
-      ps.setInt(3, fileRecordComputer.getFileId());
+      ps.setInt(3, fileRecordComputer.getFileRecordId());
       ps.setInt(4, fileRecordComputer.getComputerId());
 
       int insertCount = ps.executeUpdate();
