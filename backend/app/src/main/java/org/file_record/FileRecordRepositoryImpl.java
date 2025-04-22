@@ -27,7 +27,7 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
   public Integer save(FileRecord fileRecord) {
     try (Connection conn = super.getConnection()) {
 
-      String query = "INSERT INTO file_record(path, owner, permissions, copied_at, takeowned_at, entry_id) VALUES(?, ?, ?, ?::timestamp, ?::timestamp, ?)";
+      String query = "INSERT INTO file(path, owner, permissions, copied_at, takeowned_at, entry_id) VALUES(?, ?, ?, ?::timestamp, ?::timestamp, ?)";
       PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
       ps.setString(1, fileRecord.getPath());

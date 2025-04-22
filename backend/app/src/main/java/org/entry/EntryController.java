@@ -38,7 +38,11 @@ public class EntryController {
     String title = ctx.formParam("title");
 
     // Insert ke entitas entry, yang akan return id-nya
-    Entry entry = new Entry(null, title, null, 1);
+    Entry entry = new Entry(null, title, "NOT DONE", false, 1, null);
+    if (ctx.path().equals("/entries/oxam")) {
+      logger.info("YA MASUjk");
+      entry.setFromOxam(true);
+    }
     Integer entryId = this.entryService.createEntry(entry);
 
     // Penyediaan folder file yang akan dicopy ke clients
@@ -51,6 +55,8 @@ public class EntryController {
         .forEach(uploadedFile -> FileUtil.streamToFile(uploadedFile.content(),
             folderName + uploadedFile.filename()));
 
+    // baca JSON yang isinya array of entries, dan ekstrak data tersebut dan
+    // disimpan dalam vairabel
     try {
       ObjectMapper objectMapper = new ObjectMapper();
       JsonNode root = objectMapper.readTree(ctx.formParam("entries"));
@@ -70,9 +76,6 @@ public class EntryController {
           FileRecordComputer fileRecordComputer = new FileRecordComputer(null, null, false, fileRecordId, computerId);
           this.fileRecordComputerService.createFileRecordComputer(fileRecordComputer);
         }
-        // logger.info("hostname : " + hostname);
-        // logger.info("owner : " + owner);
-        // logger.info("permissions : " + permissions);
       }
     } catch (Exception e) {
       logger.error(e.getMessage());
@@ -81,5 +84,10 @@ public class EntryController {
 
   public void getAllEntries(Context ctx) {
     ctx.json(this.entryService.getAllEntries());
+  }
+
+  public void getAllJoinedEntries(Context ctx) {
+    // ctx.json(this.entryService.getAllJoinedEntries());
+    ctx.json(this.entryService.getAllJoinedEntries());
   }
 }

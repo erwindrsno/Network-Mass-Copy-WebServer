@@ -35,7 +35,7 @@ function UploadFileForm() {
       console.error('File reading failed:', err);
     }
 
-    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entries`, {
+    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entries/oxam`, {
       method: "POST",
       credentials: "include",
       headers: {

@@ -97,6 +97,12 @@ public class App {
         path("/entries", () -> {
           get(entryController::getAllEntries);
           post(entryController::insertEntry);
+          path("/joined", () -> {
+            get(entryController::getAllJoinedEntries);
+          });
+          path("/oxam", () -> {
+            post(entryController::insertEntry);
+          });
         });
 
         path("/files", () -> {
