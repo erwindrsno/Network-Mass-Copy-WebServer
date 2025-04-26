@@ -1,13 +1,14 @@
 import { createResource, createSignal } from 'solid-js';
 import { action, useNavigate } from "@solidjs/router";
 import Pagination from '../../utils/Pagination.jsx';
+import { useAuthContext } from "../../utils/AuthContextProvider.jsx";
 
-const fetchComputer = async (selectedLab) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/computers/lab/${selectedLab}`, {
+const fetchComputer = async (token, selectedLab) => {
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/computer/lab/${selectedLab}`, {
     method: "GET",
     credentials: "include",
     headers: {
-      "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+      "Authorization": `Bearer ${token()}`
     },
   })
   if (!response.ok && response.status === 401) {
@@ -20,9 +21,10 @@ const fetchComputer = async (selectedLab) => {
 
 function ComputerTable(props) {
   const navigate = useNavigate()
+  const { token, setToken } = useAuthContext();
   //harus pake arrow function di props.selectedLab supaya solidJS dapat melacak reaktivitas props.selectedLab dan
-  //melakukan refetch setiap kali nilainya berubah
-  const [computers, { mutate, refetch }] = createResource(() => props.selectedLab, fetchComputer)
+  //melakukan refetch setiap kali nilainya berubah, yang kemudian mengembalikan nilai props.selectedLab ke (lab)
+  const [computers, { mutate, refetch }] = createResource(() => props.selectedLab, (lab) => fetchComputer(token, lab));
 
   const [paginated, setPaginated] = createSignal({
     currentPage: 1,
@@ -33,11 +35,11 @@ function ComputerTable(props) {
   const handleDelete = async (computerId) => {
     if (!confirm("Are you sure you want to delete this computer?")) return;
     console.log("To be deleted is  : " + computerId)
-    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/computers/id/${computerId}`, {
+    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/computer/id/${computerId}`, {
       method: "DELETE",
       credentials: "include",
       headers: {
-        "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+        "Authorization": `Bearer ${token()}`
       },
     })
     if (!response.ok && response.status === 401) {

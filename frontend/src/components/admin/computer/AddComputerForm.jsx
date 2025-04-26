@@ -1,16 +1,18 @@
 import { createSignal } from "solid-js";
 import { action, useNavigate } from "@solidjs/router";
-
+import { useAuthContext } from "../../utils/AuthContextProvider.jsx";
 
 function AddComputerForm() {
   const navigate = useNavigate()
+  const { token, setToken } = useAuthContext();
+
   const handleAddComputer = action(async (formData) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/computers`, {
+    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/computer`, {
       method: "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+        "Authorization": `Bearer ${token()}`
       },
       body: new URLSearchParams({
         host_name: formData.get('host_name'),
@@ -23,7 +25,6 @@ function AddComputerForm() {
     } else if (response.ok && response.status === 200) {
       navigate('/admin/computer')
     }
-    console.log(formData)
   })
   return (
     <div class="flex flex-col gap-5 border border-gray-300 rounded-md px-4 py-4 w-lg justify-between bg-gray-50">

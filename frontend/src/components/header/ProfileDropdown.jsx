@@ -7,11 +7,11 @@ function ProfileDropdown() {
 
   const handleLogout = async () => {
     if (!confirm(`Are you sure you want to log out?`)) return;
-    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/users/logout`, {
+    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user/logout`, {
       method: "POST",
       credentials: "include",
       headers: {
-        "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+        "Authorization": `Bearer ${token()}`
       },
     })
     if (!response.ok) {

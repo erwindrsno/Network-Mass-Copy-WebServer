@@ -1,11 +1,11 @@
-import RecordTable from '../components/home/RecordTable.jsx';
+import EntryRecordTable from '../components/home/EntryRecordTable.jsx';
 import Header from '../components/header/Header.jsx';
 
 function Home() {
   return (
-    <div class="w-full h-full flex flex-col">
+    <div class="w-full h-full flex flex-col bg-gray-100">
       <Header />
-      <RecordTable />
+      <EntryRecordTable />
     </div>
   )
 }

@@ -1,16 +1,18 @@
 import { createSignal } from "solid-js";
 import { action, useNavigate } from "@solidjs/router";
+import { useAuthContext } from "../../utils/AuthContextProvider.jsx";
 
 function AddUserForm() {
   const navigate = useNavigate()
+  const { token, setToken } = useAuthContext();
 
   const handleAddUser = action(async (formData) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/users`, {
+    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user`, {
       method: "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+        "Authorization": `Bearer ${token()}`
       },
       body: new URLSearchParams({
         username: formData.get('username'),

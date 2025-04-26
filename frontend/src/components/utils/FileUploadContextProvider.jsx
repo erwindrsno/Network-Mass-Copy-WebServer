@@ -3,23 +3,19 @@ import { createStore } from "solid-js/store";
 
 const FileUploadContext = createContext();
 
-export function FileUploadContextProvider(props){
+export function FileUploadContextProvider(props) {
   const [files, setFiles] = createSignal([])
 
   const value = { files, setFiles };
 
-  return(
+  return (
     <FileUploadContext.Provider value={value}>
       {props.children}
     </FileUploadContext.Provider>
   )
 }
 
-export function useAuthContext(){
-  return useContext(AuthContext); 
-}
-
-export function useFileUploadContext(){
+export function useFileUploadContext() {
   return useContext(FileUploadContext);
 }
 

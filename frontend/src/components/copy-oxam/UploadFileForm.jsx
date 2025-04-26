@@ -2,24 +2,23 @@ import FileManager from "./FileManager.jsx"
 import { FileUploadContextProvider, useFileUploadContext } from "../utils/FileUploadContextProvider.jsx";
 import { action, useNavigate } from "@solidjs/router";
 import { extractDataFromTxt } from "../utils/DataExtraction.jsx";
+import { useAuthContext } from "../utils/AuthContextProvider.jsx";
 
 function UploadFileForm() {
   const { files, setFiles } = useFileUploadContext();
+  const { token, setToken } = useAuthContext();
+  const navigate = useNavigate();
 
   const handleUploadFiles = action(async (formData) => {
-    // console.log(files());
-    // console.log(formData.get("acl"));
-    // console.log(formData.get("target"));
-
     const file = formData.get("access_list");
 
     try {
       const { title, entries } = await extractDataFromTxt(file);
-      entries.forEach(entry => {
-        console.log("Hostname:", entry.hostname);
-        console.log("Owner:", entry.owner);
-        console.log("Permissions:", entry.permissions);
-      });
+      // entries.forEach(entry => {
+      //   console.log("Hostname:", entry.hostname);
+      //   console.log("Owner:", entry.owner);
+      //   console.log("Permissions:", entry.permissions);
+      // });
 
       formData.append("title", title);
       formData.append("entries", JSON.stringify(entries));
@@ -27,28 +26,38 @@ function UploadFileForm() {
         formData.append("files", file);
       }
       formData.delete("access_list");
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-      }
+      // for (const [key, value] of formData.entries()) {
+      //   console.log(`${key}:`, value);
+      // }
 
+      const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/oxam`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Authorization": `Bearer ${token()}`
+        },
+        body: formData,
+      });
+      console.log(response.status);
+      console.log(response.ok);
+      if (!response.ok && response.status === 401) {
+        console.log("UNAUTH!");
+      }
+      if (response.status === 200) {
+        console.log("MUST NAV TO HOME");
+        navigate("/home");
+      }
     } catch (err) {
       console.error('File reading failed:', err);
     }
 
-    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entries/oxam`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Authorization": `Bearer ${sessionStorage.getItem("token")}`
-      },
-      body: formData,
-    });
-    if (!response.ok && response.status === 401) {
-      console.log("UNAUTH!");
-    } else {
-      const result = await response.json();
-      console.log(result);
-    }
+
+    // else {
+    //   const result = await response.json();
+    //   console.log(result);
+    //   console.log("MUST NAV TO HOME");
+    //   navigate("/home");
+    // }
   })
 
   return (

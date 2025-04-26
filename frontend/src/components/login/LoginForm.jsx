@@ -16,7 +16,7 @@ function LoginForm() {
   }
 
   const handleLogin = action(async (formData) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/users/login`, {
+    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user/login`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -34,7 +34,7 @@ function LoginForm() {
       const result = await response.json();
       sessionStorage.setItem("token", result.token);
       setToken(result.token);
-      // setUserStore({ isAuth: true, display_name: result.username });
+
       navigate("/home", { replace: true });
     }
     console.log("Username " + formData.get('username'));

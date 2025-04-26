@@ -1,14 +1,14 @@
 import { createResource, createSignal } from 'solid-js';
 import { useNavigate } from '@solidjs/router'
-
+import { useAuthContext } from "../../utils/AuthContextProvider.jsx";
 import Pagination from '../../utils/Pagination.jsx'
 
-const fetchUser = async () => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/users`, {
+const fetchUser = async (token) => {
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user`, {
     method: "GET",
     credentials: "include",
     headers: {
-      "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+      "Authorization": `Bearer ${token}`
     },
   })
   if (!response.ok && response.status === 401) {
@@ -20,7 +20,8 @@ const fetchUser = async () => {
 
 function UserTable() {
   const navigate = useNavigate()
-  const [users, { mutate, refetch }] = createResource(fetchUser)
+  const { token, setToken } = useAuthContext();
+  const [users, { mutate, refetch }] = createResource(() => fetchUser(token()));
   const [paginated, setPaginated] = createSignal({
     currentPage: 1,
     items: [],
@@ -30,11 +31,11 @@ function UserTable() {
   const handleDelete = async (userId) => {
     if (!confirm(`Are you sure you want to delete this user with name ${userId}?`)) return;
     console.log("To be deleted is  : " + userId)
-    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/users/id/${userId}`, {
+    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user/id/${userId}`, {
       method: "DELETE",
       credentials: "include",
       headers: {
-        "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+        "Authorization": `Bearer ${token()}`
       },
     })
     if (!response.ok && response.status === 401) {
