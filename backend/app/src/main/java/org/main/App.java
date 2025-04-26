@@ -37,7 +37,7 @@ public class App {
 
     ComputerController computerController = injector.getInstance(ComputerController.class);
     UserController userController = injector.getInstance(UserController.class);
-    FileRecordController fileController = injector.getInstance(FileRecordController.class);
+    FileRecordController fileRecordController = injector.getInstance(FileRecordController.class);
     EntryController entryController = injector.getInstance(EntryController.class);
     SessionConfig sessionConfig = injector.getInstance(SessionConfig.class);
 
@@ -58,13 +58,13 @@ public class App {
             ctx.status(204);
             ctx.skipRemainingHandlers();
           } else {
-            if (!ctx.path().equals("/users/login") && !userController.validateUser(ctx)) {
+            if (!ctx.path().equals("/user/login") && !userController.validateUser(ctx)) {
               throw new UnauthorizedResponse("Unauthorized! Please log in first.");
             }
           }
         });
 
-        path("/users", () -> {
+        path("/user", () -> {
           get(userController::getAllUsers);
           post(userController::insertUser);
           path("/id/{id}", () -> {
@@ -79,7 +79,7 @@ public class App {
           });
         });
 
-        path("/computers", () -> {
+        path("/computer", () -> {
           get(computerController::getComputers);
           post(computerController::insertComputer);
           path("/lab/{num}", () -> {
@@ -94,19 +94,20 @@ public class App {
           });
         });
 
-        path("/entries", () -> {
+        path("/entry", () -> {
           get(entryController::getAllEntries);
-          post(entryController::insertEntry);
-          path("/joined", () -> {
-            get(entryController::getAllJoinedEntries);
-          });
+          // post(entryController::insertEntry);
           path("/oxam", () -> {
             post(entryController::insertEntry);
           });
+          path("/file/{id}", () -> {
+            get(entryController::getFileInfo);
+          });
         });
 
-        path("/files", () -> {
-          post(fileController::insertFiles);
+        path("/file/{id}", () -> {
+          get(fileRecordController::getFileInfo);
+          // post(fileRecordController::insertFiles);
         });
       });
     });

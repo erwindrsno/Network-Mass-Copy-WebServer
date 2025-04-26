@@ -8,6 +8,4 @@ public interface EntryRepository {
   Integer save(Entry entry);
 
   List<Entry> findAll();
-
-  List<Entry> findAllWithJoined();
 }

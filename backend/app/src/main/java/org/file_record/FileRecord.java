@@ -11,15 +11,25 @@ public class FileRecord {
   private Integer id;
   private String path;
   private String owner;
-  private int permissions;
+  private String filename;
+  private Integer permissions;
   private String copiedAt;
   private String takeownedAt;
+  private long filesize;
   private Integer entryId;
 
-  public FileRecord(String owner, int permissions, String path, Integer entryId) {
+  public FileRecord(String owner, int permissions, String path, String filename, long filesize, Integer entryId) {
     this.owner = owner;
     this.permissions = permissions;
     this.path = path;
+    this.filename = filename;
+    this.filesize = filesize;
     this.entryId = entryId;
+  }
+
+  public FileRecord(Integer id, String filename, long filesize) {
+    this.id = id;
+    this.filename = filename;
+    this.filesize = filesize;
   }
 }

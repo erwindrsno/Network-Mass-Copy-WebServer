@@ -1,6 +1,10 @@
 package org.entry;
 
+import java.sql.Timestamp;
+
 import javax.annotation.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +18,8 @@ public class Entry {
   private String title;
   private String completeness;
   private boolean isFromOxam;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Bangkok")
+  private Timestamp createdAt;
   private Integer userId;
   @Nullable
   private Integer permissions;

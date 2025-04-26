@@ -3,6 +3,9 @@ package org.entry;
 import org.file_record.FileRecordService;
 import org.file_record_computer.FileRecordComputer;
 import org.file_record_computer.FileRecordComputerService;
+
+import java.sql.Timestamp;
+
 import org.computer.ComputerService;
 import org.file_record.FileRecord;
 import org.slf4j.Logger;
@@ -38,9 +41,8 @@ public class EntryController {
     String title = ctx.formParam("title");
 
     // Insert ke entitas entry, yang akan return id-nya
-    Entry entry = new Entry(null, title, "NOT DONE", false, 1, null);
-    if (ctx.path().equals("/entries/oxam")) {
-      logger.info("YA MASUjk");
+    Entry entry = new Entry(null, title, "NOT DONE", false, null, 1, null);
+    if (ctx.path().equals("/entry/oxam")) {
       entry.setFromOxam(true);
     }
     Integer entryId = this.entryService.createEntry(entry);
@@ -67,14 +69,15 @@ public class EntryController {
         int permissions = receivedFileRecord.get("permissions").asInt();
 
         for (UploadedFile uploadedFile : ctx.uploadedFiles("files")) {
-          FileRecord fileRecord = new FileRecord(owner, permissions, "D/ujian/" + title + "/" + uploadedFile.filename(),
-              entryId);
+          String filePath = "D/ujian/" + title + "/" + uploadedFile.filename();
+          FileRecord fileRecord = new FileRecord(owner, permissions, filePath, uploadedFile.filename(),
+              uploadedFile.size(), entryId);
           Integer fileRecordId = this.fileRecordService.createFileRecord(fileRecord);
-          // logger.info("file record id is: " + fileRecordId);
           Integer computerId = this.computerService.getComputersByHostname(hostname).getId();
 
           FileRecordComputer fileRecordComputer = new FileRecordComputer(null, null, false, fileRecordId, computerId);
           this.fileRecordComputerService.createFileRecordComputer(fileRecordComputer);
+          ctx.status(200);
         }
       }
     } catch (Exception e) {
@@ -86,8 +89,8 @@ public class EntryController {
     ctx.json(this.entryService.getAllEntries());
   }
 
-  public void getAllJoinedEntries(Context ctx) {
-    // ctx.json(this.entryService.getAllJoinedEntries());
-    ctx.json(this.entryService.getAllJoinedEntries());
+  public void getFileInfo(Context ctx) {
+    Integer entryId = Integer.parseInt(ctx.pathParam("id"));
+    ctx.json(this.fileRecordService.getFileInfo(entryId));
   }
 }

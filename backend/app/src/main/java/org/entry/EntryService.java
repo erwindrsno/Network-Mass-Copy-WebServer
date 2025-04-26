@@ -7,6 +7,4 @@ public interface EntryService {
   Integer createEntry(Entry entry);
 
   List<Entry> getAllEntries();
-
-  List<Entry> getAllJoinedEntries();
 }

@@ -6,4 +6,6 @@ public interface FileRecordRepository {
   Integer save(FileRecord fileRecord);
 
   List<FileRecord> findAll();
+
+  List<FileRecord> findByEntryId(Integer entryId);
 }
