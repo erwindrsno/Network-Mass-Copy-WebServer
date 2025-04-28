@@ -14,11 +14,6 @@ function UploadFileForm() {
 
     try {
       const { title, entries } = await extractDataFromTxt(file);
-      // entries.forEach(entry => {
-      //   console.log("Hostname:", entry.hostname);
-      //   console.log("Owner:", entry.owner);
-      //   console.log("Permissions:", entry.permissions);
-      // });
 
       formData.append("title", title);
       formData.append("entries", JSON.stringify(entries));
@@ -26,9 +21,6 @@ function UploadFileForm() {
         formData.append("files", file);
       }
       formData.delete("access_list");
-      // for (const [key, value] of formData.entries()) {
-      //   console.log(`${key}:`, value);
-      // }
 
       const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/oxam`, {
         method: "POST",
@@ -50,14 +42,6 @@ function UploadFileForm() {
     } catch (err) {
       console.error('File reading failed:', err);
     }
-
-
-    // else {
-    //   const result = await response.json();
-    //   console.log(result);
-    //   console.log("MUST NAV TO HOME");
-    //   navigate("/home");
-    // }
   })
 
   return (

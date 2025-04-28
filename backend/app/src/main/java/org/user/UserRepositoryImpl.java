@@ -25,7 +25,6 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
 
   @Override
   public List<User> findAll() {
-    logger.info("Entered find all");
     List<User> listResultSet = new ArrayList<>();
 
     try (Connection conn = super.getConnection()) {

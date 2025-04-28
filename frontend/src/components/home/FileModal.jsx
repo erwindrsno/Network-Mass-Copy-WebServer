@@ -2,10 +2,11 @@ import { Portal } from "solid-js/web";
 import { createResource, createSignal, Show } from 'solid-js';
 import { useAuthContext } from "../utils/AuthContextProvider.jsx";
 import { DownloadIcon } from "./DownloadIcon.jsx";
+import { CloseModalIcon } from "./CloseModalIcon.jsx";
 
 const fetchFilesInfo = async (token, id) => {
   console.log(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/file/${id}`);
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/file/${id}`, {
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/${id}/file`, {
     method: "GET",
     credentials: "include",
     headers: {
@@ -32,7 +33,7 @@ function FileModal(props) {
           <div class="flex flex-col h-9/10 my-2 mx-3 gap-4">
             <div class="flex flex-row justify-between border-b-1 pb-2">
               <p>{title}</p>
-              <button onClick={props.closeModal}>X</button>
+              <button onClick={props.closeModal} class="cursor-pointer"><CloseModalIcon /></button>
             </div>
             <div class="h-35 overflow-y-auto border border-gray-300 rounded-lg p-2 bg-gray-50">
               {filesInfo()?.map((file, index) => (
@@ -45,7 +46,7 @@ function FileModal(props) {
                     </span>
                     <button
                       onClick={() => props.removeFile(index)}
-                      class="bg-blue-400 text-white text-xs px-1 py-1 rounded hover:bg-red-600 transition cursor-pointer"
+                      class="bg-blue-600 text-white text-xs px-1 py-1 rounded hover:bg-blue-700 transition cursor-pointer"
                     >
                       <DownloadIcon></DownloadIcon>
                     </button>

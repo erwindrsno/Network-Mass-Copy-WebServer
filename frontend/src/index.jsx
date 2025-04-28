@@ -15,6 +15,7 @@ import Computer from './pages/admin/Computer.jsx';
 import User from './pages/admin/User.jsx';
 import AddComputer from './pages/admin/AddComputer.jsx';
 import AddUser from './pages/admin/AddUser.jsx';
+import SingleEntryRecord from './pages/SingleEntryRecord';
 
 import ProtectedRouteWrapper from './components/utils/ProtectedRouteWrapper.jsx';
 import { AuthContextProvider } from './components/utils/AuthContextProvider.jsx';
@@ -27,33 +28,34 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   );
 }
 
-if(!wrapper){
-    throw new Error("wrapper div not found")
+if (!wrapper) {
+  throw new Error("wrapper div not found")
 }
 
 render(
-    () => (
+  () => (
     <AuthContextProvider>
-        <Router>
-            <Route path="/" component={Login} />
-            <Route path="/home">
-              <Route path="/" component={() => ProtectedRouteWrapper(Home)} />
-              <Route path="/copy-oxam" component={() => ProtectedRouteWrapper(CopyOxam)} />
-              <Route path="/copy" component={() => ProtectedRouteWrapper(Copy)} />
-            </Route>
-            
-            <Route path="/admin">
-              <Route path="/computer">
-                <Route path="/" component={() => ProtectedRouteWrapper(Computer)} />
-                <Route path="/add" component={() => ProtectedRouteWrapper(AddComputer)} />
-              </Route>
-              <Route path="/user">
-                <Route path="/" component={() => ProtectedRouteWrapper(User)} />
-                <Route path="/add" component={() => ProtectedRouteWrapper(AddUser)} />
-              </Route>
-            </Route>
-        </Router>
+      <Router>
+        <Route path="/" component={Login} />
+        <Route path="/home">
+          <Route path="/" component={() => ProtectedRouteWrapper(Home)} />
+          <Route path="/copy-oxam" component={() => ProtectedRouteWrapper(CopyOxam)} />
+          <Route path="/copy" component={() => ProtectedRouteWrapper(Copy)} />
+          <Route path="/entry/:id" component={() => ProtectedRouteWrapper(SingleEntryRecord)}></Route>
+        </Route>
+
+        <Route path="/admin">
+          <Route path="/computer">
+            <Route path="/" component={() => ProtectedRouteWrapper(Computer)} />
+            <Route path="/add" component={() => ProtectedRouteWrapper(AddComputer)} />
+          </Route>
+          <Route path="/user">
+            <Route path="/" component={() => ProtectedRouteWrapper(User)} />
+            <Route path="/add" component={() => ProtectedRouteWrapper(AddUser)} />
+          </Route>
+        </Route>
+      </Router>
     </AuthContextProvider>
-    ),
-    wrapper
+  ),
+  wrapper
 );

@@ -14,8 +14,8 @@ const fetchComputer = async (token, selectedLab) => {
   if (!response.ok && response.status === 401) {
     console.log("UNAUTH!")
   }
-
-  return response.json();
+  const result = await response.json();
+  return result
 }
 
 

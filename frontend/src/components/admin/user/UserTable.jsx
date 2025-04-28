@@ -8,20 +8,20 @@ const fetchUser = async (token) => {
     method: "GET",
     credentials: "include",
     headers: {
-      "Authorization": `Bearer ${token}`
+      "Authorization": `Bearer ${token()}`
     },
   })
   if (!response.ok && response.status === 401) {
     console.log("UNAUTH!")
   }
-
-  return response.json();
+  const result = await response.json();
+  return result;
 }
 
 function UserTable() {
   const navigate = useNavigate()
   const { token, setToken } = useAuthContext();
-  const [users, { mutate, refetch }] = createResource(() => fetchUser(token()));
+  const [users, { mutate, refetch }] = createResource(() => fetchUser(token));
   const [paginated, setPaginated] = createSignal({
     currentPage: 1,
     items: [],

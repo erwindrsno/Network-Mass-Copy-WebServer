@@ -5,7 +5,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import org.custom_dto.JoinedEntry;
+import org.joined_entry_file_filecomputer.CustomDtoOne;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -21,13 +21,13 @@ public class EntryServiceImpl implements EntryService {
 
   @Override
   public Integer createEntry(Entry entry) {
-    // Get current time in UTC+7
+    // ambil zona waktu, yaitu UTC+7
     ZoneId zoneId = ZoneId.of("UTC+7");
+    // ambil waktu saat pembuatan entri sesuai dengan zona waktu
     ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
 
-    // Convert to java.sql.Timestamp
+    // konversi waktu ke tipe data time stamp
     Timestamp createdAt = Timestamp.from(zonedDateTime.toInstant());
-    // Timestamp createdAt = new Timestamp(System.currentTimeMillis());
     entry.setCreatedAt(createdAt);
     return this.entryRepository.save(entry);
   }

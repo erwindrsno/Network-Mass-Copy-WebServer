@@ -3,6 +3,7 @@ package org.entry;
 import org.file_record.FileRecordService;
 import org.file_record_computer.FileRecordComputer;
 import org.file_record_computer.FileRecordComputerService;
+import org.joined_entry_file_filecomputer.CustomDtoOneService;
 
 import java.sql.Timestamp;
 
@@ -27,21 +28,24 @@ public class EntryController {
   private final FileRecordService fileRecordService;
   private final ComputerService computerService;
   private final FileRecordComputerService fileRecordComputerService;
+  private final CustomDtoOneService customDtoOneService;
 
   @Inject
   public EntryController(EntryService entryService, FileRecordService fileRecordService,
-      ComputerService computerService, FileRecordComputerService fileRecordComputerService) {
+      ComputerService computerService, FileRecordComputerService fileRecordComputerService,
+      CustomDtoOneService customDtoOneService) {
     this.entryService = entryService;
     this.fileRecordService = fileRecordService;
     this.computerService = computerService;
     this.fileRecordComputerService = fileRecordComputerService;
+    this.customDtoOneService = customDtoOneService;
   }
 
   public void insertEntry(Context ctx) {
     String title = ctx.formParam("title");
 
     // Insert ke entitas entry, yang akan return id-nya
-    Entry entry = new Entry(null, title, "NOT DONE", false, null, 1, null);
+    Entry entry = new Entry(null, title, "Not yet", "Not yet", false, null, 1);
     if (ctx.path().equals("/entry/oxam")) {
       entry.setFromOxam(true);
     }
@@ -69,13 +73,13 @@ public class EntryController {
         int permissions = receivedFileRecord.get("permissions").asInt();
 
         for (UploadedFile uploadedFile : ctx.uploadedFiles("files")) {
-          String filePath = "D/ujian/" + title + "/" + uploadedFile.filename();
+          String filePath = "D/ujian/" + title + " - " + owner + "/" + uploadedFile.filename();
           FileRecord fileRecord = new FileRecord(owner, permissions, filePath, uploadedFile.filename(),
               uploadedFile.size(), entryId);
           Integer fileRecordId = this.fileRecordService.createFileRecord(fileRecord);
           Integer computerId = this.computerService.getComputersByHostname(hostname).getId();
 
-          FileRecordComputer fileRecordComputer = new FileRecordComputer(null, null, false, fileRecordId, computerId);
+          FileRecordComputer fileRecordComputer = new FileRecordComputer(fileRecordId, computerId);
           this.fileRecordComputerService.createFileRecordComputer(fileRecordComputer);
           ctx.status(200);
         }
@@ -92,5 +96,16 @@ public class EntryController {
   public void getFileInfo(Context ctx) {
     Integer entryId = Integer.parseInt(ctx.pathParam("id"));
     ctx.json(this.fileRecordService.getFileInfo(entryId));
+  }
+
+  public void getFileRecordByEntryId(Context ctx) {
+    Integer entryId = Integer.parseInt(ctx.pathParam("id"));
+    // this.fileRecordService.getAllFiles
+  }
+
+  public void getJoinedFileRecordByEntryIdAndFilename(Context ctx) {
+    Integer entryId = Integer.parseInt(ctx.pathParam("id"));
+    String filename = ctx.pathParam("filename");
+    ctx.json(this.customDtoOneService.getJoinedFileRecordsDtoByEntryIdAndFilename(entryId, filename));
   }
 }

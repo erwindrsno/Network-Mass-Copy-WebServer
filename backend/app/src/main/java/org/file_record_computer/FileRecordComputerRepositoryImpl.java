@@ -29,25 +29,15 @@ public class FileRecordComputerRepositoryImpl extends BaseRepository<FileRecordC
   public void save(FileRecordComputer fileRecordComputer) {
     try (Connection conn = super.getConnection()) {
 
-      String query = "INSERT INTO file_computer(timestamp, status, file_id, computer_id) VALUES(?::timestamp, ?, ?, ?)";
+      String query = "INSERT INTO file_computer(file_id, computer_id) VALUES(?, ?)";
       PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
-      ps.setString(1, fileRecordComputer.getTimestamp());
-      // harus menggunakan isStatus, bukan getStatus(), karena aturan dari lombok;
-      ps.setBoolean(2, fileRecordComputer.isStatus());
-      ps.setInt(3, fileRecordComputer.getFileRecordId());
-      ps.setInt(4, fileRecordComputer.getComputerId());
+      ps.setInt(1, fileRecordComputer.getFileRecordId());
+      ps.setInt(2, fileRecordComputer.getComputerId());
 
       int insertCount = ps.executeUpdate();
       logger.info(insertCount + " rows inserted");
 
-      // try (ResultSet rs = ps.getGeneratedKeys()) {
-      // if (rs.next()) {
-      // return rs.getInt(1);
-      // } else {
-      // return null;
-      // }
-      // }
     } catch (Exception e) {
       logger.error(e.getMessage());
       // return null;

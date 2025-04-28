@@ -18,6 +18,7 @@ import org.entry.EntryModule;
 import org.file_record.FileRecordController;
 import org.file_record.FileRecordModule;
 import org.file_record_computer.FileRecordComputerModule;
+import org.joined_entry_file_filecomputer.CustomDtoOneModule;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.inject.Guice;
@@ -33,7 +34,8 @@ public class App {
 
   public static void main(String[] args) {
     Injector injector = Guice.createInjector(new ComputerModule(), new UserModule(), new DatabaseModule(),
-        new SessionModule(), new FileRecordModule(), new EntryModule(), new FileRecordComputerModule());
+        new SessionModule(), new FileRecordModule(), new EntryModule(), new FileRecordComputerModule(),
+        new CustomDtoOneModule());
 
     ComputerController computerController = injector.getInstance(ComputerController.class);
     UserController userController = injector.getInstance(UserController.class);
@@ -55,6 +57,7 @@ public class App {
           ctx.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
           if (ctx.method() == HandlerType.OPTIONS) {
             logger.info("before OPTIONS");
+            logger.info(ctx.path());
             ctx.status(204);
             ctx.skipRemainingHandlers();
           } else {
@@ -100,8 +103,14 @@ public class App {
           path("/oxam", () -> {
             post(entryController::insertEntry);
           });
-          path("/file/{id}", () -> {
-            get(entryController::getFileInfo);
+          path("/{id}", () -> {
+            get(entryController::getFileRecordByEntryId);
+            path("/file", () -> {
+              get(entryController::getFileInfo);
+            });
+            path("/filename/{filename}", () -> {
+              get(entryController::getJoinedFileRecordByEntryIdAndFilename);
+            });
           });
         });
 
