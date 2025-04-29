@@ -7,13 +7,15 @@ import { useParams, useLocation } from "@solidjs/router";
 function SingleEntryRecord() {
   const location = useLocation();
   return (
-    <div class="w-full h-full flex flex-col bg-gray-100">
+    <div class="w-full h-full flex flex-col bg-gray-100 gap-8">
       <Header />
-      <p>{location.state.title}</p>
-      <FileDropdownContextProvider>
-        <FileDropdown />
-        <SingleEntryRecordTable />
-      </FileDropdownContextProvider>
+      <main class="w-7xl flex flex-col justify-self-center self-center gap-3">
+        <h2 class="text-2xl">{location.state.title}</h2>
+        <FileDropdownContextProvider>
+          <FileDropdown />
+          <SingleEntryRecordTable />
+        </FileDropdownContextProvider>
+      </main>
     </div>
   )
 }

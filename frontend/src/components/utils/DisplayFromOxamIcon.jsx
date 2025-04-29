@@ -1,6 +1,5 @@
 import { Show } from "solid-js";
-import { CheckIcon } from "../home/CheckIcon.jsx";
-import { CrossIcon } from "../home/CrossIcon.jsx";
+import { CheckIcon, CrossIcon } from "../../assets/Icons.jsx";
 
 export const displayIcon = (isFromOxam) => {
 

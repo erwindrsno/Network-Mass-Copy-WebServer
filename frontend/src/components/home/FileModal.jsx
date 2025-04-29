@@ -1,8 +1,7 @@
 import { Portal } from "solid-js/web";
 import { createResource, createSignal, Show } from 'solid-js';
 import { useAuthContext } from "../utils/AuthContextProvider.jsx";
-import { DownloadIcon } from "./DownloadIcon.jsx";
-import { CloseModalIcon } from "./CloseModalIcon.jsx";
+import { DownloadIcon, CloseModalIcon, TrashcanIcon } from "../../assets/Icons.jsx";
 
 const fetchFilesInfo = async (token, id) => {
   console.log(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/file/${id}`);
@@ -49,6 +48,12 @@ function FileModal(props) {
                       class="bg-blue-600 text-white text-xs px-1 py-1 rounded hover:bg-blue-700 transition cursor-pointer"
                     >
                       <DownloadIcon></DownloadIcon>
+                    </button>
+                    <button
+                      onClick={() => props.removeFile(index)}
+                      class="bg-red-500 text-white text-xs px-1 py-1 rounded hover:bg-red-600 transition cursor-pointer"
+                    >
+                      <TrashcanIcon></TrashcanIcon>
                     </button>
                   </div>
                 </div>

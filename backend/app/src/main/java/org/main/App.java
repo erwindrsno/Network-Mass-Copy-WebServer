@@ -5,6 +5,8 @@ package org.main;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
+import java.net.http.WebSocket;
+
 import org.computer.ComputerController;
 import org.computer.ComputerModule;
 import org.main.session.SessionConfig;
@@ -13,11 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.user.UserController;
 import org.user.UserModule;
+import org.websocket.WebSocketModule;
 import org.entry.EntryController;
 import org.entry.EntryModule;
 import org.file_record.FileRecordController;
 import org.file_record.FileRecordModule;
 import org.file_record_computer.FileRecordComputerModule;
+import org.java_websocket.client.WebSocketClient;
 import org.joined_entry_file_filecomputer.CustomDtoOneModule;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -35,13 +39,15 @@ public class App {
   public static void main(String[] args) {
     Injector injector = Guice.createInjector(new ComputerModule(), new UserModule(), new DatabaseModule(),
         new SessionModule(), new FileRecordModule(), new EntryModule(), new FileRecordComputerModule(),
-        new CustomDtoOneModule());
+        new CustomDtoOneModule(), new WebSocketModule());
 
     ComputerController computerController = injector.getInstance(ComputerController.class);
     UserController userController = injector.getInstance(UserController.class);
     FileRecordController fileRecordController = injector.getInstance(FileRecordController.class);
     EntryController entryController = injector.getInstance(EntryController.class);
-    SessionConfig sessionConfig = injector.getInstance(SessionConfig.class);
+    WebSocketClient webSocketClient = injector.getInstance(WebSocketClient.class);
+
+    logger.info("Websocket is connected! " + webSocketClient.isOpen());
 
     Javalin app = Javalin.create(config -> {
       // config.jetty.modifyServletContextHandler(

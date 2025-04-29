@@ -1,4 +1,3 @@
-import { createSignal } from "solid-js";
 import { action, useNavigate } from "@solidjs/router";
 import { useAuthContext } from "../../utils/AuthContextProvider.jsx";
 

@@ -1,4 +1,5 @@
 import { useFileUploadContext } from "../utils/FileUploadContextProvider.jsx";
+import { TrashcanIcon } from "../../assets/Icons.jsx";
 
 function FilePreview(props) {
   const { files, setFiles } = useFileUploadContext();
@@ -13,13 +14,13 @@ function FilePreview(props) {
               <span class="text-sm text-gray-700">{index + 1}. {file.name}</span>
               <div class="flex items-center space-x-2">
                 <span class="text-sm text-gray-500">
-                  {(file.size / 1024).toFixed(2)} KB
+                  {(file.size / 10240).toFixed(2)} MB
                 </span>
                 <button
                   onClick={() => props.removeFile(index)}
-                  class="bg-red-500 text-white text-xs px-2 py-1 rounded hover:bg-red-600 transition cursor-pointer"
+                  class="bg-red-500 text-white text-xs px-1 py-1 rounded hover:bg-red-600 transition cursor-pointer"
                 >
-                  Delete
+                  <TrashcanIcon></TrashcanIcon>
                 </button>
               </div>
             </div>

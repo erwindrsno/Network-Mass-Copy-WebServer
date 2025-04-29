@@ -3,10 +3,12 @@ import Header from '../components/header/Header.jsx';
 
 function Home() {
   return (
-    <div class="w-full h-full flex flex-col bg-gray-100">
+    <div class="w-full h-full flex flex-col bg-gray-100 gap-8">
       <Header />
-      <EntryRecordTable />
-    </div>
+      <main class="w-7xl flex flex-col justify-self-center self-center gap-3">
+        <EntryRecordTable />
+      </main>
+    </div >
   )
 }
 
