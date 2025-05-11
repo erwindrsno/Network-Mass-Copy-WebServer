@@ -2,7 +2,7 @@ import Header from '../../components/header/Header.jsx'
 import Navbar from '../../components/admin/Navbar.jsx'
 import UserCRUD from '../../components/admin/user/UserCRUD.jsx'
 
-function User() {
+function UserPage() {
   return (
     <div class="w-full h-full flex flex-col bg-gray-100">
       <Header />
@@ -14,4 +14,4 @@ function User() {
   )
 }
 
-export default User
+export default UserPage;

@@ -2,7 +2,7 @@ import Header from '../../components/header/Header.jsx'
 import Navbar from '../../components/admin/Navbar.jsx'
 import ComputerCRUD from '../../components/admin/computer/ComputerCRUD.jsx'
 
-function Computer() {
+function ComputerPage() {
   return (
     <div class="w-full h-full flex flex-col bg-gray-100">
       <Header />
@@ -14,4 +14,4 @@ function Computer() {
   )
 }
 
-export default Computer
+export default ComputerPage;

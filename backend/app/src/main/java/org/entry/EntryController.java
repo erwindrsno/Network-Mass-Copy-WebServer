@@ -1,16 +1,18 @@
 package org.entry;
 
-import org.file_record.FileRecordService;
-import org.file_record_computer.FileRecordComputer;
-import org.file_record_computer.FileRecordComputerService;
-import org.joined_entry_file_filecomputer.CustomDtoOneService;
-
-import java.sql.Timestamp;
+import java.util.List;
 
 import org.computer.ComputerService;
 import org.file_record.FileRecord;
+import org.file_record.FileRecordService;
+import org.file_record_computer.FileRecordComputer;
+import org.file_record_computer.FileRecordComputerService;
+import org.joined_entry_file_filecomputer.CustomDtoOne;
+import org.joined_entry_file_filecomputer.CustomDtoOneService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.websocket.FileAccessInfo;
+import org.websocket.WebSocketClientService;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,23 +31,26 @@ public class EntryController {
   private final ComputerService computerService;
   private final FileRecordComputerService fileRecordComputerService;
   private final CustomDtoOneService customDtoOneService;
+  private final WebSocketClientService wsClientService;
 
   @Inject
   public EntryController(EntryService entryService, FileRecordService fileRecordService,
       ComputerService computerService, FileRecordComputerService fileRecordComputerService,
-      CustomDtoOneService customDtoOneService) {
+      CustomDtoOneService customDtoOneService, WebSocketClientService wsClientService) {
     this.entryService = entryService;
     this.fileRecordService = fileRecordService;
     this.computerService = computerService;
     this.fileRecordComputerService = fileRecordComputerService;
     this.customDtoOneService = customDtoOneService;
+    this.wsClientService = wsClientService;
   }
 
   public void insertEntry(Context ctx) {
     String title = ctx.formParam("title");
+    Integer count = Integer.parseInt(ctx.formParam("count"));
 
     // Insert ke entitas entry, yang akan return id-nya
-    Entry entry = new Entry(null, title, "Not yet", "Not yet", false, null, 1);
+    Entry entry = new Entry(null, title, "0/" + count, "0/" + count, false, count, null, 1);
     if (ctx.path().equals("/entry/oxam")) {
       entry.setFromOxam(true);
     }
@@ -53,7 +58,7 @@ public class EntryController {
 
     // Penyediaan folder file yang akan dicopy ke clients
     StringBuilder baseFolder = new StringBuilder("upload/");
-    String folderName = baseFolder.append(title).append("/").toString();
+    String folderName = baseFolder.append(entryId).append("/").toString();
 
     // File yang dikirimkan oleh client akan di simpan di folder upload/${title
     // entry nya}/FILESSSSSS
@@ -65,7 +70,7 @@ public class EntryController {
     // disimpan dalam vairabel
     try {
       ObjectMapper objectMapper = new ObjectMapper();
-      JsonNode root = objectMapper.readTree(ctx.formParam("entries"));
+      JsonNode root = objectMapper.readTree(ctx.formParam("records"));
 
       for (JsonNode receivedFileRecord : root) {
         String hostname = receivedFileRecord.get("hostname").asText();
@@ -73,13 +78,22 @@ public class EntryController {
         int permissions = receivedFileRecord.get("permissions").asInt();
 
         for (UploadedFile uploadedFile : ctx.uploadedFiles("files")) {
-          String filePath = "D/ujian/" + title + " - " + owner + "/" + uploadedFile.filename();
-          FileRecord fileRecord = new FileRecord(owner, permissions, filePath, uploadedFile.filename(),
-              uploadedFile.size(), entryId);
+          String filePath = "D\\Ujian\\" + owner + " - " + title + "\\" + uploadedFile.filename();
+
+          FileRecord fileRecord = FileRecord.builder()
+              .owner(owner)
+              .permissions(permissions)
+              .path(filePath)
+              .filename(uploadedFile.filename())
+              .build();
+
           Integer fileRecordId = this.fileRecordService.createFileRecord(fileRecord);
           Integer computerId = this.computerService.getComputersByHostname(hostname).getId();
 
-          FileRecordComputer fileRecordComputer = new FileRecordComputer(fileRecordId, computerId);
+          FileRecordComputer fileRecordComputer = FileRecordComputer.builder()
+              .id(fileRecordId)
+              .computerId(computerId)
+              .build();
           this.fileRecordComputerService.createFileRecordComputer(fileRecordComputer);
           ctx.status(200);
         }
@@ -107,5 +121,15 @@ public class EntryController {
     Integer entryId = Integer.parseInt(ctx.pathParam("id"));
     String filename = ctx.pathParam("filename");
     ctx.json(this.customDtoOneService.getJoinedFileRecordsDtoByEntryIdAndFilename(entryId, filename));
+  }
+
+  public void copyFileByEntry(Context ctx) {
+    Integer entryId = Integer.parseInt(ctx.pathParam("id"));
+    String title = this.entryService.getTitleByEntryId(entryId);
+    this.customDtoOneService.getMetadataByEntryId(entryId);
+    // path, owner, permissions, ip address/hostname
+    // atribute di atas harus assign ke filemetadata
+    List<FileAccessInfo> listFai = this.customDtoOneService.getMetadataByEntryId(entryId);
+    this.wsClientService.prepareMetadata(entryId, title, listFai);
   }
 }

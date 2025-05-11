@@ -1,7 +1,9 @@
 import { A, useNavigate, action } from "@solidjs/router";
 import { useAuthContext } from "../utils/AuthContextProvider.jsx";
+import { useWebSocketContext } from "../utils/WebSocketContextProvider.jsx";
 
 function ProfileDropdown() {
+  const { socket, setSocket } = useWebSocketContext();
   const { token, setToken } = useAuthContext();
   const navigate = useNavigate()
 
@@ -21,7 +23,7 @@ function ProfileDropdown() {
       console.log(response)
       setToken("");
       sessionStorage.removeItem("token");
-      console.log(sessionStorage.getItem("token"));
+      socket().close();
     }
     navigate("/", { replace: true })
   }

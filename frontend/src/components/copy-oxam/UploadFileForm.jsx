@@ -13,14 +13,14 @@ function UploadFileForm() {
     const file = formData.get("access_list");
 
     try {
-      const { title, entries } = await extractDataFromTxt(file);
+      const { title, records } = await extractDataFromTxt(file);
 
       formData.append("title", title);
-      formData.append("entries", JSON.stringify(entries));
+      formData.append("records", JSON.stringify(records));
       for (const file of files()) {
         formData.append("files", file);
       }
-      formData.append("counts",);
+      formData.append("count", records.length * files().length);
       formData.delete("access_list");
 
       const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/oxam`, {

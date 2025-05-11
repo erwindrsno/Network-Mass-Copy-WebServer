@@ -179,4 +179,23 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
     }
     return false;
   }
+
+  @Override
+  public List<Integer> findAllLabNum() {
+    try (Connection conn = super.getConnection()) {
+      List<Integer> listResultSet = new ArrayList<>();
+      String query = "SELECT DISTINCT ON(lab_num) lab_num FROM computer ORDER BY lab_num ASC";
+
+      PreparedStatement ps = conn.prepareStatement(query);
+
+      ResultSet resultSet = ps.executeQuery();
+      while (resultSet.next()) {
+        listResultSet.add(resultSet.getInt("lab_num"));
+      }
+      return listResultSet;
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+      return null;
+    }
+  }
 }

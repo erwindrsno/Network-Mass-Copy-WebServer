@@ -2,7 +2,7 @@ import Header from '../components/header/Header.jsx'
 import UploadFileForm from '../components/copy-oxam/UploadFileForm.jsx'
 import { FileUploadContextProvider, useFileUploadContext } from "../components/utils/FileUploadContextProvider.jsx";
 
-function CopyOxam() {
+function CopyOxamPage() {
   return (
     <div class="w-full h-full flex flex-col bg-gray-100">
       <Header />
@@ -16,4 +16,4 @@ function CopyOxam() {
   )
 }
 
-export default CopyOxam
+export default CopyOxamPage;

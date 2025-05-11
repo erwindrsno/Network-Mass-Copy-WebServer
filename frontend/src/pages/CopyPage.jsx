@@ -1,7 +1,7 @@
 import Header from '../components/header/Header.jsx';
 
-function Copy(){
-  return(
+function CopyPage() {
+  return (
     <div class="w-full h-full">
       <Header />
       <p>Copy page</p>
@@ -9,4 +9,4 @@ function Copy(){
   )
 }
 
-export default Copy
+export default CopyPage

@@ -1,5 +1,7 @@
 package org.file_record;
 
+import java.io.InputStream;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,5 +29,24 @@ public class FileRecordController {
   public void getFileInfo(Context ctx) {
     Integer entryId = Integer.parseInt(ctx.pathParam("entry_id"));
     ctx.json(this.fileRecordService.getFileInfo(entryId));
+  }
+
+  public void downloadFile(Context ctx) {
+    Integer entryId = Integer.parseInt(ctx.pathParam("entry_id"));
+    String filename = ctx.pathParam("filename");
+    InputStream inputStream = this.fileRecordService.downloadFile(entryId, filename);
+
+    if (inputStream == null) {
+      ctx.status(404).result("Not found");
+      return;
+    }
+    ctx.header("Content-Disposition", "attachment; filename=\"" + filename +
+        "\"");
+    ctx.contentType("application/octet-stream");
+    try {
+      ctx.result(inputStream);
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+    }
   }
 }

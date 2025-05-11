@@ -16,4 +16,6 @@ public interface ComputerService {
   Computer getComputersByHostname(String hostname);
 
   boolean deleteComputersById(Integer id);
+
+  List<Integer> getAllLabNum();
 }

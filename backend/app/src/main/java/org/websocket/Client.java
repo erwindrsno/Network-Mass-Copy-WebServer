@@ -2,7 +2,9 @@ package org.websocket;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.java_websocket.client.WebSocketClient;
@@ -11,19 +13,12 @@ import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class Client extends WebSocketClient {
   Logger logger = LoggerFactory.getLogger(Client.class);
 
-  boolean readyToReceiveFile = false;
-
-  byte[] fileBytes; // complete file in bytes
-  int currIdx = 0;
-  long fileSize;
-  long chunkSize;
-  long chunkCount;
-
-  Map<Integer, byte[]> bytesMap = new HashMap<>();
-  int bytesIdx = 0;
+  Context context;
 
   public Client(URI serverUri, Draft draft) {
     super(serverUri, draft);
@@ -40,7 +35,26 @@ public class Client extends WebSocketClient {
 
   @Override
   public void onMessage(String message) {
-    logger.info(message);
+    if (message.startsWith("file~")) {
+      String[] parts = message.split("CHUNK-ID~");
+
+      String leftPart = parts[0]; // "file~5"
+      String rightPart = parts[1]; // "10"
+
+      String requestedFileUuid = leftPart.split("~")[1];
+      Long chunkId = Long.parseLong(rightPart);
+      logger.info("receiveFileUuid: " + requestedFileUuid);
+      logger.info("chunkId: " + chunkId);
+
+      FileChunkMetadata requestedFcm = this.context.listFcm.stream()
+          .filter(fcm -> fcm.getUuid().equals(requestedFileUuid))
+          .findFirst()
+          .orElseThrow(() -> new RuntimeException("No file found."));
+
+      byte[] arrOfBytes = requestedFcm.getMapOfChunks().get(chunkId);
+      ByteBuffer byteBuffer = ByteBuffer.wrap(arrOfBytes);
+      send(byteBuffer);
+    }
   }
 
   @Override
@@ -55,5 +69,17 @@ public class Client extends WebSocketClient {
   @Override
   public void onError(Exception ex) {
     System.err.println("an error occurred:" + ex);
+  }
+
+  public void setContextAndInitSend(Context context) {
+    this.context = context;
+
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      String json = mapper.writeValueAsString(this.context);
+      send("webserver/metadata/" + json);
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+    }
   }
 }

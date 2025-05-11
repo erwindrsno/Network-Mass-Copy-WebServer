@@ -8,4 +8,6 @@ public interface FileRecordRepository {
   List<FileRecord> findAll();
 
   List<FileRecord> findByEntryId(Integer entryId);
+
+  List<String> findOwnerByEntryId(Integer entryId);
 }

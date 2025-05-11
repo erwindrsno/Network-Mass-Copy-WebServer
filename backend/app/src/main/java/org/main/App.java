@@ -5,16 +5,14 @@ package org.main;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
-import java.net.http.WebSocket;
-
 import org.computer.ComputerController;
 import org.computer.ComputerModule;
-import org.main.session.SessionConfig;
 import org.main.session.SessionModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.user.UserController;
 import org.user.UserModule;
+import org.websocket.WebSocketClientService;
 import org.websocket.WebSocketModule;
 import org.entry.EntryController;
 import org.entry.EntryModule;
@@ -46,6 +44,12 @@ public class App {
     FileRecordController fileRecordController = injector.getInstance(FileRecordController.class);
     EntryController entryController = injector.getInstance(EntryController.class);
     WebSocketClient webSocketClient = injector.getInstance(WebSocketClient.class);
+
+    try {
+      webSocketClient.connectBlocking();
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+    }
 
     logger.info("Websocket is connected! " + webSocketClient.isOpen());
 
@@ -91,7 +95,13 @@ public class App {
         path("/computer", () -> {
           get(computerController::getComputers);
           post(computerController::insertComputer);
-          path("/lab/{num}", () -> {
+          path("/lab", () -> {
+            path("/", () -> {
+              get(computerController::getAllLabNum);
+            });
+            path("/{num}", () -> {
+              get(computerController::getComputersByLabNum);
+            });
             get(computerController::getComputersByLabNum);
           });
           path("/id/{id}", () -> {
@@ -117,12 +127,32 @@ public class App {
             path("/filename/{filename}", () -> {
               get(entryController::getJoinedFileRecordByEntryIdAndFilename);
             });
+            path("copy", () -> {
+              get(entryController::copyFileByEntry);
+            });
           });
         });
 
-        path("/file/{id}", () -> {
-          get(fileRecordController::getFileInfo);
-          // post(fileRecordController::insertFiles);
+        path("/file", () -> {
+          path("/{id}", () -> {
+            get(fileRecordController::getFileInfo);
+          });
+          path("/download", () -> {
+            path("/{entry_id}", () -> {
+              path("/{filename}", () -> {
+                get(fileRecordController::downloadFile);
+              });
+            });
+          });
+        });
+
+        path("/websocket", () -> {
+          path("/{message}", () -> {
+            get(ctx -> {
+              String message = ctx.pathParam("message");
+              // webSocketClient.send(message);
+            });
+          });
         });
       });
     });

@@ -5,12 +5,14 @@ import org.file_record.FileRecord;
 import org.file_record_computer.FileRecordComputer;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class CustomDtoOne {
   private Integer entryId;
   private FileRecordComputer fileRecordComputer;

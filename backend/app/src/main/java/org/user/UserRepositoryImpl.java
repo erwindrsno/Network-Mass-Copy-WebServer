@@ -37,7 +37,11 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
         Integer id = resultSet.getInt("id");
         String username = resultSet.getString("username");
         String display_name = resultSet.getString("display_name");
-        User user = new User(id, username, display_name);
+        User user = User.builder()
+            .id(id)
+            .username(username)
+            .display_name(display_name)
+            .build();
         listResultSet.add(user);
       }
     } catch (Exception e) {
@@ -75,10 +79,13 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
       ResultSet resultSet = ps.executeQuery();
 
       while (resultSet.next()) {
-        Integer res_id = resultSet.getInt("id");
         String username = resultSet.getString("username");
         String display_name = resultSet.getString("display_name");
-        User user = new User(res_id, username, display_name);
+        User user = User.builder()
+            .id(id)
+            .username(username)
+            .display_name(display_name)
+            .build();
         return user;
       }
     } catch (Exception e) {

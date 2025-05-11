@@ -9,4 +9,5 @@ public interface EntryService {
 
   List<Entry> getAllEntries();
 
+  String getTitleByEntryId(Integer entryId);
 }

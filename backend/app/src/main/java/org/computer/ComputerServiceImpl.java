@@ -48,4 +48,9 @@ public class ComputerServiceImpl implements ComputerService {
   public boolean deleteComputersById(Integer id) {
     return this.computerRepository.destroyById(id);
   }
+
+  @Override
+  public List<Integer> getAllLabNum() {
+    return this.computerRepository.findAllLabNum();
+  }
 }

@@ -8,6 +8,7 @@ function Navbar() {
         <A href='/home' end={true} class="text-slate-200" activeClass="underline">Home</A>
         <A href="/home/copy-oxam" class="text-slate-200" activeClass="underline">Copy (OXAM)</A>
         <A href="/home/copy" class="text-slate-200" activeClass="underline">Copy</A>
+        <A href="/home/ping_board" class="text-slate-200" activeClass="underline">Ping Board</A>
       </nav>
     </div>
   )

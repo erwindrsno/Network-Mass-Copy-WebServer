@@ -1,7 +1,7 @@
 import EntryRecordTable from '../components/home/EntryRecordTable.jsx';
 import Header from '../components/header/Header.jsx';
 
-function Home() {
+function HomePage() {
   return (
     <div class="w-full h-full flex flex-col bg-gray-100 gap-8">
       <Header />
@@ -12,4 +12,4 @@ function Home() {
   )
 }
 
-export default Home
+export default HomePage;

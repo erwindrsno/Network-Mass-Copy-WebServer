@@ -74,8 +74,31 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
         Integer id = rs.getInt("id");
         String filename = rs.getString("filename");
         long filesize = rs.getLong("filesize");
-        FileRecord fileRecord = new FileRecord(id, filename, filesize);
+        FileRecord fileRecord = FileRecord.builder()
+            .id(id)
+            .filename(filename)
+            .filesize(filesize)
+            .build();
         listResultSet.add(fileRecord);
+      }
+      return listResultSet;
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+      return null;
+    }
+  }
+
+  @Override
+  public List<String> findOwnerByEntryId(Integer entryId) {
+    try (Connection conn = super.getConnection()) {
+      List<String> listResultSet = new ArrayList<>();
+      String query = "SELECT DISTINCT ON(owner) owner from file WHERE entry_id = ?";
+      PreparedStatement ps = conn.prepareStatement(query);
+      ps.setInt(1, entryId);
+      ResultSet resultSet = ps.executeQuery();
+
+      while (resultSet.next()) {
+        listResultSet.add(resultSet.getString("owner"));
       }
       return listResultSet;
     } catch (Exception e) {

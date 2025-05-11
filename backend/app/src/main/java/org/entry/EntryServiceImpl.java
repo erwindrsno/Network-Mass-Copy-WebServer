@@ -36,4 +36,10 @@ public class EntryServiceImpl implements EntryService {
   public List<Entry> getAllEntries() {
     return this.entryRepository.findAll();
   }
+
+  @Override
+  public String getTitleByEntryId(Integer entryId) {
+    return this.entryRepository.findTitleByEntryId(entryId);
+  }
+
 }

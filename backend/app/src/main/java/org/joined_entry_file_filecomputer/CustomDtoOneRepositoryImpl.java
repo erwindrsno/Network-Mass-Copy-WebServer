@@ -15,6 +15,7 @@ import org.main.BaseRepository;
 import org.main.DatabaseConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.websocket.FileAccessInfo;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -59,12 +60,68 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
         Integer lab_num = resultSet.getInt("lab_num");
         String ip_address = resultSet.getString("ip_address");
 
-        FileRecord tempFileRecord = new FileRecord(fileRecordId, filePath, owner, permissions);
-        FileRecordComputer tempFileRecordComputer = new FileRecordComputer(fileRecordComputerId, copiedAt,
-            takeownedAt);
+        FileRecord tempFileRecord = FileRecord.builder()
+            .id(fileRecordId)
+            .path(filePath)
+            .owner(owner)
+            .permissions(permissions)
+            .build();
+
+        FileRecordComputer tempFileRecordComputer = FileRecordComputer.builder()
+            .id(fileRecordComputerId)
+            .copiedAt(copiedAt)
+            .takeownedAt(takeownedAt)
+            .build();
+
         Computer tempComputer = new Computer(computerId, ip_address, hostname, lab_num);
         CustomDtoOne customDtoOne = new CustomDtoOne(tempFileRecord, tempFileRecordComputer, tempComputer);
         listResultSet.add(customDtoOne);
+      }
+      return listResultSet;
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+      return null;
+    }
+  }
+
+  // kalo generic nya dalam bentuk CustomDtoOne akan repot, soalnya data ini akan
+  // dikirimkan ke server secara langsung.
+  // Untuk menghindari pemrosesan pemindahan data dari customDtoOne ke
+  // FileAccessInfo, maka pada method ini
+  // genericnya akan di set dalam bentuk FileAccessInfo secara langsung.
+  @Override
+  public List<FileAccessInfo> findPathOwnerPermissionsIpAddressByEntryId(Integer entryId) {
+    try (Connection conn = super.getConnection()) {
+      List<FileAccessInfo> listResultSet = new ArrayList<>();
+
+      String select = "SELECT file.id, file.path, file.owner, file.permissions, computer.ip_address";
+      String joinEntryFileRecord = "FROM file INNER JOIN entry ON file.entry_id = entry.id";
+      String joinFileComputer = "INNER JOIN file_computer ON file.id = file_computer.file_id";
+      String joinComputer = "INNER JOIN computer ON file_computer.computer_id = computer.id";
+      String whereClause = "WHERE entry.id = ?";
+
+      String query = select + " " + joinEntryFileRecord + " " + joinFileComputer + " " + joinComputer + " "
+          + whereClause;
+      PreparedStatement ps = conn.prepareStatement(query);
+      ps.setInt(1, entryId);
+      ResultSet resultSet = ps.executeQuery();
+
+      while (resultSet.next()) {
+        Integer id = resultSet.getInt("id");
+        String filePath = resultSet.getString("path");
+        String owner = resultSet.getString("owner");
+        Integer permissions = resultSet.getInt("permissions");
+        String ip_address = resultSet.getString("ip_address");
+
+        FileAccessInfo tempFai = FileAccessInfo.builder()
+            .id(id)
+            .path(filePath)
+            .owner(owner)
+            .permissions(permissions)
+            .ip_address(ip_address)
+            .build();
+
+        listResultSet.add(tempFai);
       }
       return listResultSet;
     } catch (Exception e) {

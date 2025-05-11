@@ -21,6 +21,10 @@ public class ComputerController {
     ctx.json(this.computerService.getAllComputers());
   }
 
+  public void getAllLabNum(Context ctx) {
+    ctx.json(this.computerService.getAllLabNum());
+  }
+
   public void insertComputer(Context ctx) {
     String ip_address = ctx.formParam("ip_address");
     String host_name = ctx.formParam("host_name");

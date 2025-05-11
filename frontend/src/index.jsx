@@ -6,19 +6,21 @@ import 'solid-devtools';
 import './index.css';
 // import App from './App';
 
-import Login from './pages/Login.jsx';
-import Home from './pages/Home.jsx';
-import CopyOxam from './pages/CopyOxam.jsx';
-import Copy from './pages/Copy.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import HomePage from './pages/HomePage.jsx';
+import CopyOxamPage from './pages/CopyOxamPage.jsx';
+import CopyPage from './pages/CopyPage.jsx';
 
-import Computer from './pages/admin/Computer.jsx';
-import User from './pages/admin/User.jsx';
-import AddComputer from './pages/admin/AddComputer.jsx';
-import AddUser from './pages/admin/AddUser.jsx';
-import SingleEntryRecord from './pages/SingleEntryRecord';
+import ComputerPage from './pages/admin/ComputerPage.jsx';
+import UserPage from './pages/admin/UserPage.jsx';
+import AddComputerPage from './pages/admin/AddComputerPage.jsx';
+import AddUserPage from './pages/admin/AddUserPage.jsx';
+import SingleEntryRecordPage from './pages/SingleEntryRecordPage';
+import PingBoardPage from "./pages/PingBoardPage.jsx";
 
 import ProtectedRouteWrapper from './components/utils/ProtectedRouteWrapper.jsx';
 import { AuthContextProvider } from './components/utils/AuthContextProvider.jsx';
+import { WebSocketContextProvider } from './components/utils/WebSocketContextProvider';
 
 const wrapper = document.getElementById('root');
 
@@ -35,27 +37,30 @@ if (!wrapper) {
 render(
   () => (
     <AuthContextProvider>
-      <Router>
-        <Route path="/" component={Login} />
-        <Route path="/home">
-          <Route path="/" component={() => ProtectedRouteWrapper(Home)} />
-          <Route path="/copy-oxam" component={() => ProtectedRouteWrapper(CopyOxam)} />
-          <Route path="/copy" component={() => ProtectedRouteWrapper(Copy)} />
-          <Route path="/entry/:id" component={() => ProtectedRouteWrapper(SingleEntryRecord)}></Route>
-        </Route>
+      <WebSocketContextProvider>
+        <Router>
+          <Route path="/" component={LoginPage} />
+          <Route path="/home">
+            <Route path="/" component={() => ProtectedRouteWrapper(HomePage)} />
+            <Route path="/copy-oxam" component={() => ProtectedRouteWrapper(CopyOxamPage)} />
+            <Route path="/copy" component={() => ProtectedRouteWrapper(CopyPage)} />
+            <Route path="/entry/:id" component={() => ProtectedRouteWrapper(SingleEntryRecordPage)}></Route>
+            <Route path="/ping_board" component={() => ProtectedRouteWrapper(PingBoardPage)} />
+          </Route>
 
-        <Route path="/admin">
-          <Route path="/computer">
-            <Route path="/" component={() => ProtectedRouteWrapper(Computer)} />
-            <Route path="/add" component={() => ProtectedRouteWrapper(AddComputer)} />
+          <Route path="/admin">
+            <Route path="/computer">
+              <Route path="/" component={() => ProtectedRouteWrapper(ComputerPage)} />
+              <Route path="/add" component={() => ProtectedRouteWrapper(AddComputerPage)} />
+            </Route>
+            <Route path="/user">
+              <Route path="/" component={() => ProtectedRouteWrapper(UserPage)} />
+              <Route path="/add" component={() => ProtectedRouteWrapper(AddUserPage)} />
+            </Route>
           </Route>
-          <Route path="/user">
-            <Route path="/" component={() => ProtectedRouteWrapper(User)} />
-            <Route path="/add" component={() => ProtectedRouteWrapper(AddUser)} />
-          </Route>
-        </Route>
-      </Router>
-    </AuthContextProvider>
+        </Router>
+      </WebSocketContextProvider>
+    </AuthContextProvider >
   ),
   wrapper
 );

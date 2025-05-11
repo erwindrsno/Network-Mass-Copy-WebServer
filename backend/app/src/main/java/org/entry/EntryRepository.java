@@ -6,4 +6,7 @@ public interface EntryRepository {
   Integer save(Entry entry);
 
   List<Entry> findAll();
+
+  String findTitleByEntryId(Integer entryId);
+
 }

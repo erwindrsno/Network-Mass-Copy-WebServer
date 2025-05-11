@@ -72,7 +72,12 @@ public class UserServiceImpl implements UserService {
       // destroy retrievedUser agar user baru yang dikirimkan tidak mengandung atribut
       // yang tidak perlu, seperti passsword
       retrievedUser = null;
-      return new User(id, username, display_name);
+      User reUser = User.builder()
+          .id(id)
+          .username(username)
+          .display_name(display_name)
+          .build();
+      return reUser;
     }
     return null;
   }

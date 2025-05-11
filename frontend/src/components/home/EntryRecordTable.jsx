@@ -22,6 +22,22 @@ const fetchEntries = async (token) => {
   return result;
 }
 
+const handleCopyByEntry = async (token, id) => {
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/${id}/copy`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Authorization": `Bearer ${token()}`
+    },
+  })
+  if (!response.ok && response.status === 401) {
+    console.log("UNAUTH!")
+  }
+  if (response.ok && response.status === 200) {
+    console.log("SUCCEED!");
+  }
+}
+
 function EntryRecordTable() {
   const navigate = useNavigate();
   const { token, setToken } = useAuthContext();
@@ -68,27 +84,29 @@ function EntryRecordTable() {
             </tr>
           </thead>
           <tbody>
-            {paginated().items?.map((entry, index) => (
-              <tr key={entry.id} class="bg-white border-b border-gray-200 hover:bg-gray-50">
-                <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * 10 + index + 1}</td>
-                <td class="py-3 text-left whitespace-nowrap">{entry.title}</td>
-                <td class="py-3 text-center whitespace-nowrap"><button onClick={() => openModal(entry.title, entry.id)} class="hover:text-blue-500 cursor-pointer hover:underline">view</button></td>
-                <td class="py-3 text-center whitespace-nowrap justify-items-center">{displayIcon(entry.fromOxam)}</td>
-                <td class="py-3 text-center whitespace-nowrap">{formatDateTime(entry.createdAt)}</td>
-                <td class="py-3 text-center whitespace-nowrap">{entry.copyStatus}</td>
-                <td class="py-3 text-center whitespace-nowrap">{entry.takeownStatus}</td>
-                <td class="text-center text-sm px-2 py-1.5">
-                  <div class="flex flex-col gap-1 w-min">
-                    <button onClick={() => viewSingleEntryRecord(entry.id, entry.title)} class="bg-blue-600 hover:bg-blue-700 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">View</button>
-                    <div class="flex gap-1">
-                      <button onClick={() => console.log(entry.createdAt)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
-                      <button onClick={() => console.log(entry.createdAt)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TakeownIcon></TakeownIcon></button>
-                      <button onClick={() => console.log(entry.createdAt)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><InfoIcon></InfoIcon></button>
+            <For each={paginated().items} fallback={<p>Loading...</p>}>
+              {(entry, index) => (
+                <tr key={entry.id} class="bg-white border-b border-gray-200 hover:bg-gray-50">
+                  <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * 10 + index() + 1}</td>
+                  <td class="py-3 text-left whitespace-nowrap">{entry.title}</td>
+                  <td class="py-3 text-center whitespace-nowrap"><button onClick={() => openModal(entry.title, entry.id)} class="hover:text-blue-500 cursor-pointer hover:underline">view</button></td>
+                  <td class="py-3 text-center whitespace-nowrap justify-items-center">{displayIcon(entry.fromOxam)}</td>
+                  <td class="py-3 text-center whitespace-nowrap">{formatDateTime(entry.createdAt)}</td>
+                  <td class="py-3 text-center whitespace-nowrap">{entry.copyStatus}</td>
+                  <td class="py-3 text-center whitespace-nowrap">{entry.takeownStatus}</td>
+                  <td class="text-center text-sm px-2 py-1.5">
+                    <div class="flex flex-col gap-1 w-min">
+                      <button onClick={() => viewSingleEntryRecord(entry.id, entry.title)} class="bg-blue-600 hover:bg-blue-700 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">View</button>
+                      <div class="flex gap-1">
+                        <button onClick={() => handleCopyByEntry(token, entry.id)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
+                        <button onClick={() => console.log(entry.createdAt)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TakeownIcon></TakeownIcon></button>
+                        <button onClick={() => console.log(entry.createdAt)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><InfoIcon></InfoIcon></button>
+                      </div>
                     </div>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                </tr>
+              )}
+            </For>
           </tbody>
         </table>
         <Show when={isModalToggled()}>

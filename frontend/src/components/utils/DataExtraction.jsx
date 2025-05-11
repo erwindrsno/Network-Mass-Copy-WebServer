@@ -9,12 +9,12 @@ export const extractDataFromTxt = (file) => {
         .filter(line => line !== '') // Remove empty lines
 
       const title = lines[0]; // first line
-      const entries = lines.slice(1).map(line => {
+      const records = lines.slice(1).map(line => {
         const [hostname, owner, permissions] = line.split('|').map(field => field.trim());
         return { hostname, owner, permissions };
       });
 
-      resolve({ title, entries });
+      resolve({ title, records });
     };
 
     reader.onerror = (err) => {

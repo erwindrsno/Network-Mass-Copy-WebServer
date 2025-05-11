@@ -16,4 +16,6 @@ public interface ComputerRepository {
   Computer findByHostname(String hostname);
 
   boolean destroyById(Integer id);
+
+  List<Integer> findAllLabNum();
 }

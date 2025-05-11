@@ -59,16 +59,18 @@ function UserTable() {
             </tr>
           </thead>
           <tbody>
-            {paginated().items?.map((user, index) => (
-              <tr key={user.id} class="bg-white border-b border-gray-200 hover:bg-gray-50">
-                <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * 10 + index + 1}</td>
-                <td class="py-3 text-left whitespace-nowrap">{user.username}</td>
-                <td class="py-3 text-left whitespace-nowrap">{user.display_name}</td>
-                <td class="text-center text-sm px-0.5">
-                  <button onClick={() => handleDelete(user.id)} class="bg-red-500 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">Delete</button>
-                </td>
-              </tr>
-            ))}
+            <For each={paginated().items} fallback={<p>Loading...</p>}>
+              {(user, index) => (
+                <tr key={user.id} class="bg-white border-b border-gray-200 hover:bg-gray-50">
+                  <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * 10 + index() + 1}</td>
+                  <td class="py-3 text-left whitespace-nowrap">{user.username}</td>
+                  <td class="py-3 text-left whitespace-nowrap">{user.display_name}</td>
+                  <td class="text-center text-sm px-0.5">
+                    <button onClick={() => handleDelete(user.id)} class="bg-red-500 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">Delete</button>
+                  </td>
+                </tr>
+              )}
+            </For>
           </tbody>
         </table>
       </div>
