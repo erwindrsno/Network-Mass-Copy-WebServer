@@ -68,7 +68,7 @@ public class UserController {
     }
 
     String token = authHeader.substring("Bearer ".length());
-    boolean isValidated = this.userService.validateToken(token, 2, "yayay");
+    boolean isValidated = this.userService.validateToken(token);
     return isValidated;
   }
 
@@ -88,5 +88,22 @@ public class UserController {
     // Integer id = ctx.sessionAttribute("user_id");
     // ctx.req().getSession().invalidate();
     // ctx.result("Log out OK " + id).status(200);
+  }
+
+  public void validateSudoAction(Context ctx) {
+    String authHeader = ctx.header("Authorization");
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      ctx.status(401).result("Missing or invalid Authorization header");
+      logger.info("Invalid token");
+    }
+    String token = authHeader.substring("Bearer ".length());
+    boolean isValidated = this.userService.validateSudoAction(token,
+        ctx.formParam("sudo"));
+
+    if (isValidated) {
+      ctx.status(200);
+    } else {
+      ctx.status(401);
+    }
   }
 }

@@ -78,20 +78,22 @@ public class EntryController {
         int permissions = receivedFileRecord.get("permissions").asInt();
 
         for (UploadedFile uploadedFile : ctx.uploadedFiles("files")) {
-          String filePath = "D\\Ujian\\" + owner + " - " + title + "\\" + uploadedFile.filename();
+          String filePath = "D:\\Ujian\\" + owner + " - " + title + "\\" + uploadedFile.filename();
 
           FileRecord fileRecord = FileRecord.builder()
               .owner(owner)
               .permissions(permissions)
               .path(filePath)
               .filename(uploadedFile.filename())
+              .entryId(entryId)
+              .filesize(uploadedFile.size())
               .build();
 
           Integer fileRecordId = this.fileRecordService.createFileRecord(fileRecord);
           Integer computerId = this.computerService.getComputersByHostname(hostname).getId();
 
           FileRecordComputer fileRecordComputer = FileRecordComputer.builder()
-              .id(fileRecordId)
+              .fileRecordId(fileRecordId)
               .computerId(computerId)
               .build();
           this.fileRecordComputerService.createFileRecordComputer(fileRecordComputer);
@@ -99,7 +101,7 @@ public class EntryController {
         }
       }
     } catch (Exception e) {
-      logger.error(e.getMessage());
+      logger.error(e.getMessage(), e);
     }
   }
 
@@ -107,29 +109,32 @@ public class EntryController {
     ctx.json(this.entryService.getAllEntries());
   }
 
-  public void getFileInfo(Context ctx) {
+  public void getFile(Context ctx) {
     Integer entryId = Integer.parseInt(ctx.pathParam("id"));
     ctx.json(this.fileRecordService.getFileInfo(entryId));
   }
 
   public void getFileRecordByEntryId(Context ctx) {
     Integer entryId = Integer.parseInt(ctx.pathParam("id"));
-    // this.fileRecordService.getAllFiles
+    ctx.json(this.customDtoOneService.getJoinedFileRecordsDtoByEntryId(entryId));
   }
 
-  public void getJoinedFileRecordByEntryIdAndFilename(Context ctx) {
-    Integer entryId = Integer.parseInt(ctx.pathParam("id"));
-    String filename = ctx.pathParam("filename");
-    ctx.json(this.customDtoOneService.getJoinedFileRecordsDtoByEntryIdAndFilename(entryId, filename));
-  }
+  // public void getJoinedFileRecordByEntryIdAndFilename(Context ctx) {
+  // Integer entryId = Integer.parseInt(ctx.pathParam("id"));
+  // String filename = ctx.pathParam("filename");
+  // ctx.json(this.customDtoOneService.getJoinedFileRecordsDtoByEntryIdAndFilename(entryId,
+  // filename));
+  // }
 
   public void copyFileByEntry(Context ctx) {
     Integer entryId = Integer.parseInt(ctx.pathParam("id"));
     String title = this.entryService.getTitleByEntryId(entryId);
+    this.fileRecordComputerService.setCopyTimestamp(entryId);
     this.customDtoOneService.getMetadataByEntryId(entryId);
     // path, owner, permissions, ip address/hostname
     // atribute di atas harus assign ke filemetadata
     List<FileAccessInfo> listFai = this.customDtoOneService.getMetadataByEntryId(entryId);
     this.wsClientService.prepareMetadata(entryId, title, listFai);
   }
+
 }

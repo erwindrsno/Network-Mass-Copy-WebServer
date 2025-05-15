@@ -30,10 +30,10 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
   }
 
   @Override
-  public List<CustomDtoOne> findJoinedByEntryIdAndFilename(Integer entryId, String filename) {
+  public List<CustomDtoOne> findJoinedByEntryId(Integer entryId) {
     try (Connection conn = super.getConnection()) {
       List<CustomDtoOne> listResultSet = new ArrayList<>();
-      String select = "SELECT file.id as fileId, file_computer.id as fileComputerId, file.path, file.owner, file.permissions, file_computer.copied_at, file_computer.takeowned_at, computer.id as computerId, computer.host_name, computer.ip_address, computer.lab_num";
+      String select = "SELECT file.id as fileId, file.file_name as filename, file_computer.id as fileComputerId, file.path, file.owner, file.permissions, file_computer.copied_at, file_computer.takeowned_at, computer.id as computerId, computer.host_name, computer.ip_address, computer.lab_num";
       String joinEntryFileRecord = "FROM file INNER JOIN entry ON file.entry_id = entry.id";
       String joinFileComputer = "INNER JOIN file_computer ON file.id = file_computer.file_id";
       String joinComputer = "INNER JOIN computer ON file_computer.computer_id = computer.id";
@@ -48,6 +48,8 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
       while (resultSet.next()) {
         Integer fileRecordId = resultSet.getInt("fileId");
         String filePath = resultSet.getString("path");
+        logger.info(resultSet.getString("filename"));
+        String filename = resultSet.getString("filename");
         String owner = resultSet.getString("owner");
         Integer permissions = resultSet.getInt("permissions");
 
@@ -64,6 +66,7 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
             .id(fileRecordId)
             .path(filePath)
             .owner(owner)
+            .filename(filename)
             .permissions(permissions)
             .build();
 
@@ -73,7 +76,13 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
             .takeownedAt(takeownedAt)
             .build();
 
-        Computer tempComputer = new Computer(computerId, ip_address, hostname, lab_num);
+        Computer tempComputer = Computer.builder()
+            .id(computerId)
+            .ip_address(ip_address)
+            .host_name(hostname)
+            .lab_num(lab_num)
+            .build();
+
         CustomDtoOne customDtoOne = new CustomDtoOne(tempFileRecord, tempFileRecordComputer, tempComputer);
         listResultSet.add(customDtoOne);
       }
@@ -94,7 +103,7 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
     try (Connection conn = super.getConnection()) {
       List<FileAccessInfo> listResultSet = new ArrayList<>();
 
-      String select = "SELECT file.id, file.path, file.owner, file.permissions, computer.ip_address";
+      String select = "SELECT file.id, file.path, file.owner, file.permissions, file.file_name, computer.ip_address";
       String joinEntryFileRecord = "FROM file INNER JOIN entry ON file.entry_id = entry.id";
       String joinFileComputer = "INNER JOIN file_computer ON file.id = file_computer.file_id";
       String joinComputer = "INNER JOIN computer ON file_computer.computer_id = computer.id";
@@ -111,6 +120,7 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
         String filePath = resultSet.getString("path");
         String owner = resultSet.getString("owner");
         Integer permissions = resultSet.getInt("permissions");
+        String filename = resultSet.getString("file_name");
         String ip_address = resultSet.getString("ip_address");
 
         FileAccessInfo tempFai = FileAccessInfo.builder()
@@ -118,6 +128,7 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
             .path(filePath)
             .owner(owner)
             .permissions(permissions)
+            .filename(filename)
             .ip_address(ip_address)
             .build();
 

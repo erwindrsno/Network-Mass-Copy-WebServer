@@ -41,5 +41,4 @@ public class EntryServiceImpl implements EntryService {
   public String getTitleByEntryId(Integer entryId) {
     return this.entryRepository.findTitleByEntryId(entryId);
   }
-
 }

@@ -1,6 +1,5 @@
 package org.websocket;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.entry.EntryService;
+import org.file_record_computer.FileRecordComputerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +24,10 @@ public class WebSocketClientServiceImpl implements WebSocketClientService {
   private Logger logger = LoggerFactory.getLogger(WebSocketClientService.class);
 
   @Inject
-  public WebSocketClientServiceImpl(Client wsClient) {
+  public WebSocketClientServiceImpl(Client wsClient, FileRecordComputerService fileRecordComputerService,
+      EntryService entryService) {
     this.wsClient = wsClient;
+    this.wsClient.injectDependencies(fileRecordComputerService, entryService);
   }
 
   @Override
@@ -74,6 +77,7 @@ public class WebSocketClientServiceImpl implements WebSocketClientService {
       });
 
       Context context = Context.builder()
+          .entryId(entryId)
           .listFai(listFai)
           .listFcm(listFileChunkMetadata)
           .build();

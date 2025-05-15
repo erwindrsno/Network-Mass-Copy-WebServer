@@ -136,4 +136,22 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
     }
     return false;
   }
+
+  @Override
+  public String findHashedPasswordById(Integer id) {
+    try (Connection conn = super.getConnection()) {
+      String query = "SELECT password FROM users WHERE id = ?";
+      PreparedStatement ps = conn.prepareStatement(query);
+
+      ps.setInt(1, id);
+      ResultSet resultSet = ps.executeQuery();
+
+      while (resultSet.next()) {
+        return resultSet.getString("password");
+      }
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+    }
+    return null;
+  }
 }

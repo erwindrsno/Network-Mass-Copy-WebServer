@@ -49,7 +49,7 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
         }
       }
     } catch (Exception e) {
-      logger.error(e.getMessage());
+      logger.error(e.getMessage(), e);
       return null;
     }
   }
@@ -83,7 +83,7 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
       }
       return listResultSet;
     } catch (Exception e) {
-      logger.error(e.getMessage());
+      logger.error(e.getMessage(), e);
       return null;
     }
   }
@@ -102,7 +102,7 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
       }
       return listResultSet;
     } catch (Exception e) {
-      logger.error(e.getMessage());
+      logger.error(e.getMessage(), e);
       return null;
     }
   }

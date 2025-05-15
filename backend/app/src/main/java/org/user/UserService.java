@@ -15,5 +15,7 @@ public interface UserService {
 
   String generateToken(User authedUser);
 
-  boolean validateToken(String token, Integer id, String display_name);
+  boolean validateToken(String token);
+
+  boolean validateSudoAction(String token, String password);
 }

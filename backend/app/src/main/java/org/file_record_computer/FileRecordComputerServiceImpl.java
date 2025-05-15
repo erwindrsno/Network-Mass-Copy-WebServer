@@ -1,5 +1,9 @@
 package org.file_record_computer;
 
+import java.sql.Timestamp;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -15,5 +19,30 @@ public class FileRecordComputerServiceImpl implements FileRecordComputerService 
   @Override
   public void createFileRecordComputer(FileRecordComputer fileRecordComputer) {
     this.fileRecordComputerRepository.save(fileRecordComputer);
+  }
+
+  @Override
+  public void setCopyTimestamp(Integer entryId) {
+    // ambil zona waktu, yaitu UTC+7
+    ZoneId zoneId = ZoneId.of("UTC+7");
+    // ambil waktu saat pembuatan entri sesuai dengan zona waktu
+    ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+
+    // konversi waktu ke tipe data time stamp
+    Timestamp copiedAt = Timestamp.from(zonedDateTime.toInstant());
+
+    this.fileRecordComputerRepository.updateCopyTimestampByEntryId(entryId, copiedAt);
+  }
+
+  @Override
+  public void updateCopyStatus(Integer entryId, String ip_addr, Integer fileId) {
+    // ambil zona waktu, yaitu UTC+7
+    ZoneId zoneId = ZoneId.of("UTC+7");
+    // ambil waktu saat pembuatan entri sesuai dengan zona waktu
+    ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+
+    // konversi waktu ke tipe data time stamp
+    Timestamp copiedAt = Timestamp.from(zonedDateTime.toInstant());
+    this.fileRecordComputerRepository.updateCopyStatus(entryId, ip_addr, fileId, copiedAt);
   }
 }

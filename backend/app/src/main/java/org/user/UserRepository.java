@@ -12,4 +12,6 @@ public interface UserRepository {
   User findUserByUsername(String username);
 
   boolean destroyById(Integer id);
+
+  String findHashedPasswordById(Integer id);
 }

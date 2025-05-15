@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public boolean validateToken(String token, Integer userId, String display_name) {
+  public boolean validateToken(String token) {
     DecodedJWT decodedJWT;
     try {
       Algorithm algorithm = Algorithm.HMAC512("Secr3t");
@@ -108,6 +108,29 @@ public class UserServiceImpl implements UserService {
           .build();
       decodedJWT = verifier.verify(token);
       return true;
+    } catch (JWTVerificationException exception) {
+      logger.error(exception.getMessage());
+      return false;
+    }
+  }
+
+  @Override
+  public boolean validateSudoAction(String token, String password) {
+    DecodedJWT decodedJWT;
+
+    try {
+      Algorithm algorithm = Algorithm.HMAC512("Secr3t");
+      JWTVerifier verifier = JWT.require(algorithm)
+          .withIssuer("auth0")
+          .build();
+      decodedJWT = verifier.verify(token);
+
+      Integer userId = decodedJWT.getClaim("id").asInt();
+      String retrievedUserHashedPassword = this.userRepository.findHashedPasswordById(userId);
+      Result result = BCrypt.verifyer().verify(password.toCharArray(),
+          retrievedUserHashedPassword);
+      return result.verified;
+
     } catch (JWTVerificationException exception) {
       logger.error(exception.getMessage());
       return false;

@@ -1,5 +1,6 @@
 package org.entry;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 public interface EntryRepository {
@@ -8,5 +9,4 @@ public interface EntryRepository {
   List<Entry> findAll();
 
   String findTitleByEntryId(Integer entryId);
-
 }

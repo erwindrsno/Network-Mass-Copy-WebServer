@@ -2,30 +2,44 @@ package org.websocket;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.entry.EntryService;
+import org.file_record_computer.FileRecordComputerService;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.inject.Inject;
 
 public class Client extends WebSocketClient {
   Logger logger = LoggerFactory.getLogger(Client.class);
 
-  Context context;
+  private Context context;
+  private ObjectMapper mapper;
+
+  private FileRecordComputerService fileRecordComputerService;
+  private EntryService entryService;
 
   public Client(URI serverUri, Draft draft) {
     super(serverUri, draft);
+    this.mapper = new ObjectMapper();
   }
 
   public Client(URI serverURI) {
     super(serverURI);
+    this.mapper = new ObjectMapper();
+  }
+
+  @Inject
+  public void injectDependencies(FileRecordComputerService fileRecordComputerService, EntryService entryService) {
+    this.fileRecordComputerService = fileRecordComputerService;
+    this.entryService = entryService;
   }
 
   @Override
@@ -43,10 +57,8 @@ public class Client extends WebSocketClient {
 
       String requestedFileUuid = leftPart.split("~")[1];
       Long chunkId = Long.parseLong(rightPart);
-      logger.info("receiveFileUuid: " + requestedFileUuid);
-      logger.info("chunkId: " + chunkId);
 
-      FileChunkMetadata requestedFcm = this.context.listFcm.stream()
+      FileChunkMetadata requestedFcm = this.context.getListFcm().stream()
           .filter(fcm -> fcm.getUuid().equals(requestedFileUuid))
           .findFirst()
           .orElseThrow(() -> new RuntimeException("No file found."));
@@ -54,6 +66,23 @@ public class Client extends WebSocketClient {
       byte[] arrOfBytes = requestedFcm.getMapOfChunks().get(chunkId);
       ByteBuffer byteBuffer = ByteBuffer.wrap(arrOfBytes);
       send(byteBuffer);
+    } else if (message.startsWith("ok/")) {
+      try {
+        this.mapper.enable(SerializationFeature.INDENT_OUTPUT); // pretty print
+        String json = message.substring(3);
+        logger.info(json);
+        Map<String, String> jsonMap = this.mapper.readValue(json, new TypeReference<Map<String, String>>() {
+        });
+        Integer entryId = Integer.parseInt(jsonMap.get("entry_id"));
+        Integer fileId = Integer.parseInt(jsonMap.get("file_id"));
+        String ip_addr = jsonMap.get("ip_addr");
+        logger.info("updating copy status");
+        this.fileRecordComputerService.updateCopyStatus(entryId, ip_addr, fileId);
+
+        send("webserver/to-webclient/refetch");
+      } catch (Exception e) {
+        logger.error(e.getMessage(), e);
+      }
     }
   }
 

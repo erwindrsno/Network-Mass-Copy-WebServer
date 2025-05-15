@@ -16,9 +16,16 @@ public class CustomDtoOneServiceImpl implements CustomDtoOneService {
     this.customDtoOneRepository = customDtoOneRepository;
   }
 
+  // @Override
+  // public List<CustomDtoOne> getJoinedFileRecordsDtoByEntryIdAndFilename(Integer
+  // entryId, String filename) {
+  // return this.customDtoOneRepository.findJoinedByEntryIdAndFilename(entryId,
+  // filename);
+  // }
+
   @Override
-  public List<CustomDtoOne> getJoinedFileRecordsDtoByEntryIdAndFilename(Integer entryId, String filename) {
-    return this.customDtoOneRepository.findJoinedByEntryIdAndFilename(entryId, filename);
+  public List<CustomDtoOne> getJoinedFileRecordsDtoByEntryId(Integer entryId) {
+    return this.customDtoOneRepository.findJoinedByEntryId(entryId);
   }
 
   @Override

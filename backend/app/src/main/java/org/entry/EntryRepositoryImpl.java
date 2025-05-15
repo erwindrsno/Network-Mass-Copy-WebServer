@@ -72,6 +72,7 @@ public class EntryRepositoryImpl extends BaseRepository<Entry> implements EntryR
         String takeownStatus = resultSet.getString("takeown_status");
         boolean isFromOxam = resultSet.getBoolean("is_from_oxam");
         Timestamp createdAt = resultSet.getTimestamp("created_at");
+        int count = resultSet.getInt("count");
         Integer userId = resultSet.getInt("user_id");
 
         Entry entry = Entry.builder()
@@ -81,6 +82,7 @@ public class EntryRepositoryImpl extends BaseRepository<Entry> implements EntryR
             .takeownStatus(takeownStatus)
             .isFromOxam(isFromOxam)
             .createdAt(createdAt)
+            .count(count)
             .userId(userId)
             .build();
 
@@ -110,5 +112,4 @@ public class EntryRepositoryImpl extends BaseRepository<Entry> implements EntryR
       return null;
     }
   }
-
 }

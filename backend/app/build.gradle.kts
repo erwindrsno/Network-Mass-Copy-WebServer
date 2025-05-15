@@ -29,6 +29,7 @@ dependencies {
     implementation("at.favre.lib:bcrypt:0.10.2")
     implementation("com.auth0:java-jwt:4.5.0")
     implementation("org.java-websocket:Java-WebSocket:1.6.0")
+    implementation("io.github.cdimascio:dotenv-java:3.2.0")
     compileOnly("org.projectlombok:lombok:1.18.36")
     annotationProcessor("org.projectlombok:lombok:1.18.36")
     // This dependency is used by the application.
