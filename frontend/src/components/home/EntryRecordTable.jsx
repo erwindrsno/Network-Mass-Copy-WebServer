@@ -1,50 +1,27 @@
-import { createResource, createSignal, Show } from 'solid-js';
+import { createResource, createSignal, onMount, onCleanup, Show } from 'solid-js';
 import { useAuthContext } from "../utils/AuthContextProvider.jsx";
 import FileModal from "./FileModal.jsx";
-import { CopyIcon, TakeownIcon, InfoIcon } from "../../assets/Icons.jsx";
-import { useNavigate } from "@solidjs/router";
+import { CopyIcon, TakeownIcon, TrashcanIcon } from "../../assets/Icons.jsx";
+import { useNavigate, action } from "@solidjs/router";
 import Pagination from '../utils/Pagination.jsx'
 import { formatDateTime } from '../utils/DateTimeDisplayFormatter.jsx';
 import { displayIcon } from '../utils/DisplayFromOxamIcon.jsx';
+import SudoModal from './SudoModal.jsx';
+import Loading from '../utils/Loading.jsx';
+import toast, { Toaster } from 'solid-toast';
+import { useWebSocketContext } from '../utils/WebSocketContextProvider.jsx';
 
-const fetchEntries = async (token) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Authorization": `Bearer ${token()}`
-    },
-  })
-  if (!response.ok && response.status === 401) {
-    console.log("UNAUTH!")
-  }
-  const result = await response.json();
-  return result;
-}
-
-const handleCopyByEntry = async (token, id) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/${id}/copy`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Authorization": `Bearer ${token()}`
-    },
-  })
-  if (!response.ok && response.status === 401) {
-    console.log("UNAUTH!")
-  }
-  if (response.ok && response.status === 200) {
-    console.log("SUCCEED!");
-  }
-}
 
 function EntryRecordTable() {
   const navigate = useNavigate();
   const { token, setToken } = useAuthContext();
+  const { socket, setSocket } = useWebSocketContext();
   const [entries, { mutate, refetch }] = createResource(() => fetchEntries(token));
   const [isModalToggled, toggleModal] = createSignal(false);
+  const [isSudoModalToggled, toggleSudoModal] = createSignal(false);
   const [title, setTitle] = createSignal("" || "N/A");
   const [entryId, setEntryId] = createSignal(null);
+  const [clientCount, setClientCount] = createSignal(0);
   const [paginated, setPaginated] = createSignal({
     currentPage: 1,
     items: [],
@@ -63,9 +40,49 @@ function EntryRecordTable() {
     toggleModal(prev => !prev);
   }
 
+  const openSudoModal = (id, title, count) => {
+    setTitle(title);
+    setEntryId(id);
+    setClientCount(count);
+    console.log("the count is: " + clientCount());
+    toggleSudoModal(prev => !prev);
+  }
+
+  const closeSudoModal = () => {
+    setTitle("");
+    setEntryId(null);
+    toggleSudoModal(prev => !prev);
+  }
+
   const viewSingleEntryRecord = (id, title) => {
     navigate(`entry/${id}`, { state: { title: title } });
   }
+
+  onMount(() => {
+    const ws = socket();
+    if (!ws) return;
+
+    const onMessage = (event) => {
+      const message = event.data;
+
+      console.log(message);
+
+      if (message.startsWith("ok/")) {
+        const strJson = message.slice("ok/".length);
+        const json = JSON.parse(strJson);
+        // console.log("Handled in component:", json);
+        insertFileCompletion(token, json, entryId);
+      } else if (message === "refetch") {
+        console.log("aye aye sir, ready to received");
+      }
+    };
+
+    ws.addEventListener("message", onMessage);
+
+    onCleanup(() => {
+      ws.removeEventListener("message", onMessage);
+    });
+  });
 
   return (
     <>
@@ -98,9 +115,9 @@ function EntryRecordTable() {
                     <div class="flex flex-col gap-1 w-min">
                       <button onClick={() => viewSingleEntryRecord(entry.id, entry.title)} class="bg-blue-600 hover:bg-blue-700 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">View</button>
                       <div class="flex gap-1">
-                        <button onClick={() => handleCopyByEntry(token, entry.id)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
+                        <button onClick={() => openSudoModal(entry.id, entry.title, entry.count)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
                         <button onClick={() => console.log(entry.createdAt)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TakeownIcon></TakeownIcon></button>
-                        <button onClick={() => console.log(entry.createdAt)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><InfoIcon></InfoIcon></button>
+                        <button onClick={() => console.log(entry.createdAt)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TrashcanIcon /></button>
                       </div>
                     </div>
                   </td>
@@ -112,11 +129,79 @@ function EntryRecordTable() {
         <Show when={isModalToggled()}>
           <FileModal title={title()} entryId={entryId()} closeModal={closeModal} />
         </Show>
+        <Show when={isSudoModalToggled()}>
+          <SudoModal closeSudoModal={closeSudoModal} title={title()} entryId={entryId()} authSudoAction={authSudoAction} />
+        </Show>
       </div>
 
       <Pagination items={entries()} onPageChange={setPaginated} />
     </>
   )
+}
+
+const fetchEntries = async (token) => {
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Authorization": `Bearer ${token()}`
+    },
+  })
+  if (!response.ok && response.status === 401) {
+    console.log("UNAUTH!")
+  }
+  const result = await response.json();
+  return result;
+}
+
+const handleCopyByEntry = async (token, id) => {
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/${id}/copy`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Authorization": `Bearer ${token()}`
+    },
+  })
+  if (!response.ok && response.status === 401) {
+    console.log("UNAUTH!")
+  }
+  if (response.ok && response.status === 200) {
+    console.log("SUCCEED!");
+  }
+}
+
+const authSudoAction = async (event, token, id) => {
+  event.preventDefault();
+
+  const formData = new FormData(event.currentTarget)
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user/sudo`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Authorization": `Bearer ${token()}`
+    },
+    body: formData,
+  })
+
+  if (!response.ok && response.status === 401) {
+    toast.error("Sudo action not permit.");
+  }
+  if (response.ok && response.status === 200) {
+
+    handleCopyByEntry(token, id);
+  }
+}
+
+const insertFileCompletion = async (token, json, entryId) => {
+  console.log("The id issssss: " + entryId());
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user/sudo`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Authorization": `Bearer ${token()}`
+    },
+    body: formData,
+  })
 }
 
 export default EntryRecordTable;

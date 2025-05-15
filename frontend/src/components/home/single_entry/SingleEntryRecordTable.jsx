@@ -1,12 +1,14 @@
-import { createResource, createSignal, Show, createEffect } from 'solid-js';
+import { createResource, createSignal, Show, createMemo, createEffect } from 'solid-js';
 import { useAuthContext } from "../../utils/AuthContextProvider.jsx";
 import Pagination from '../../utils/Pagination.jsx'
 import { useParams } from "@solidjs/router";
 import { useFileDropdownContext } from "../../utils/FileDropdownContextProvider.jsx";
 import { CopyIcon, TakeownIcon, InfoIcon } from '../../../assets/Icons.jsx';
+import { formatDateTime } from '../../utils/DateTimeDisplayFormatter.jsx';
 
-const fetchFileRecord = async (token, id, filename) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/${id}/filename/${filename}`, {
+const fetchFileRecord = async (token, id) => {
+  console.log("id at fetchFileRecords is: " + id);
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/${id}`, {
     method: "GET",
     credentials: "include",
     headers: {
@@ -17,6 +19,7 @@ const fetchFileRecord = async (token, id, filename) => {
     console.log("UNAUTH!")
   }
   const result = await response.json();
+  console.log(result);
   return result;
 }
 
@@ -25,13 +28,25 @@ function SingleEntryRecordTable(props) {
   const { token, setToken } = useAuthContext();
   const { currFilename, setCurrFilename } = useFileDropdownContext();
   const [fileRecords, { mutate, refetch }] = createResource(
-    () => currFilename() || undefined,
-    (filename) => fetchFileRecord(token, params.id, filename)
+    () => fetchFileRecord(token, params.id)
   );
   const [paginated, setPaginated] = createSignal({
     currentPage: 1,
     items: [],
     totalPages: 1
+  });
+
+  const filteredFiles = createMemo(() => {
+    //jika files masih dalam proses fetching
+    if (fileRecords.loading) {
+      return [];
+    } else if (fileRecords()) {
+      return fileRecords().filter((file) => file.fileRecord.filename === currFilename());
+    }
+    //jika files gagal fetching
+    else {
+      return [];
+    }
   });
 
   return (
@@ -50,18 +65,18 @@ function SingleEntryRecordTable(props) {
             </tr>
           </thead>
           <tbody>
-            <For each={fileRecords()} fallback={<p>Loading...</p>}>
+            <For each={paginated().items} fallback={<p>Loading...</p>}>
               {(file, index) => (
                 <tr key={file.fileRecord.id} class="bg-white border-b border-gray-200 hover:bg-gray-50">
                   <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * 10 + index() + 1}</td>
                   <td class="py-3 text-left whitespace-nowrap">{file.computer.host_name} | {file.computer.ip_address}</td>
                   <td class="py-3 text-center whitespace-nowrap">{file.fileRecord.owner}</td>
-                  <td class="py-3 text-center whitespace-nowrap justify-items-center">{"null"}</td>
+                  <td class="py-3 text-center whitespace-nowrap justify-items-center">{formatDateTime(file.fileRecordComputer.copiedAt)}</td>
                   <td class="py-3 text-center whitespace-nowrap">{"null"}</td>
                   <td class="py-3 text-center whitespace-nowrap">{file.fileRecord.permissions}</td>
                   <td class="text-center text-sm px-2 py-1.5">
                     <div class="flex gap-1 justify-center">
-                      <button onClick={() => console.log("tung tun gtung hsadaur")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
+                      <button onClick={() => openSudoModal(entry.id, entry.title, entry.count)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
                       <button onClick={() => console.log("yoyoyo")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TakeownIcon></TakeownIcon></button>
                       <button onClick={() => console.log("infoooo")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><InfoIcon></InfoIcon></button>
                     </div>
@@ -73,7 +88,7 @@ function SingleEntryRecordTable(props) {
         </table>
       </div>
 
-      <Pagination items={fileRecords()} onPageChange={setPaginated} />
+      <Pagination items={filteredFiles()} onPageChange={setPaginated} />
     </>
   )
 }

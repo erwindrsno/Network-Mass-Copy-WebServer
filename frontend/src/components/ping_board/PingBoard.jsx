@@ -1,6 +1,7 @@
 import { createEffect, createResource, createSignal, createMemo, onCleanup } from "solid-js";
 import { useAuthContext } from "../utils/AuthContextProvider.jsx";
 import { useWebSocketContext } from "../utils/WebSocketContextProvider.jsx";
+import toast, { Toaster } from 'solid-toast';
 
 const fetchComputer = async (token) => {
   const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/computer/`, {
@@ -34,6 +35,9 @@ function PingBoard() {
 
   const handlePing = () => {
     setHasPinged(true)
+    toast("Polling...", {
+      position: "top-center"
+    });
 
     setTimeout(() => {
       setColorReady(true);
@@ -93,8 +97,8 @@ function PingBoard() {
           <p class="block">Legends:</p>
           <div class="flex flex-row gap-16">
             <p><span class="inline-block w-3 h-3 bg-sky-100 rounded-full"></span> = Not yet polled.</p>
-            <p><span class="inline-block w-3 h-3 bg-green-500 rounded-full"></span> = Active</p>
-            <p><span class="inline-block w-3 h-3 bg-red-500 rounded-full"></span> = Not Active</p>
+            <p><span class="inline-block w-3 h-3 bg-green-500 rounded-full"></span> = Connected</p>
+            <p><span class="inline-block w-3 h-3 bg-red-500 rounded-full"></span> = Not connected</p>
           </div>
         </div>
       </div>

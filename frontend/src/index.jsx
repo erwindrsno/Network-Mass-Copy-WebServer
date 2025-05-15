@@ -3,6 +3,8 @@ import { render } from 'solid-js/web';
 import { Router, Route } from '@solidjs/router';
 import 'solid-devtools';
 
+import toast, { Toaster } from 'solid-toast';
+
 import './index.css';
 // import App from './App';
 
@@ -38,6 +40,7 @@ render(
   () => (
     <AuthContextProvider>
       <WebSocketContextProvider>
+        <Toaster />
         <Router>
           <Route path="/" component={LoginPage} />
           <Route path="/home">

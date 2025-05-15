@@ -49,16 +49,17 @@ function FileModal(props) {
 
   return (
     <Portal>
-      <div class="fixed inset-0 bg-black opacity-20 z-40" onClick={props.closeModal}></div>
+      <div class="fixed inset-0 bg-black opacity-50 z-40" onClick={props.closeModal}>
+      </div>
 
       <div class="flex inset-0 fixed self-center justify-center z-50">
-        <div class="w-2/5 h-9/10 border rounded-lg bg-gray-50 border-gray-300 shadow-md">
-          <div class="flex flex-col h-9/10 my-2 mx-3 gap-4">
+        <div class="w-2/5 h-9/10 border rounded-lg bg-gray-50 border-gray-300 shadow-md inline">
+          <div class="flex flex-col my-2 mx-3 gap-4">
             <div class="flex flex-row justify-between border-b-1 pb-2">
               <p>{title}</p>
               <button onClick={props.closeModal} class="cursor-pointer bg-gray-200 hover:bg-gray-300 rounded-sm"><CloseModalIcon /></button>
             </div>
-            <div class="h-35 overflow-y-auto border border-gray-300 rounded-lg p-2 bg-gray-50">
+            <div class="overflow-y-auto border border-gray-300 rounded-lg p-2 bg-gray-50">
               <For each={filesInfo()} fallback={<p>Loading...</p>}>
                 {(file, index) => (
                   <div class="flex items-center justify-between p-2 mb-1 bg-gray-200 rounded-lg font-medium">

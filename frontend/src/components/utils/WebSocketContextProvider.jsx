@@ -13,7 +13,7 @@ export function WebSocketContextProvider(props) {
     if (!token()) {
       return;
     }
-    const ws = new WebSocket("ws://192.168.0.106:8887");
+    const ws = new WebSocket(`${import.meta.env.VITE_WEBSOCKET_SERVER_URL}`);
     setSocket(ws);
 
     ws.onopen = () => {
@@ -30,8 +30,25 @@ export function WebSocketContextProvider(props) {
     };
 
     ws.onmessage = (event) => {
-      const openedConnections = JSON.parse(event.data);
-      setData(() => openedConnections);
+      const message = event.data;
+
+      if (message.startsWith("monitor/")) {
+        const jsonPayload = message.slice("monitor/".length);
+        try {
+          const openedConnections = JSON.parse(jsonPayload);
+          setData(() => openedConnections);
+        } catch (error) {
+          console.error("Failed to parse monitor JSON:", error);
+        }
+      }
+      // else if (message.startsWith("ok/")) {
+      //   const strJson = message.slice("ok/".length);
+      //   const json = JSON.parse(strJson);
+      //   console.log(json);
+      // } else {
+      //   // Handle other message types (optional)
+      //   console.log("Received non-monitor message:", message);
+      // }
     };
 
     ws.onerror = (err) => {
