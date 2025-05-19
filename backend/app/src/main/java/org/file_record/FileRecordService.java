@@ -11,4 +11,10 @@ public interface FileRecordService {
   InputStream downloadFile(Integer entryId, String filename);
 
   List<String> getOwnerByEntryId(Integer entryId);
+
+  void deleteFileById(Integer entryId);
+
+  void deleteByEntryId(Integer entryId);
+
+  Integer getDirectoryIdById(Integer fileId);
 }

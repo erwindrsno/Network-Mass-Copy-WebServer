@@ -18,4 +18,6 @@ public interface UserService {
   boolean validateToken(String token);
 
   boolean validateSudoAction(String token, String password);
+
+  Integer getUserIdFromJWT(String token);
 }

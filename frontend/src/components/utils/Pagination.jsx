@@ -2,7 +2,8 @@ import { createResource, createSignal, createEffect } from 'solid-js';
 
 function Pagination(props) {
   const [currentPage, setCurrentPage] = createSignal(1)
-  const itemsPerPage = 10
+  const itemsPerPage = props.maxItems;
+  // const itemsPerPage = 10;
 
   const totalPages = () => {
     return Math.ceil(props.items?.length / itemsPerPage);

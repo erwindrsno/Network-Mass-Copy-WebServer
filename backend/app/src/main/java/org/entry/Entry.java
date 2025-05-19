@@ -22,5 +22,7 @@ public class Entry {
   private Integer count;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Bangkok")
   private Timestamp createdAt;
+  private Timestamp deletedAt;
   private Integer userId;
+  private boolean deletable;
 }

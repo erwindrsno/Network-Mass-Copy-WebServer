@@ -2,8 +2,6 @@ package org.joined_entry_file_filecomputer;
 
 import java.util.List;
 
-import org.websocket.FileAccessInfo;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -16,20 +14,28 @@ public class CustomDtoOneServiceImpl implements CustomDtoOneService {
     this.customDtoOneRepository = customDtoOneRepository;
   }
 
-  // @Override
-  // public List<CustomDtoOne> getJoinedFileRecordsDtoByEntryIdAndFilename(Integer
-  // entryId, String filename) {
-  // return this.customDtoOneRepository.findJoinedByEntryIdAndFilename(entryId,
-  // filename);
-  // }
-
   @Override
   public List<CustomDtoOne> getJoinedFileRecordsDtoByEntryId(Integer entryId) {
     return this.customDtoOneRepository.findJoinedByEntryId(entryId);
   }
 
   @Override
-  public List<FileAccessInfo> getMetadataByEntryId(Integer entryId) {
+  public AccessInfo getMetadataByEntryId(Integer entryId) {
     return this.customDtoOneRepository.findPathOwnerPermissionsIpAddressByEntryId(entryId);
+  }
+
+  @Override
+  public AccessInfo getMetadataByFileId(Integer fileId) {
+    return this.customDtoOneRepository.findPathOwnerPermissionsIpAddressByFileId(fileId);
+  }
+
+  @Override
+  public AccessInfo getMetadataByDirectoryId(Integer directoryId) {
+    return this.customDtoOneRepository.findPathOwnerPermissionsIpAddressByDirectoryId(directoryId);
+  }
+
+  @Override
+  public List<CustomDtoOne> getFileRecordByDirectoryId(Integer directoryId) {
+    return this.customDtoOneRepository.findFileRecordCopiedAtByDirectoryId(directoryId);
   }
 }

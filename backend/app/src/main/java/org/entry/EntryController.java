@@ -3,15 +3,17 @@ package org.entry;
 import java.util.List;
 
 import org.computer.ComputerService;
+import org.directory.Directory;
+import org.directory.DirectoryService;
 import org.file_record.FileRecord;
 import org.file_record.FileRecordService;
 import org.file_record_computer.FileRecordComputer;
 import org.file_record_computer.FileRecordComputerService;
-import org.joined_entry_file_filecomputer.CustomDtoOne;
+import org.joined_entry_file_filecomputer.AccessInfo;
 import org.joined_entry_file_filecomputer.CustomDtoOneService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.websocket.FileAccessInfo;
+import org.user.UserService;
 import org.websocket.WebSocketClientService;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -32,50 +34,80 @@ public class EntryController {
   private final FileRecordComputerService fileRecordComputerService;
   private final CustomDtoOneService customDtoOneService;
   private final WebSocketClientService wsClientService;
+  private final UserService userService;
+  private final DirectoryService directoryService;
 
   @Inject
   public EntryController(EntryService entryService, FileRecordService fileRecordService,
       ComputerService computerService, FileRecordComputerService fileRecordComputerService,
-      CustomDtoOneService customDtoOneService, WebSocketClientService wsClientService) {
+      CustomDtoOneService customDtoOneService, WebSocketClientService wsClientService, UserService userService,
+      DirectoryService directoryService) {
     this.entryService = entryService;
     this.fileRecordService = fileRecordService;
     this.computerService = computerService;
     this.fileRecordComputerService = fileRecordComputerService;
     this.customDtoOneService = customDtoOneService;
     this.wsClientService = wsClientService;
+    this.userService = userService;
+    this.directoryService = directoryService;
   }
 
   public void insertEntry(Context ctx) {
-    String title = ctx.formParam("title");
-    Integer count = Integer.parseInt(ctx.formParam("count"));
-
-    // Insert ke entitas entry, yang akan return id-nya
-    Entry entry = new Entry(null, title, "0/" + count, "0/" + count, false, count, null, 1);
-    if (ctx.path().equals("/entry/oxam")) {
-      entry.setFromOxam(true);
-    }
-    Integer entryId = this.entryService.createEntry(entry);
-
-    // Penyediaan folder file yang akan dicopy ke clients
-    StringBuilder baseFolder = new StringBuilder("upload/");
-    String folderName = baseFolder.append(entryId).append("/").toString();
-
-    // File yang dikirimkan oleh client akan di simpan di folder upload/${title
-    // entry nya}/FILESSSSSS
-    ctx.uploadedFiles("files")
-        .forEach(uploadedFile -> FileUtil.streamToFile(uploadedFile.content(),
-            folderName + uploadedFile.filename()));
-
-    // baca JSON yang isinya array of entries, dan ekstrak data tersebut dan
-    // disimpan dalam vairabel
     try {
       ObjectMapper objectMapper = new ObjectMapper();
+      String authHeader = ctx.header("Authorization");
+      if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        ctx.status(401).result("Missing or invalid Authorization header");
+        logger.info("Invalid token");
+      }
+
+      String token = authHeader.substring("Bearer ".length());
+
+      String title = ctx.formParam("title");
+      Integer count = Integer.parseInt(ctx.formParam("count"));
+      Integer dirCount = Integer.parseInt(ctx.formParam("host_count"));
+      Integer userId = this.userService.getUserIdFromJWT(token);
+
+      // Insert ke entitas entry, yang akan return id-nya
+      Entry entry = Entry.builder()
+          .title(title)
+          .count(count)
+          .isFromOxam(false)
+          .userId(userId)
+          .deletable(true)
+          .build();
+
+      if (ctx.path().equals("/entry/oxam")) {
+        entry.setFromOxam(true);
+      }
+      Integer entryId = this.entryService.createEntry(entry);
+
+      StringBuilder baseFolder = new StringBuilder("upload/");
+      String folderName = baseFolder.append(entryId).append("/").toString();
+
+      ctx.uploadedFiles("files")
+          .forEach(uploadedFile -> FileUtil.streamToFile(uploadedFile.content(),
+              folderName + uploadedFile.filename()));
+
+      // baca JSON yang isinya array of records, dan ekstrak data tersebut dan
+      // disimpan dalam vairabel
       JsonNode root = objectMapper.readTree(ctx.formParam("records"));
 
       for (JsonNode receivedFileRecord : root) {
         String hostname = receivedFileRecord.get("hostname").asText();
         String owner = receivedFileRecord.get("owner").asText();
         int permissions = receivedFileRecord.get("permissions").asInt();
+
+        // filter berdasarkan owner
+        // untuk tiap owner, dibkin direktorinya
+        Directory dirPerOwner = Directory.builder()
+            .path("D:\\Ujian\\" + owner + " - " + title)
+            .copied(0)
+            .owner(owner)
+            .fileCount(ctx.uploadedFiles("files").size())
+            .build();
+
+        Integer directoryId = this.directoryService.insertDirectory(dirPerOwner);
 
         for (UploadedFile uploadedFile : ctx.uploadedFiles("files")) {
           String filePath = "D:\\Ujian\\" + owner + " - " + title + "\\" + uploadedFile.filename();
@@ -87,6 +119,7 @@ public class EntryController {
               .filename(uploadedFile.filename())
               .entryId(entryId)
               .filesize(uploadedFile.size())
+              .directoryId(directoryId)
               .build();
 
           Integer fileRecordId = this.fileRecordService.createFileRecord(fileRecord);
@@ -119,22 +152,21 @@ public class EntryController {
     ctx.json(this.customDtoOneService.getJoinedFileRecordsDtoByEntryId(entryId));
   }
 
-  // public void getJoinedFileRecordByEntryIdAndFilename(Context ctx) {
-  // Integer entryId = Integer.parseInt(ctx.pathParam("id"));
-  // String filename = ctx.pathParam("filename");
-  // ctx.json(this.customDtoOneService.getJoinedFileRecordsDtoByEntryIdAndFilename(entryId,
-  // filename));
-  // }
-
   public void copyFileByEntry(Context ctx) {
     Integer entryId = Integer.parseInt(ctx.pathParam("id"));
-    String title = this.entryService.getTitleByEntryId(entryId);
-    this.fileRecordComputerService.setCopyTimestamp(entryId);
-    this.customDtoOneService.getMetadataByEntryId(entryId);
-    // path, owner, permissions, ip address/hostname
-    // atribute di atas harus assign ke filemetadata
-    List<FileAccessInfo> listFai = this.customDtoOneService.getMetadataByEntryId(entryId);
-    this.wsClientService.prepareMetadata(entryId, title, listFai);
+    AccessInfo accessInfo = this.customDtoOneService.getMetadataByEntryId(entryId);
+    this.wsClientService.prepareCopyMetadata(entryId, accessInfo);
   }
 
+  public void softDeleteEntryById(Context ctx) {
+    Integer entryId = Integer.parseInt(ctx.pathParam("id"));
+    this.fileRecordService.deleteFileById(entryId);
+    this.entryService.softDeleteEntryById(entryId);
+  }
+
+  public void takeownFileByEntry(Context ctx) {
+    Integer entryId = Integer.parseInt(ctx.pathParam("id"));
+    AccessInfo accessInfo = this.customDtoOneService.getMetadataByEntryId(entryId);
+    this.wsClientService.prepareTakeownMetadata(entryId, accessInfo);
+  }
 }

@@ -2,8 +2,10 @@ package org.websocket;
 
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Map;
 
+import org.directory.DirectoryService;
 import org.entry.EntryService;
 import org.file_record_computer.FileRecordComputerService;
 import org.java_websocket.client.WebSocketClient;
@@ -25,6 +27,7 @@ public class Client extends WebSocketClient {
 
   private FileRecordComputerService fileRecordComputerService;
   private EntryService entryService;
+  private DirectoryService directoryService;
 
   public Client(URI serverUri, Draft draft) {
     super(serverUri, draft);
@@ -37,9 +40,11 @@ public class Client extends WebSocketClient {
   }
 
   @Inject
-  public void injectDependencies(FileRecordComputerService fileRecordComputerService, EntryService entryService) {
+  public void injectDependencies(FileRecordComputerService fileRecordComputerService, EntryService entryService,
+      DirectoryService directoryService) {
     this.fileRecordComputerService = fileRecordComputerService;
     this.entryService = entryService;
+    this.directoryService = directoryService;
   }
 
   @Override
@@ -68,20 +73,35 @@ public class Client extends WebSocketClient {
       send(byteBuffer);
     } else if (message.startsWith("ok/")) {
       try {
-        this.mapper.enable(SerializationFeature.INDENT_OUTPUT); // pretty print
         String json = message.substring(3);
-        logger.info(json);
         Map<String, String> jsonMap = this.mapper.readValue(json, new TypeReference<Map<String, String>>() {
         });
-        Integer entryId = Integer.parseInt(jsonMap.get("entry_id"));
         Integer fileId = Integer.parseInt(jsonMap.get("file_id"));
         String ip_addr = jsonMap.get("ip_addr");
-        logger.info("updating copy status");
-        this.fileRecordComputerService.updateCopyStatus(entryId, ip_addr, fileId);
-
-        send("webserver/to-webclient/refetch");
+        this.fileRecordComputerService.updateCopiedAt(ip_addr, fileId);
       } catch (Exception e) {
         logger.error(e.getMessage(), e);
+      }
+    } else if (message.startsWith("fin/")) {
+      String action = message.substring(4);
+      if (action.startsWith("copy/")) {
+        try {
+          Integer directoryId = Integer.parseInt(action.substring(5));
+          this.directoryService.updateFileCopiedCountById(directoryId);
+
+          send("webserver/to-webclient/refetch");
+        } catch (Exception e) {
+          logger.error(e.getMessage(), e);
+        }
+      } else if (action.startsWith("takeown/")) {
+        try {
+          Integer directoryId = Integer.parseInt(action.substring(8));
+          this.directoryService.updateTakeownedAtById(directoryId);
+
+          send("webserver/to-webclient/refetch");
+        } catch (Exception e) {
+          logger.error(e.getMessage(), e);
+        }
       }
     }
   }
@@ -100,13 +120,15 @@ public class Client extends WebSocketClient {
     System.err.println("an error occurred:" + ex);
   }
 
-  public void setContextAndInitSend(Context context) {
+  public void setContextAndInitSend(Context context, boolean isCopy) {
     this.context = context;
 
     try {
       ObjectMapper mapper = new ObjectMapper();
-      String json = mapper.writeValueAsString(this.context);
-      send("webserver/metadata/" + json);
+      String message = isCopy ? "webserver/metadata/copy/" : "webserver/metadata/takeown/";
+      String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this.context);
+      mapper.enable(SerializationFeature.INDENT_OUTPUT);
+      send(message + "" + json);
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
     }

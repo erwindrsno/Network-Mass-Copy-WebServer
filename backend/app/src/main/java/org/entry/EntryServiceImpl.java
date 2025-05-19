@@ -1,5 +1,7 @@
 package org.entry;
 
+import static io.javalin.apibuilder.ApiBuilder.delete;
+
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -38,7 +40,39 @@ public class EntryServiceImpl implements EntryService {
   }
 
   @Override
-  public String getTitleByEntryId(Integer entryId) {
+  public String getTitleById(Integer entryId) {
     return this.entryRepository.findTitleByEntryId(entryId);
+  }
+
+  @Override
+  public void updateDeletableById(boolean deletable, Integer entryId) {
+    this.entryRepository.updateDeletable(deletable, entryId);
+  }
+
+  @Override
+  public void softDeleteEntryById(Integer entryId) {
+    // ambil zona waktu, yaitu UTC+7
+    ZoneId zoneId = ZoneId.of("UTC+7");
+    // ambil waktu saat pembuatan entri sesuai dengan zona waktu
+    ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
+
+    // konversi waktu ke tipe data time stamp
+    Timestamp deletedAt = Timestamp.from(zonedDateTime.toInstant());
+    this.entryRepository.softDeleteById(entryId, deletedAt);
+  }
+
+  @Override
+  public void updateCopyCountById(Integer entryId, int copySuccessCount) {
+    this.entryRepository.updateCopyCountById(entryId, copySuccessCount);
+  }
+
+  @Override
+  public Integer getCopyCountById(Integer entryId) {
+    return this.entryRepository.findCopyCountById(entryId);
+  }
+
+  @Override
+  public Integer getTakeownCountById(Integer entryId) {
+    return this.entryRepository.findTakeownCountById(entryId);
   }
 }

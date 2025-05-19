@@ -1,4 +1,7 @@
 export const formatDateTime = (dateString) => {
+  if (dateString == null) {
+    return <p class="block">Not yet.</p>;
+  }
   const date = new Date(dateString);
 
   const formattedDate = date.toISOString().split('T')[0];

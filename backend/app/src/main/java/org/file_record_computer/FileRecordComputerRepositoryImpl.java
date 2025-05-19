@@ -65,26 +65,37 @@ public class FileRecordComputerRepositoryImpl extends BaseRepository<FileRecordC
   }
 
   @Override
-  public void updateCopyStatus(Integer entryId, String ip_addr, Integer fileId, Timestamp copiedAt) {
+  public void updateCopiedAt(String ip_addr, Integer fileId, Timestamp copiedAt) {
     try (Connection conn = super.getConnection()) {
       String updateClause = "UPDATE file_computer";
       String setClause = "SET copied_at = ?";
       String fromClause = "FROM file";
       String firstWhereClause = "WHERE file.id = file_computer.file_id";
-      String secondWhereClause = "AND file.entry_id = ?";
       String thirdWhereClause = "AND file.id = ?";
 
       String query = updateClause + " " + setClause + " " + fromClause + " " + firstWhereClause + " "
-          + secondWhereClause + " " + thirdWhereClause;
+          + " " + thirdWhereClause;
 
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setTimestamp(1, copiedAt);
-      ps.setInt(2, entryId);
-      ps.setInt(3, fileId);
+      ps.setInt(2, fileId);
 
       ps.executeUpdate();
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public void destroyByEntryId(Integer entryId) {
+    try (Connection conn = super.getConnection()) {
+      String query = "DELETE FROM file_computer WHERE entry_id = ?";
+      PreparedStatement ps = conn.prepareStatement(query);
+      ps.setInt(1, entryId);
+
+      ps.executeUpdate();
+    } catch (Exception e) {
+      logger.error(e.getMessage());
     }
   }
 }

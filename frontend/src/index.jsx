@@ -23,6 +23,8 @@ import PingBoardPage from "./pages/PingBoardPage.jsx";
 import ProtectedRouteWrapper from './components/utils/ProtectedRouteWrapper.jsx';
 import { AuthContextProvider } from './components/utils/AuthContextProvider.jsx';
 import { WebSocketContextProvider } from './components/utils/WebSocketContextProvider';
+import { FileActionContextProvider } from './components/utils/FileActionContextProvider';
+import SingleDirectoryRecordPage from './pages/SingleDirectoryRecordPage';
 
 const wrapper = document.getElementById('root');
 
@@ -47,7 +49,10 @@ render(
             <Route path="/" component={() => ProtectedRouteWrapper(HomePage)} />
             <Route path="/copy-oxam" component={() => ProtectedRouteWrapper(CopyOxamPage)} />
             <Route path="/copy" component={() => ProtectedRouteWrapper(CopyPage)} />
-            <Route path="/entry/:id" component={() => ProtectedRouteWrapper(SingleEntryRecordPage)}></Route>
+            <Route path="/entry/:entry_id">
+              <Route path="/" component={() => ProtectedRouteWrapper(SingleEntryRecordPage)} />
+              <Route path="/directory/:dir_id" component={() => ProtectedRouteWrapper(SingleDirectoryRecordPage)} />
+            </Route>
             <Route path="/ping_board" component={() => ProtectedRouteWrapper(PingBoardPage)} />
           </Route>
 

@@ -9,5 +9,15 @@ public interface EntryService {
 
   List<Entry> getAllEntries();
 
-  String getTitleByEntryId(Integer entryId);
+  String getTitleById(Integer entryId);
+
+  void updateDeletableById(boolean deletable, Integer entryId);
+
+  void softDeleteEntryById(Integer entryId);
+
+  void updateCopyCountById(Integer entryId, int copySuccessCount);
+
+  Integer getCopyCountById(Integer entryId);
+
+  Integer getTakeownCountById(Integer entryId);
 }

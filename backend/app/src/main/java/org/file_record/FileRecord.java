@@ -17,4 +17,5 @@ public class FileRecord {
   private Integer permissions;
   private long filesize;
   private Integer entryId;
+  private Integer directoryId;
 }

@@ -4,6 +4,8 @@ import static io.javalin.apibuilder.ApiBuilder.*;
 
 import org.computer.ComputerController;
 import org.computer.ComputerModule;
+import org.directory.DirectoryController;
+import org.directory.DirectoryModule;
 import org.main.session.SessionModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,12 +35,13 @@ public class App {
   public static void main(String[] args) {
     Injector injector = Guice.createInjector(new ComputerModule(), new UserModule(), new DatabaseModule(),
         new SessionModule(), new FileRecordModule(), new EntryModule(), new FileRecordComputerModule(),
-        new CustomDtoOneModule(), new WebSocketModule());
+        new CustomDtoOneModule(), new WebSocketModule(), new DirectoryModule());
 
     ComputerController computerController = injector.getInstance(ComputerController.class);
     UserController userController = injector.getInstance(UserController.class);
     FileRecordController fileRecordController = injector.getInstance(FileRecordController.class);
     EntryController entryController = injector.getInstance(EntryController.class);
+    DirectoryController directoryController = injector.getInstance(DirectoryController.class);
     WebSocketClient webSocketClient = injector.getInstance(WebSocketClient.class);
 
     try {
@@ -119,14 +122,15 @@ public class App {
           });
           path("/{id}", () -> {
             get(entryController::getFileRecordByEntryId);
+            delete(entryController::softDeleteEntryById);
             path("/file", () -> {
               get(entryController::getFile);
             });
-            // path("/filename/{filename}", () -> {
-            // get(entryController::getJoinedFileRecordByEntryIdAndFilename);
-            // });
-            path("copy", () -> {
+            path("/copy", () -> {
               get(entryController::copyFileByEntry);
+            });
+            path("takeown", () -> {
+              get(entryController::takeownFileByEntry);
             });
           });
         });
@@ -134,11 +138,30 @@ public class App {
         path("/file", () -> {
           path("/{id}", () -> {
             get(fileRecordController::getFileInfo);
+            path("/copy", () -> {
+              path("/file_computer/{file_computer_id}/entry/{entry_id}", () -> {
+                get(fileRecordController::copyFile);
+              });
+            });
           });
           path("/download", () -> {
             path("/{entry_id}", () -> {
               path("/{filename}", () -> {
                 get(fileRecordController::downloadFile);
+              });
+            });
+          });
+        });
+
+        path("/directory", () -> {
+          path("/{directory_id}", () -> {
+            get(directoryController::getFileRecordByDirectoryId);
+            path("/entry/{entry_id}", () -> {
+              path("/copy", () -> {
+                get(directoryController::copyFilesByDirectoryId);
+              });
+              path("/takeown", () -> {
+                get(directoryController::takeownByDirectoryId);
               });
             });
           });

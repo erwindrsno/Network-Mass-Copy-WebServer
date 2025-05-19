@@ -10,4 +10,8 @@ public interface FileRecordRepository {
   List<FileRecord> findByEntryId(Integer entryId);
 
   List<String> findOwnerByEntryId(Integer entryId);
+
+  void destroyByEntryId(Integer entryId);
+
+  Integer findDirectoryIdById(Integer fileId);
 }

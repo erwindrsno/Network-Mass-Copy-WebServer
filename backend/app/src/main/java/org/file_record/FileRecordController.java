@@ -1,9 +1,17 @@
 package org.file_record;
 
 import java.io.InputStream;
+import java.net.http.WebSocket;
+import java.util.List;
 
+import org.directory.DirectoryService;
+import org.joined_entry_file_filecomputer.AccessInfo;
+import org.joined_entry_file_filecomputer.CustomDtoOneService;
+import org.joined_entry_file_filecomputer.CustomDtoOneServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.websocket.FileAccessInfo;
+import org.websocket.WebSocketClientService;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -15,10 +23,17 @@ import io.javalin.util.FileUtil;
 public class FileRecordController {
   private Logger logger = LoggerFactory.getLogger(FileRecordController.class);
   private final FileRecordService fileRecordService;
+  private final CustomDtoOneService customDtoOneService;
+  private final WebSocketClientService wsClientService;
+  private final DirectoryService directoryService;
 
   @Inject
-  public FileRecordController(FileRecordService fileRecordService) {
+  public FileRecordController(FileRecordService fileRecordService, CustomDtoOneService customDtoOneService,
+      WebSocketClientService wsClientService, DirectoryService directoryService) {
     this.fileRecordService = fileRecordService;
+    this.customDtoOneService = customDtoOneService;
+    this.wsClientService = wsClientService;
+    this.directoryService = directoryService;
   }
 
   public void insertFiles(Context ctx) {
@@ -48,5 +63,15 @@ public class FileRecordController {
     } catch (Exception e) {
       logger.error(e.getMessage());
     }
+  }
+
+  public void copyFile(Context ctx) {
+    Integer fileId = Integer.parseInt(ctx.pathParam("id"));
+    Integer entryId = Integer.parseInt(ctx.pathParam("entry_id"));
+    // logger.info("file id is: " + ctx.pathParam("id"));
+    // logger.info("filecomputer id is: " + ctx.pathParam("file_computer_id"));
+    // logger.info("entry id is: " + ctx.pathParam("entry_id"));
+    AccessInfo accessInfo = this.customDtoOneService.getMetadataByFileId(fileId);
+    this.wsClientService.prepareSingleCopyMetadata(entryId, accessInfo);
   }
 }

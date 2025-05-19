@@ -136,4 +136,22 @@ public class UserServiceImpl implements UserService {
       return false;
     }
   }
+
+  @Override
+  public Integer getUserIdFromJWT(String token) {
+    DecodedJWT decodedJWT;
+    try {
+      Algorithm algorithm = Algorithm.HMAC512("Secr3t");
+      JWTVerifier verifier = JWT.require(algorithm)
+          .withIssuer("auth0")
+          .build();
+      decodedJWT = verifier.verify(token);
+
+      Integer userId = decodedJWT.getClaim("id").asInt();
+      return userId;
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+      return null;
+    }
+  }
 }

@@ -35,7 +35,7 @@ public class FileRecordComputerServiceImpl implements FileRecordComputerService 
   }
 
   @Override
-  public void updateCopyStatus(Integer entryId, String ip_addr, Integer fileId) {
+  public void updateCopiedAt(String ip_addr, Integer fileId) {
     // ambil zona waktu, yaitu UTC+7
     ZoneId zoneId = ZoneId.of("UTC+7");
     // ambil waktu saat pembuatan entri sesuai dengan zona waktu
@@ -43,6 +43,11 @@ public class FileRecordComputerServiceImpl implements FileRecordComputerService 
 
     // konversi waktu ke tipe data time stamp
     Timestamp copiedAt = Timestamp.from(zonedDateTime.toInstant());
-    this.fileRecordComputerRepository.updateCopyStatus(entryId, ip_addr, fileId, copiedAt);
+    this.fileRecordComputerRepository.updateCopiedAt(ip_addr, fileId, copiedAt);
+  }
+
+  @Override
+  public void deleteByEntryId(Integer entryId) {
+    this.fileRecordComputerRepository.destroyByEntryId(entryId);
   }
 }

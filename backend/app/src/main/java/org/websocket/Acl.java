@@ -1,4 +1,3 @@
-
 package org.websocket;
 
 import java.nio.file.attribute.AclEntryPermission;

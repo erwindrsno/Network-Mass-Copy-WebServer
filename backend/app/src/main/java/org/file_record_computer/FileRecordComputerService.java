@@ -5,5 +5,7 @@ public interface FileRecordComputerService {
 
   void setCopyTimestamp(Integer entryId);
 
-  void updateCopyStatus(Integer entryId, String ip_addr, Integer fileId);
+  void updateCopiedAt(String ip_addr, Integer fileId);
+
+  void deleteByEntryId(Integer entryId);
 }

@@ -21,6 +21,7 @@ function UploadFileForm() {
         formData.append("files", file);
       }
       formData.append("count", records.length * files().length);
+      formData.append("host_count", records.length);
       formData.delete("access_list");
 
       const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/oxam`, {

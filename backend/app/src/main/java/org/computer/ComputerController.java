@@ -17,7 +17,6 @@ public class ComputerController {
   }
 
   public void getComputers(Context ctx) {
-    logger.info("Entered controller");
     ctx.json(this.computerService.getAllComputers());
   }
 
@@ -29,9 +28,6 @@ public class ComputerController {
     String ip_address = ctx.formParam("ip_address");
     String host_name = ctx.formParam("host_name");
     int lab_num = Integer.parseInt(ctx.formParam("lab_num"));
-    logger.info("ip addr is : " + ip_address);
-    logger.info("host_name is : " + host_name);
-    logger.info("lab_num is : " + lab_num);
     Computer computer = new Computer(null, ip_address, host_name, lab_num);
     this.computerService.createComputer(computer);
   }

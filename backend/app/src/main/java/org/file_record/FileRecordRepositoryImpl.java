@@ -28,7 +28,7 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
   public Integer save(FileRecord fileRecord) {
     try (Connection conn = super.getConnection()) {
 
-      String query = "INSERT INTO file(path, owner, file_name, permissions, size, entry_id) VALUES(?, ?, ?, ?, ?, ?)";
+      String query = "INSERT INTO file(path, owner, file_name, permissions, size, entry_id, directory_id) VALUES(?, ?, ?, ?, ?, ?, ?)";
       PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
       ps.setString(1, fileRecord.getPath());
@@ -37,9 +37,9 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
       ps.setInt(4, fileRecord.getPermissions());
       ps.setLong(5, fileRecord.getFilesize());
       ps.setInt(6, fileRecord.getEntryId());
+      ps.setInt(7, fileRecord.getDirectoryId());
 
       int insertCount = ps.executeUpdate();
-      logger.info(insertCount + " rows inserted");
 
       try (ResultSet rs = ps.getGeneratedKeys()) {
         if (rs.next()) {
@@ -103,6 +103,38 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
       return listResultSet;
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
+      return null;
+    }
+  }
+
+  @Override
+  public void destroyByEntryId(Integer entryId) {
+    try (Connection conn = super.getConnection()) {
+      String query = "DELETE FROM file WHERE entry_id = ?";
+      PreparedStatement ps = conn.prepareStatement(query);
+      ps.setInt(1, entryId);
+
+      ps.executeUpdate();
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+    }
+  }
+
+  @Override
+  public Integer findDirectoryIdById(Integer fileId) {
+    try (Connection conn = super.getConnection()) {
+      String query = "SELECT directory_id FROM file WHERE id = ?";
+      PreparedStatement ps = conn.prepareStatement(query);
+      ps.setInt(1, fileId);
+
+      ResultSet resultSet = ps.executeQuery();
+
+      while (resultSet.next()) {
+        return resultSet.getInt("directory_id");
+      }
+      throw new Exception("cant get the dir id");
+    } catch (Exception e) {
+      logger.error(e.getMessage());
       return null;
     }
   }

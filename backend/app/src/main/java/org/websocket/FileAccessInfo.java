@@ -32,4 +32,6 @@ public class FileAccessInfo {
   @JsonProperty("ip_address")
   String ip_address;
 
+  @JsonProperty("directory_id")
+  Integer directoryId;
 }

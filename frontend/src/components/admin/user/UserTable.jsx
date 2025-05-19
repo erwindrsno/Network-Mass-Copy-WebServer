@@ -19,6 +19,7 @@ const fetchUser = async (token) => {
 }
 
 function UserTable() {
+  const maxItems = 10;
   const navigate = useNavigate()
   const { token, setToken } = useAuthContext();
   const [users, { mutate, refetch }] = createResource(() => fetchUser(token));
@@ -62,7 +63,7 @@ function UserTable() {
             <For each={paginated().items} fallback={<p>Loading...</p>}>
               {(user, index) => (
                 <tr key={user.id} class="bg-white border-b border-gray-200 hover:bg-gray-50">
-                  <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * 10 + index() + 1}</td>
+                  <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * maxItems + index() + 1}</td>
                   <td class="py-3 text-left whitespace-nowrap">{user.username}</td>
                   <td class="py-3 text-left whitespace-nowrap">{user.display_name}</td>
                   <td class="text-center text-sm px-0.5">
@@ -75,7 +76,7 @@ function UserTable() {
         </table>
       </div>
 
-      <Pagination items={users()} onPageChange={setPaginated} />
+      <Pagination items={users()} onPageChange={setPaginated} maxItems={maxItems} />
     </div>
   )
 }

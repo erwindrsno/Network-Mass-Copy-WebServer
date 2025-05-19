@@ -20,6 +20,7 @@ const fetchComputer = async (token) => {
 
 
 function ComputerTable(props) {
+  const maxItems = 10;
   const { token, setToken } = useAuthContext();
   const [computers, { mutate, refetch }] = createResource(() => fetchComputer(token));
 
@@ -76,7 +77,7 @@ function ComputerTable(props) {
             <For each={paginated().items} fallback={<p>Loading...</p>}>
               {(computer, index) => (
                 <tr key={computer.id} class="bg-white border-b border-gray-200 hover:bg-gray-50">
-                  <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * 10 + index() + 1}</td>
+                  <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * maxItems + index() + 1}</td>
                   <td class="py-3 text-left whitespace-nowrap">{computer.host_name}</td>
                   <td class="py-3 text-left whitespace-nowrap">{computer.ip_address}</td>
                   <td class="text-center text-sm px-0.5">
@@ -89,7 +90,7 @@ function ComputerTable(props) {
         </table>
       </div>
       <Show when={filteredComputers().length > 0} fallback={<p>No computers found or still loading...</p>}>
-        <Pagination items={filteredComputers()} onPageChange={setPaginated} />
+        <Pagination items={filteredComputers()} onPageChange={setPaginated} maxItems={maxItems} />
       </Show>
     </div>
   )

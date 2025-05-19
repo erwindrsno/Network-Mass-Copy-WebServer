@@ -25,9 +25,8 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
 
   @Override
   public List<Computer> findAll() {
-    List<Computer> listResultSet = new ArrayList<>();
     try (Connection conn = super.getConnection()) {
-
+      List<Computer> listResultSet = new ArrayList<>();
       String query = "SELECT * FROM computer";
       PreparedStatement ps = conn.prepareStatement(query);
       ResultSet resultSet = ps.executeQuery();
@@ -40,10 +39,11 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
         Computer computer = new Computer(id, ip_address, host_name, lab_num);
         listResultSet.add(computer);
       }
+      return listResultSet;
     } catch (Exception e) {
       logger.error(e.getMessage());
+      return null;
     }
-    return listResultSet;
   }
 
   @Override
