@@ -5,6 +5,8 @@ import java.util.List;
 public interface FileRecordRepository {
   Integer save(FileRecord fileRecord);
 
+  List<Integer> bulkSave(Integer directoryId, List<FileRecord> listFileRecord);
+
   List<FileRecord> findAll();
 
   List<FileRecord> findByEntryId(Integer entryId);

@@ -6,6 +6,8 @@ import java.util.List;
 public interface FileRecordService {
   Integer createFileRecord(FileRecord fileRecord);
 
+  List<Integer> bulkCreate(Integer directoryId, List<FileRecord> listFileRecord);
+
   List<FileRecord> getFileInfo(Integer entryId);
 
   InputStream downloadFile(Integer entryId, String filename);

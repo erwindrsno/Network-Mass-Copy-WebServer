@@ -68,9 +68,6 @@ public class FileRecordController {
   public void copyFile(Context ctx) {
     Integer fileId = Integer.parseInt(ctx.pathParam("id"));
     Integer entryId = Integer.parseInt(ctx.pathParam("entry_id"));
-    // logger.info("file id is: " + ctx.pathParam("id"));
-    // logger.info("filecomputer id is: " + ctx.pathParam("file_computer_id"));
-    // logger.info("entry id is: " + ctx.pathParam("entry_id"));
     AccessInfo accessInfo = this.customDtoOneService.getMetadataByFileId(fileId);
     this.wsClientService.prepareSingleCopyMetadata(entryId, accessInfo);
   }

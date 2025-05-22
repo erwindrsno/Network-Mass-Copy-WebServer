@@ -18,3 +18,6 @@ public class AccessInfo {
   List<FileAccessInfo> listFai;
   List<DirectoryAccessInfo> listDai;
 }
+
+// alasan listDai terpisah dengan listFai, untuk menghindari coupling.
+// setiap fai sudah ada direktori id nya.

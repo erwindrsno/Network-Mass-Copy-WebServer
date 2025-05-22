@@ -25,6 +25,9 @@ import { AuthContextProvider } from './components/utils/AuthContextProvider.jsx'
 import { WebSocketContextProvider } from './components/utils/WebSocketContextProvider';
 import { FileActionContextProvider } from './components/utils/FileActionContextProvider';
 import SingleDirectoryRecordPage from './pages/SingleDirectoryRecordPage';
+import DeletedEntryRecordTable from './components/home/deleted/DeletedEntryRecordTable';
+import DeletedSingleEntryRecordPage from './pages/DeletedSingleEntryRecordPage.jsx';
+import AddDirectoryPerEntry from './pages/AddDirectoryPerEntry';
 
 const wrapper = document.getElementById('root');
 
@@ -47,11 +50,16 @@ render(
           <Route path="/" component={LoginPage} />
           <Route path="/home">
             <Route path="/" component={() => ProtectedRouteWrapper(HomePage)} />
+            <Route path="/deleted_entry">
+              <Route path="/" component={() => ProtectedRouteWrapper(HomePage)} />
+              <Route path="/:entry_id" component={() => ProtectedRouteWrapper(DeletedSingleEntryRecordPage)} />
+            </Route>
             <Route path="/copy-oxam" component={() => ProtectedRouteWrapper(CopyOxamPage)} />
             <Route path="/copy" component={() => ProtectedRouteWrapper(CopyPage)} />
             <Route path="/entry/:entry_id">
               <Route path="/" component={() => ProtectedRouteWrapper(SingleEntryRecordPage)} />
               <Route path="/directory/:dir_id" component={() => ProtectedRouteWrapper(SingleDirectoryRecordPage)} />
+              <Route path="add" component={() => ProtectedRouteWrapper(AddDirectoryPerEntry)} />
             </Route>
             <Route path="/ping_board" component={() => ProtectedRouteWrapper(PingBoardPage)} />
           </Route>

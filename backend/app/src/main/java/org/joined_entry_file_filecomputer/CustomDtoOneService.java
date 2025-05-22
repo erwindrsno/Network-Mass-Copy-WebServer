@@ -2,6 +2,8 @@ package org.joined_entry_file_filecomputer;
 
 import java.util.List;
 
+import org.file_record.FileRecord;
+
 public interface CustomDtoOneService {
   // List<CustomDtoOne> getJoinedFileRecordsDtoByEntryIdAndFilename(Integer
   // entryId, String filename);
@@ -15,4 +17,9 @@ public interface CustomDtoOneService {
   AccessInfo getMetadataByDirectoryId(Integer directoryId);
 
   List<CustomDtoOne> getFileRecordByDirectoryId(Integer directoryId);
+
+  List<CustomDtoOne> getFileRecordMetadataByEntryId(Integer entryId);
+
+  void insertFileRecordsAndFileRecordsComputerByDirectoryId(Integer directoryId, Integer compId,
+      List<FileRecord> listFileRecord);
 }

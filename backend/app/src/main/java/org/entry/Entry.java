@@ -16,13 +16,12 @@ import lombok.NoArgsConstructor;
 public class Entry {
   private Integer id;
   private String title;
-  private String copyStatus;
-  private String takeownStatus;
   private boolean isFromOxam;
+  private String basePath;
   private Integer count;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Bangkok")
   private Timestamp createdAt;
   private Timestamp deletedAt;
   private Integer userId;
-  private boolean deletable;
+  private boolean deleteFiles;
 }

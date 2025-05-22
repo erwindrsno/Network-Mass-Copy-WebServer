@@ -13,4 +13,6 @@ public interface DirectoryRepository {
   void updateCopiedById(Integer directoryId);
 
   void updateTakeownedAtById(Integer directoryId, Timestamp takeownedAt);
+
+  void updateDeletedAtById(Integer directoryId, Timestamp deletedAt);
 }

@@ -28,7 +28,7 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
   public Integer save(FileRecord fileRecord) {
     try (Connection conn = super.getConnection()) {
 
-      String query = "INSERT INTO file(path, owner, file_name, permissions, size, entry_id, directory_id) VALUES(?, ?, ?, ?, ?, ?, ?)";
+      String query = FileRecordQuery.SAVE;
       PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
       ps.setString(1, fileRecord.getPath());
@@ -45,12 +45,43 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
         if (rs.next()) {
           return rs.getInt(1);
         } else {
-          return null;
+          throw new RuntimeException("cant insert");
         }
       }
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
-      return null;
+      throw new RuntimeException("cant insert");
+    }
+  }
+
+  public List<Integer> bulkSave(Integer directoryId, List<FileRecord> listFileRecord) {
+    try (Connection conn = super.getConnection()) {
+      String query = FileRecordQuery.SAVE;
+      PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+
+      for (FileRecord fileRecord : listFileRecord) {
+        ps.setString(1, fileRecord.getPath());
+        ps.setString(2, fileRecord.getOwner());
+        ps.setInt(3, fileRecord.getEntryId());
+        ps.setInt(4, fileRecord.getPermissions());
+        ps.setLong(5, fileRecord.getFilesize());
+        ps.setString(6, fileRecord.getFilename());
+        ps.setInt(7, directoryId);
+        ps.addBatch();
+      }
+
+      ps.executeBatch();
+
+      ResultSet rs = ps.getGeneratedKeys();
+      List<Integer> generatedIds = new ArrayList<>();
+      while (rs.next()) {
+        generatedIds.add(rs.getInt(1));
+        logger.info("the id after insert batch is: " + rs.getInt(1));
+      }
+      return generatedIds;
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+      throw new RuntimeException("cant bulk save");
     }
   }
 
@@ -61,9 +92,9 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
 
   @Override
   public List<FileRecord> findByEntryId(Integer entryId) {
-    List<FileRecord> listResultSet = new ArrayList<>();
     try (Connection conn = super.getConnection()) {
-      String query = "SELECT DISTINCT ON (file_name) id as id, file_name as filename, size as filesize FROM file WHERE entry_id = ?";
+      List<FileRecord> listResultSet = new ArrayList<>();
+      String query = FileRecordQuery.FIND_BY_ENTRY_ID;
 
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setInt(1, entryId);
@@ -71,13 +102,10 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
       ResultSet rs = ps.executeQuery();
 
       while (rs.next()) {
-        Integer id = rs.getInt("id");
-        String filename = rs.getString("filename");
-        long filesize = rs.getLong("filesize");
         FileRecord fileRecord = FileRecord.builder()
-            .id(id)
-            .filename(filename)
-            .filesize(filesize)
+            .id(rs.getInt("id"))
+            .filename(rs.getString("filename"))
+            .filesize(rs.getLong("filesize"))
             .build();
         listResultSet.add(fileRecord);
       }
@@ -92,7 +120,7 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
   public List<String> findOwnerByEntryId(Integer entryId) {
     try (Connection conn = super.getConnection()) {
       List<String> listResultSet = new ArrayList<>();
-      String query = "SELECT DISTINCT ON(owner) owner from file WHERE entry_id = ?";
+      String query = FileRecordQuery.FIND_OWNER_BY_ENTRY_ID;
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setInt(1, entryId);
       ResultSet resultSet = ps.executeQuery();
@@ -123,7 +151,7 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
   @Override
   public Integer findDirectoryIdById(Integer fileId) {
     try (Connection conn = super.getConnection()) {
-      String query = "SELECT directory_id FROM file WHERE id = ?";
+      String query = FileRecordQuery.FIND_DIRECTORY_ID_BY_ID;
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setInt(1, fileId);
 
@@ -132,10 +160,10 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
       while (resultSet.next()) {
         return resultSet.getInt("directory_id");
       }
-      throw new Exception("cant get the dir id");
+      throw new RuntimeException("cant get the dir id");
     } catch (Exception e) {
       logger.error(e.getMessage());
-      return null;
+      throw new RuntimeException("cant get the dir id");
     }
   }
 }

@@ -8,15 +8,17 @@ public interface EntryRepository {
 
   List<Entry> findAll();
 
-  String findTitleByEntryId(Integer entryId);
+  List<Entry> findAllDeleted();
 
-  void updateDeletable(boolean deletable, Integer entryId);
+  String findTitleById(Integer entryId);
+
+  void updateDeletableById(boolean deletable, Integer entryId);
 
   void softDeleteById(Integer entryId, Timestamp deletedAt);
 
-  void updateCopyCountById(Integer entryId, int copySuccessCount);
+  void updateDeleteFilesByDirectoryId(Integer directoryId);
 
-  Integer findCopyCountById(Integer entryId);
+  void updateDeleteFilesByFileId(Integer fileId);
 
-  Integer findTakeownCountById(Integer entryId);
+  Boolean findDeleteFilesById(Integer entryId);
 }

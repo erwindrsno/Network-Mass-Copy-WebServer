@@ -3,6 +3,9 @@ package org.file_record_computer;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
+
+import org.util.TimeUtil;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -22,32 +25,13 @@ public class FileRecordComputerServiceImpl implements FileRecordComputerService 
   }
 
   @Override
-  public void setCopyTimestamp(Integer entryId) {
-    // ambil zona waktu, yaitu UTC+7
-    ZoneId zoneId = ZoneId.of("UTC+7");
-    // ambil waktu saat pembuatan entri sesuai dengan zona waktu
-    ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
-
-    // konversi waktu ke tipe data time stamp
-    Timestamp copiedAt = Timestamp.from(zonedDateTime.toInstant());
-
-    this.fileRecordComputerRepository.updateCopyTimestampByEntryId(entryId, copiedAt);
-  }
-
-  @Override
   public void updateCopiedAt(String ip_addr, Integer fileId) {
-    // ambil zona waktu, yaitu UTC+7
-    ZoneId zoneId = ZoneId.of("UTC+7");
-    // ambil waktu saat pembuatan entri sesuai dengan zona waktu
-    ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
-
-    // konversi waktu ke tipe data time stamp
-    Timestamp copiedAt = Timestamp.from(zonedDateTime.toInstant());
-    this.fileRecordComputerRepository.updateCopiedAt(ip_addr, fileId, copiedAt);
+    Timestamp copiedAt = TimeUtil.nowTimestamp();
+    this.fileRecordComputerRepository.updateCopiedAtByFileId(ip_addr, fileId, copiedAt);
   }
 
   @Override
-  public void deleteByEntryId(Integer entryId) {
-    this.fileRecordComputerRepository.destroyByEntryId(entryId);
+  public void bulkCreate(List<FileRecordComputer> listFileRecordComputer) {
+    this.fileRecordComputerRepository.bulkSave(listFileRecordComputer);
   }
 }

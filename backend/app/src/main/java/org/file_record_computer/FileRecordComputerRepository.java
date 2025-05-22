@@ -1,13 +1,12 @@
 package org.file_record_computer;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public interface FileRecordComputerRepository {
   void save(FileRecordComputer fileRecordComputer);
 
-  void updateCopyTimestampByEntryId(Integer entryId, Timestamp copiedAt);
+  void bulkSave(List<FileRecordComputer> listFileRecordComputer);
 
-  void updateCopiedAt(String ip_addr, Integer fileId, Timestamp copiedAt);
-
-  void destroyByEntryId(Integer entryId);
+  void updateCopiedAtByFileId(String ip_addr, Integer fileId, Timestamp copiedAt);
 }

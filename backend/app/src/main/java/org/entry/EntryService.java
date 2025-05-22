@@ -2,12 +2,12 @@ package org.entry;
 
 import java.util.List;
 
-import org.joined_entry_file_filecomputer.CustomDtoOne;
-
 public interface EntryService {
   Integer createEntry(Entry entry);
 
   List<Entry> getAllEntries();
+
+  List<Entry> getAllDeletedEntries();
 
   String getTitleById(Integer entryId);
 
@@ -15,9 +15,10 @@ public interface EntryService {
 
   void softDeleteEntryById(Integer entryId);
 
-  void updateCopyCountById(Integer entryId, int copySuccessCount);
+  void updateDeleteFilesByDirectoryId(Integer directoryId);
 
-  Integer getCopyCountById(Integer entryId);
+  void updateDeleteFilesByFileId(Integer fileId);
 
-  Integer getTakeownCountById(Integer entryId);
+  Boolean getDeleteFilesFlagById(Integer entryId);
+
 }

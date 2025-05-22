@@ -1,13 +1,9 @@
 package org.entry;
 
-import static io.javalin.apibuilder.ApiBuilder.delete;
-
+import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
-
-import org.joined_entry_file_filecomputer.CustomDtoOne;
+import org.util.TimeUtil;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -23,13 +19,7 @@ public class EntryServiceImpl implements EntryService {
 
   @Override
   public Integer createEntry(Entry entry) {
-    // ambil zona waktu, yaitu UTC+7
-    ZoneId zoneId = ZoneId.of("UTC+7");
-    // ambil waktu saat pembuatan entri sesuai dengan zona waktu
-    ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
-
-    // konversi waktu ke tipe data time stamp
-    Timestamp createdAt = Timestamp.from(zonedDateTime.toInstant());
+    Timestamp createdAt = TimeUtil.nowTimestamp();
     entry.setCreatedAt(createdAt);
     return this.entryRepository.save(entry);
   }
@@ -40,39 +30,38 @@ public class EntryServiceImpl implements EntryService {
   }
 
   @Override
+  public List<Entry> getAllDeletedEntries() {
+    return this.entryRepository.findAllDeleted();
+  }
+
+  @Override
   public String getTitleById(Integer entryId) {
-    return this.entryRepository.findTitleByEntryId(entryId);
+    return this.entryRepository.findTitleById(entryId);
   }
 
   @Override
   public void updateDeletableById(boolean deletable, Integer entryId) {
-    this.entryRepository.updateDeletable(deletable, entryId);
+    this.entryRepository.updateDeletableById(deletable, entryId);
   }
 
   @Override
   public void softDeleteEntryById(Integer entryId) {
-    // ambil zona waktu, yaitu UTC+7
-    ZoneId zoneId = ZoneId.of("UTC+7");
-    // ambil waktu saat pembuatan entri sesuai dengan zona waktu
-    ZonedDateTime zonedDateTime = ZonedDateTime.now(zoneId);
-
-    // konversi waktu ke tipe data time stamp
-    Timestamp deletedAt = Timestamp.from(zonedDateTime.toInstant());
+    Timestamp deletedAt = TimeUtil.nowTimestamp();
     this.entryRepository.softDeleteById(entryId, deletedAt);
   }
 
   @Override
-  public void updateCopyCountById(Integer entryId, int copySuccessCount) {
-    this.entryRepository.updateCopyCountById(entryId, copySuccessCount);
+  public void updateDeleteFilesByDirectoryId(Integer directoryId) {
+    this.entryRepository.updateDeleteFilesByDirectoryId(directoryId);
   }
 
   @Override
-  public Integer getCopyCountById(Integer entryId) {
-    return this.entryRepository.findCopyCountById(entryId);
+  public void updateDeleteFilesByFileId(Integer fileId) {
+    this.entryRepository.updateDeleteFilesByFileId(fileId);
   }
 
   @Override
-  public Integer getTakeownCountById(Integer entryId) {
-    return this.entryRepository.findTakeownCountById(entryId);
+  public Boolean getDeleteFilesFlagById(Integer entryId) {
+    return this.entryRepository.findDeleteFilesById(entryId);
   }
 }

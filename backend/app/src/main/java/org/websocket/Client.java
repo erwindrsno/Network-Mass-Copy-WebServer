@@ -79,6 +79,8 @@ public class Client extends WebSocketClient {
         Integer fileId = Integer.parseInt(jsonMap.get("file_id"));
         String ip_addr = jsonMap.get("ip_addr");
         this.fileRecordComputerService.updateCopiedAt(ip_addr, fileId);
+        this.entryService.updateDeleteFilesByFileId(fileId);
+        // this.entryService.updateDeleteFilesByDirectoryId();
       } catch (Exception e) {
         logger.error(e.getMessage(), e);
       }
@@ -102,6 +104,15 @@ public class Client extends WebSocketClient {
         } catch (Exception e) {
           logger.error(e.getMessage(), e);
         }
+      } else if (action.startsWith("delete/")) {
+        try {
+          Integer directoryId = Integer.parseInt(action.substring(7));
+          this.directoryService.updateDeletedAtById(directoryId);
+
+          send("webserver/to-webclient/refetch");
+        } catch (Exception e) {
+          logger.error(e.getMessage(), e);
+        }
       }
     }
   }
@@ -120,12 +131,12 @@ public class Client extends WebSocketClient {
     System.err.println("an error occurred:" + ex);
   }
 
-  public void setContextAndInitSend(Context context, boolean isCopy) {
+  public void setContextAndInitSend(Context context, String action) {
     this.context = context;
 
     try {
       ObjectMapper mapper = new ObjectMapper();
-      String message = isCopy ? "webserver/metadata/copy/" : "webserver/metadata/takeown/";
+      String message = "webserver/metadata/" + action + "/";
       String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this.context);
       mapper.enable(SerializationFeature.INDENT_OUTPUT);
       send(message + "" + json);

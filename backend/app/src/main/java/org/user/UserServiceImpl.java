@@ -65,19 +65,7 @@ public class UserServiceImpl implements UserService {
 
     Result result = BCrypt.verifyer().verify(user.getPassword().toCharArray(), retrievedUser.getPassword());
     if (result.verified == true) {
-      Integer id = retrievedUser.getId();
-      String username = retrievedUser.getUsername();
-      String display_name = retrievedUser.getDisplay_name();
-
-      // destroy retrievedUser agar user baru yang dikirimkan tidak mengandung atribut
-      // yang tidak perlu, seperti passsword
-      retrievedUser = null;
-      User reUser = User.builder()
-          .id(id)
-          .username(username)
-          .display_name(display_name)
-          .build();
-      return reUser;
+      return retrievedUser;
     }
     return null;
   }
@@ -117,7 +105,6 @@ public class UserServiceImpl implements UserService {
   @Override
   public boolean validateSudoAction(String token, String password) {
     DecodedJWT decodedJWT;
-
     try {
       Algorithm algorithm = Algorithm.HMAC512("Secr3t");
       JWTVerifier verifier = JWT.require(algorithm)

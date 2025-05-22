@@ -26,7 +26,7 @@ public class DirectoryRepositoryImpl extends BaseRepository<Directory> implement
   @Override
   public Integer save(Directory dir) {
     try (Connection conn = super.getConnection()) {
-      String query = "INSERT INTO directory(path, copied, owner, file_count) VALUES (?,?,?,?);";
+      String query = DirectoryQuery.SAVE;
       PreparedStatement ps = conn.prepareStatement(query,
           Statement.RETURN_GENERATED_KEYS);
 
@@ -36,8 +36,6 @@ public class DirectoryRepositoryImpl extends BaseRepository<Directory> implement
       ps.setInt(4, dir.getFileCount());
 
       int insertCount = ps.executeUpdate();
-      logger.info(insertCount + "directory rows inserted");
-      // Get generated ID
       Integer generatedId = null;
       try (ResultSet rs = ps.getGeneratedKeys()) {
         if (rs.next()) {
@@ -57,15 +55,9 @@ public class DirectoryRepositoryImpl extends BaseRepository<Directory> implement
   public List<Directory> findByEntryId(Integer entryId) {
     try (Connection conn = super.getConnection()) {
       List<Directory> listResultSet = new ArrayList<>();
-      String query = """
-              SELECT DISTINCT directory.*
-              FROM directory INNER JOIN file
-              ON directory.id = file.directory_id
-              INNER JOIN entry
-              ON entry.id = file.entry_id
-              WHERE entry.id = 114
-          """;
+      String query = DirectoryQuery.FIND_BY_ENTRY_ID;
       PreparedStatement ps = conn.prepareStatement(query);
+      ps.setInt(1, entryId);
       ResultSet resultSet = ps.executeQuery();
 
       while (resultSet.next()) {
@@ -96,8 +88,7 @@ public class DirectoryRepositoryImpl extends BaseRepository<Directory> implement
   @Override
   public Integer findCopiedById(Integer directoryId) {
     try (Connection conn = super.getConnection()) {
-      String query = "SELECT copied FROM directory WHERE id = ?";
-
+      String query = DirectoryQuery.FIND_COPIED_BY_ID;
       PreparedStatement ps = conn.prepareStatement(query);
       ResultSet resultSet = ps.executeQuery();
 
@@ -115,18 +106,7 @@ public class DirectoryRepositoryImpl extends BaseRepository<Directory> implement
   @Override
   public void updateCopiedById(Integer directoryId) {
     try (Connection conn = super.getConnection()) {
-      String query = """
-              UPDATE directory
-              SET copied = (
-                  SELECT COUNT(*)
-                  FROM file
-                  INNER JOIN file_computer ON
-                  file.id = file_computer.file_id
-                  WHERE file_computer.copied_at IS NOT NULL AND directory_id = ?
-              )
-              WHERE id = ?;
-          """;
-
+      String query = DirectoryQuery.UPDATE_COPIED_BY_ID;
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setInt(1, directoryId);
       ps.setInt(2, directoryId);
@@ -139,14 +119,22 @@ public class DirectoryRepositoryImpl extends BaseRepository<Directory> implement
   @Override
   public void updateTakeownedAtById(Integer directoryId, Timestamp takeownedAt) {
     try (Connection conn = super.getConnection()) {
-      String query = """
-              UPDATE directory
-              SET takeowned_at = ?
-              WHERE id = ?;
-          """;
-
+      String query = DirectoryQuery.UPDATE_TAKEOWNED_AT_BY_ID;
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setTimestamp(1, takeownedAt);
+      ps.setInt(2, directoryId);
+      ps.executeUpdate();
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public void updateDeletedAtById(Integer directoryId, Timestamp deletedAt) {
+    try (Connection conn = super.getConnection()) {
+      String query = DirectoryQuery.UPDATE_DELETED_AT_BY_ID;
+      PreparedStatement ps = conn.prepareStatement(query);
+      ps.setTimestamp(1, deletedAt);
       ps.setInt(2, directoryId);
       ps.executeUpdate();
     } catch (Exception e) {

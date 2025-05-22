@@ -25,37 +25,32 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
 
   @Override
   public List<User> findAll() {
-    List<User> listResultSet = new ArrayList<>();
-
     try (Connection conn = super.getConnection()) {
-
-      String query = "SELECT * FROM users";
+      List<User> listResultSet = new ArrayList<>();
+      String query = UserQuery.FIND_ALL;
       PreparedStatement ps = conn.prepareStatement(query);
       ResultSet resultSet = ps.executeQuery();
 
       while (resultSet.next()) {
-        Integer id = resultSet.getInt("id");
-        String username = resultSet.getString("username");
-        String display_name = resultSet.getString("display_name");
         User user = User.builder()
-            .id(id)
-            .username(username)
-            .display_name(display_name)
+            .id(resultSet.getInt("id"))
+            .username(resultSet.getString("username"))
+            .display_name(resultSet.getString("display_name"))
             .build();
         listResultSet.add(user);
       }
+      return listResultSet;
     } catch (Exception e) {
       logger.error(e.getMessage());
+      throw new RuntimeException("cant find all");
     }
-    return listResultSet;
   }
 
   @Override
   public boolean save(User user) {
     try (Connection conn = super.getConnection()) {
-      String query = "INSERT INTO users(username, password, display_name) VALUES (?,?,?);";
+      String query = UserQuery.SAVE;
       PreparedStatement ps = conn.prepareStatement(query);
-
       ps.setString(1, user.getUsername());
       ps.setString(2, user.getPassword());
       ps.setString(3, user.getDisplay_name());
@@ -72,19 +67,17 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
   @Override
   public User findById(Integer id) {
     try (Connection conn = super.getConnection()) {
-      String query = "SELECT * FROM users WHERE id = ?";
+      String query = UserQuery.FIND_BY_ID;
       PreparedStatement ps = conn.prepareStatement(query);
 
       ps.setInt(1, id);
       ResultSet resultSet = ps.executeQuery();
 
       while (resultSet.next()) {
-        String username = resultSet.getString("username");
-        String display_name = resultSet.getString("display_name");
         User user = User.builder()
             .id(id)
-            .username(username)
-            .display_name(display_name)
+            .username(resultSet.getString("username"))
+            .display_name(resultSet.getString("display_name"))
             .build();
         return user;
       }
@@ -97,32 +90,31 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
   @Override
   public User findUserByUsername(String username) {
     try (Connection conn = super.getConnection()) {
-      String query = "SELECT * FROM users WHERE username = ?";
+      String query = UserQuery.FIND_BY_USERNAME;
       PreparedStatement ps = conn.prepareStatement(query);
-
       ps.setString(1, username);
 
       ResultSet resultSet = ps.executeQuery();
       while (resultSet.next()) {
-        Integer retrievedId = resultSet.getInt("id");
-        String retrievedUsername = resultSet.getString("username");
-        String retrievedPassword = resultSet.getString("password");
-        String retrievedDisplayName = resultSet.getString("display_name");
+        User retrievedUser = User.builder()
+            .id(resultSet.getInt("id"))
+            .username(resultSet.getString("username"))
+            .display_name(resultSet.getString("display_name"))
+            .build();
 
-        User retrievedUser = new User(retrievedId, retrievedUsername, retrievedPassword, retrievedDisplayName);
         return retrievedUser;
       }
+      throw new RuntimeException("cant find user by username");
     } catch (Exception e) {
       logger.error(e.getMessage());
+      throw new RuntimeException("cant find user by username");
     }
-    return null;
   }
 
   @Override
   public boolean destroyById(Integer id) {
     try (Connection conn = super.getConnection()) {
-      String query = "DELETE FROM users WHERE id = ?";
-
+      String query = UserQuery.DESTROY_BY_ID;
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setInt(1, id);
 
@@ -140,7 +132,7 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
   @Override
   public String findHashedPasswordById(Integer id) {
     try (Connection conn = super.getConnection()) {
-      String query = "SELECT password FROM users WHERE id = ?";
+      String query = UserQuery.FIND_PASSWORD_BY_ID;
       PreparedStatement ps = conn.prepareStatement(query);
 
       ps.setInt(1, id);

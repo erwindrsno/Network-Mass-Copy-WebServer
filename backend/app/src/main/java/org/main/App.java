@@ -6,7 +6,6 @@ import org.computer.ComputerController;
 import org.computer.ComputerModule;
 import org.directory.DirectoryController;
 import org.directory.DirectoryModule;
-import org.main.session.SessionModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.user.UserController;
@@ -34,7 +33,7 @@ public class App {
 
   public static void main(String[] args) {
     Injector injector = Guice.createInjector(new ComputerModule(), new UserModule(), new DatabaseModule(),
-        new SessionModule(), new FileRecordModule(), new EntryModule(), new FileRecordComputerModule(),
+        new FileRecordModule(), new EntryModule(), new FileRecordComputerModule(),
         new CustomDtoOneModule(), new WebSocketModule(), new DirectoryModule());
 
     ComputerController computerController = injector.getInstance(ComputerController.class);
@@ -116,9 +115,12 @@ public class App {
 
         path("/entry", () -> {
           get(entryController::getAllEntries);
-          // post(entryController::insertEntry);
+          post(entryController::createEntry);
+          path("/deleted", () -> {
+            get(entryController::getAllDeletedEntries);
+          });
           path("/oxam", () -> {
-            post(entryController::insertEntry);
+            post(entryController::createEntry);
           });
           path("/{id}", () -> {
             get(entryController::getFileRecordByEntryId);
@@ -154,6 +156,7 @@ public class App {
         });
 
         path("/directory", () -> {
+          post(directoryController::createDirectoryByEntryId);
           path("/{directory_id}", () -> {
             get(directoryController::getFileRecordByDirectoryId);
             path("/entry/{entry_id}", () -> {
@@ -162,6 +165,9 @@ public class App {
               });
               path("/takeown", () -> {
                 get(directoryController::takeownByDirectoryId);
+              });
+              path("/delete", () -> {
+                delete(directoryController::deleteByDirectoryId);
               });
             });
           });

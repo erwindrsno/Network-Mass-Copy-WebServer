@@ -1,0 +1,105 @@
+import OwnerInput from "./OwnerInput";
+import PermissionInput from "./PermissionInput";
+import FileInput from "./FileInput";
+import ComputerSelector from "./ComputerSelector.jsx";
+import { FileUploadContextProvider, useFileUploadContext } from "../utils/FileUploadContextProvider";
+import { createSignal, createEffect, createResource } from "solid-js";
+import { action, useNavigate } from "@solidjs/router";
+import { useAuthContext } from "../utils/AuthContextProvider.jsx";
+
+function CopyManager() {
+  const navigate = useNavigate();
+  const { files, setFiles } = useFileUploadContext();
+  const { token, setToken } = useAuthContext();
+  const [owners, setOwners] = createSignal([]);
+  const [permission, setPermission] = createSignal([]);
+  const [title, setTitle] = createSignal("");
+  const [selectedComputers, setSelectedComputers] = createSignal([]);
+
+  createEffect(() => {
+    console.log("===");
+    console.log(owners());
+    console.log(permission());
+    console.log(files());
+    console.log(selectedComputers());
+    console.log(title());
+  })
+
+  const handleSubmit = (async (event) => {
+    event.preventDefault();
+    const formatRecords = () => {
+      const shuffledOwners = [...owners()].sort(() => Math.random() - 0.5); // Shuffle
+      const result = [];
+
+      selectedComputers().forEach((computer, index) => {
+        const hostname = computer.host_name;
+        const formatPermission = (perms) => {
+          const permOrder = ["read", "write", "execute"];
+          return permOrder.map(p => perms.includes(p) ? "1" : "0").join("");
+        };
+        const owner = shuffledOwners[index % shuffledOwners.length]; // wrap if shorter
+        result.push({
+          hostname,
+          owner,
+          permissions: formatPermission(permission())
+        });
+      });
+
+      return result;
+    };
+
+    try {
+      let formData = new FormData();
+      const records = formatRecords();
+      const form = event.currentTarget;
+      const title = form.elements.title.value;
+      const path = form.elements.path.value;
+      formData.append("title", title);
+      formData.append("path", path);
+
+      formData.append("records", JSON.stringify(records));
+      for (const file of files()) {
+        formData.append("files", file);
+      }
+      formData.append("count", records.length * files().length);
+      formData.append("host_count", records.length);
+
+      console.log("myformdata is:");
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Authorization": `Bearer ${token()}`
+        },
+        body: formData,
+      });
+      navigate("/home");
+      console.log(response);
+    } catch (err) {
+      // return err;
+      console.error(err);
+    }
+  });
+
+  return (
+    <>
+      <form onSubmit={handleSubmit}>
+        <label for="title">Title</label>
+        <input type="text" name="title" value="" />
+        <label for="path">Path</label>
+        <input type="text" name="path" value="" />
+        <OwnerInput owners={owners} setOwners={setOwners} />
+        <PermissionInput permission={permission} setPermission={setPermission} />
+        <FileInput />
+        <ComputerSelector selectedComputers={selectedComputers} setSelectedComputers={setSelectedComputers} />
+        <button type="submit" class="w-full bg-blue-600 border rounded-md py-1 text-blue-50 font-semibold hover:bg-blue-700 cursor-pointer">Add</button>
+      </form>
+    </>
+  )
+}
+
+export default CopyManager;

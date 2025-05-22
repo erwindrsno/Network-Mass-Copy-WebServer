@@ -89,7 +89,7 @@ public class WebSocketClientServiceImpl implements WebSocketClientService {
           .listFcm(listFileChunkMetadata)
           .build();
 
-      this.wsClient.setContextAndInitSend(context, true);
+      this.wsClient.setContextAndInitSend(context, "copy");
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -148,7 +148,7 @@ public class WebSocketClientServiceImpl implements WebSocketClientService {
           .listFcm(listFileChunkMetadata)
           .build();
 
-      this.wsClient.setContextAndInitSend(context, true);
+      this.wsClient.setContextAndInitSend(context, "copy");
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -163,7 +163,23 @@ public class WebSocketClientServiceImpl implements WebSocketClientService {
           .listDai(accessInfo.getListDai())
           .build();
 
-      this.wsClient.setContextAndInitSend(context, false);
+      this.wsClient.setContextAndInitSend(context, "takeown");
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public void prepareDeleteMetadata(Integer entryId, AccessInfo accessInfo) {
+    try {
+      Context context = Context.builder()
+          .entryId(entryId)
+          .listFai(accessInfo.getListFai())
+          .listDai(accessInfo.getListDai())
+          .build();
+
+      logger.info("try deleting...");
+      this.wsClient.setContextAndInitSend(context, "delete");
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
     }

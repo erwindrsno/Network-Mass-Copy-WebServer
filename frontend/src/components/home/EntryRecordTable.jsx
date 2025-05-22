@@ -94,11 +94,7 @@ function EntryRecordTable() {
                       <div class="flex gap-1">
                         <button onClick={() => openModal(entry.title, entry.id, true)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
                         <button onClick={() => openModal(entry.title, entry.id, false)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TakeownIcon></TakeownIcon></button>
-                        <button onClick={() => {
-                          if (entry.deletable) { handleDeleteEntry(token, entry.id) } else {
-                            toast.error("Entry is not deletable.")
-                          }
-                        }
+                        <button onClick={() => handleDeleteEntry(token, entry.id, refetch)
                         } class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TrashcanIcon /></button>
                       </div>
                     </div>
@@ -133,6 +129,7 @@ const fetchEntries = async (token) => {
     console.log("UNAUTH!")
   }
   const result = await response.json();
+  console.log(result);
   return result;
 }
 
@@ -174,7 +171,7 @@ const handleTakeownByEntry = async (token, id, closeModal) => {
   closeModal();
 }
 
-const handleDeleteEntry = async (token, id) => {
+const handleDeleteEntry = async (token, id, refetch) => {
   if (!confirm(`Are you sure you want to delete?`)) return;
   const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/${id}`, {
     method: "DELETE",
@@ -189,6 +186,7 @@ const handleDeleteEntry = async (token, id) => {
   if (response.ok && response.status === 200) {
     console.log("SUCCEED!");
   }
+  refetch();
 }
 
 const authSudoAction = async (event, token, id, isCopy, closeModal) => {

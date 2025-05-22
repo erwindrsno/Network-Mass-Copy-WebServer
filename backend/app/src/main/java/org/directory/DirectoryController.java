@@ -47,4 +47,20 @@ public class DirectoryController {
     Integer directoryId = Integer.parseInt(ctx.pathParam("directory_id"));
     ctx.json(this.customDtoOneService.getFileRecordByDirectoryId(directoryId));
   }
+
+  public void deleteByDirectoryId(Context ctx) {
+    logger.info("received deleting command");
+    Integer directoryId = Integer.parseInt(ctx.pathParam("directory_id"));
+    Integer entryId = Integer.parseInt(ctx.pathParam("entry_id"));
+    AccessInfo accessInfo = this.customDtoOneService.getMetadataByDirectoryId(directoryId);
+    this.wsClient.prepareDeleteMetadata(entryId, accessInfo);
+  }
+
+  public void createDirectoryByEntryId(Context ctx) {
+    Integer entryId = Integer.parseInt(ctx.formParam("entry_id"));
+    Integer labNum = Integer.parseInt(ctx.formParam("lab_num"));
+    Integer hostNum = Integer.parseInt(ctx.formParam("host_num"));
+    String owner = ctx.formParam("owner");
+    this.directoryService.createDirectoryByEntryId(entryId, labNum, hostNum, owner);
+  }
 }

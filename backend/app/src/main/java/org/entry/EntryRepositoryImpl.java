@@ -28,21 +28,18 @@ public class EntryRepositoryImpl extends BaseRepository<Entry> implements EntryR
   @Override
   public Integer save(Entry entry) {
     try (Connection conn = super.getConnection()) {
-
-      String query = "INSERT INTO entry(title, copy_status, takeown_status, is_from_oxam, count, created_at, deletable, user_id) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+      String query = EntryQuery.SAVE;
       PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
       ps.setString(1, entry.getTitle());
-      ps.setString(2, entry.getCopyStatus());
-      ps.setString(3, entry.getTakeownStatus());
-      ps.setBoolean(4, entry.isFromOxam());
-      ps.setInt(5, entry.getCount());
-      ps.setTimestamp(6, entry.getCreatedAt());
-      ps.setBoolean(7, entry.isDeletable());
-      ps.setInt(8, entry.getUserId());
+      ps.setBoolean(2, entry.isFromOxam());
+      ps.setInt(3, entry.getCount());
+      ps.setTimestamp(4, entry.getCreatedAt());
+      ps.setBoolean(5, entry.isDeleteFiles());
+      ps.setString(6, entry.getBasePath());
+      ps.setInt(7, entry.getUserId());
 
-      int insertCount = ps.executeUpdate();
-      logger.info(insertCount + " rows inserted");
+      ps.executeUpdate();
 
       try (ResultSet rs = ps.getGeneratedKeys()) {
         if (rs.next()) {
@@ -53,73 +50,89 @@ public class EntryRepositoryImpl extends BaseRepository<Entry> implements EntryR
       }
     } catch (Exception e) {
       logger.error(e.getMessage());
-      return null;
+      throw new RuntimeException("cant create entry", e);
     }
   }
 
   @Override
   public List<Entry> findAll() {
-    List<Entry> listResultSet = new ArrayList<>();
     try (Connection conn = super.getConnection()) {
-
-      String query = "SELECT * FROM entry WHERE deleted_at IS NULL ORDER BY created_at DESC";
+      List<Entry> listResultSet = new ArrayList<>();
+      String query = EntryQuery.FIND_ALL;
       PreparedStatement ps = conn.prepareStatement(query);
       ResultSet resultSet = ps.executeQuery();
 
       while (resultSet.next()) {
-        Integer id = resultSet.getInt("id");
-        String title = resultSet.getString("title");
-        String copyStatus = resultSet.getString("copy_status");
-        String takeownStatus = resultSet.getString("takeown_status");
-        boolean isFromOxam = resultSet.getBoolean("is_from_oxam");
-        Timestamp createdAt = resultSet.getTimestamp("created_at");
-        int count = resultSet.getInt("count");
-        Integer userId = resultSet.getInt("user_id");
-        boolean deletable = resultSet.getBoolean("deletable");
-
         Entry entry = Entry.builder()
-            .id(id)
-            .title(title)
-            .copyStatus(copyStatus)
-            .takeownStatus(takeownStatus)
-            .isFromOxam(isFromOxam)
-            .createdAt(createdAt)
-            .count(count)
-            .userId(userId)
-            .deletable(deletable)
+            .id(resultSet.getInt("id"))
+            .title(resultSet.getString("title"))
+            .isFromOxam(resultSet.getBoolean("is_from_oxam"))
+            .createdAt(resultSet.getTimestamp("created_at"))
+            .deletedAt(resultSet.getTimestamp("deleted_at"))
+            .count(resultSet.getInt("count"))
+            .userId(resultSet.getInt("user_id"))
+            .deleteFiles(resultSet.getBoolean("delete_files"))
             .build();
 
         listResultSet.add(entry);
       }
+      return listResultSet;
     } catch (Exception e) {
       logger.error(e.getMessage());
+      throw new RuntimeException("cant find all", e);
     }
-    return listResultSet;
+  }
+
+  public List<Entry> findAllDeleted() {
+    try (Connection conn = super.getConnection()) {
+      List<Entry> listResultSet = new ArrayList<>();
+      String query = EntryQuery.FIND_ALL_DELETED;
+      PreparedStatement ps = conn.prepareStatement(query);
+      ResultSet resultSet = ps.executeQuery();
+
+      while (resultSet.next()) {
+        Entry entry = Entry.builder()
+            .id(resultSet.getInt("id"))
+            .title(resultSet.getString("title"))
+            .isFromOxam(resultSet.getBoolean("is_from_oxam"))
+            .createdAt(resultSet.getTimestamp("created_at"))
+            .deletedAt(resultSet.getTimestamp("deleted_at"))
+            .count(resultSet.getInt("count"))
+            .userId(resultSet.getInt("user_id"))
+            .deleteFiles(resultSet.getBoolean("delete_files"))
+            .build();
+
+        listResultSet.add(entry);
+      }
+      return listResultSet;
+    } catch (Exception e) {
+      logger.error(e.getMessage());
+      throw new RuntimeException("cant find all deleted");
+    }
   }
 
   @Override
-  public String findTitleByEntryId(Integer entryId) {
+  public String findTitleById(Integer entryId) {
     try (Connection conn = super.getConnection()) {
-      String title = "";
-      String query = "SELECT title FROM entry WHERE id = ?";
+      String query = EntryQuery.FIND_TITLE_BY_ID;
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setInt(1, entryId);
       ResultSet resultSet = ps.executeQuery();
 
       while (resultSet.next()) {
-        title = resultSet.getString("title");
+        return resultSet.getString("title");
       }
-      return title;
+      throw new Exception("cant find title");
     } catch (Exception e) {
       logger.error(e.getMessage());
-      return null;
+      throw new RuntimeException("cant get title by entryId", e);
     }
   }
 
   @Override
-  public void updateDeletable(boolean deletable, Integer entryId) {
+  public void updateDeletableById(boolean deletable, Integer entryId) {
     try (Connection conn = super.getConnection()) {
-      String query = "UPDATE entry SET deletable = ? WHERE id = ?";
+      String query = EntryQuery.UPDATE_DELETABLE_BY_ID;
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setBoolean(1, deletable);
       ps.setInt(2, entryId);
@@ -127,13 +140,14 @@ public class EntryRepositoryImpl extends BaseRepository<Entry> implements EntryR
       ps.executeUpdate();
     } catch (Exception e) {
       logger.error(e.getMessage());
+      throw new RuntimeException("cant update deletable with this entry", e);
     }
   }
 
   @Override
   public void softDeleteById(Integer entryId, Timestamp deletedAt) {
     try (Connection conn = super.getConnection()) {
-      String query = "UPDATE entry SET deleted_at = ? WHERE id = ?";
+      String query = EntryQuery.UPDATE_DELETED_AT_BY_ID;
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setTimestamp(1, deletedAt);
       ps.setInt(2, entryId);
@@ -141,58 +155,56 @@ public class EntryRepositoryImpl extends BaseRepository<Entry> implements EntryR
       ps.executeUpdate();
     } catch (Exception e) {
       logger.error(e.getMessage());
+      throw new RuntimeException("cant soft delete this entry.", e);
     }
   }
 
   @Override
-  public void updateCopyCountById(Integer entryId, int copySuccessCount) {
+  public void updateDeleteFilesByDirectoryId(Integer directoryId) {
     try (Connection conn = super.getConnection()) {
-      String query = "UPDATE entry SET copy_status = ? || '/' || split_part(copy_status, '/', 2) WHERE id = ?";
+      String query = EntryQuery.UPDATE_DELETE_FILES_BY_DIRECTORY_ID;
+
       PreparedStatement ps = conn.prepareStatement(query);
-      ps.setString(1, copySuccessCount + "");
-      ps.setInt(2, entryId);
+      ps.setInt(1, directoryId);
 
-      ps.executeUpdate();
+      int count = ps.executeUpdate();
+      if (count == 0)
+        throw new RuntimeException("cant update deleted files on this entry");
     } catch (Exception e) {
-      logger.error(e.getMessage());
+      logger.error(e.getMessage(), e);
     }
   }
 
   @Override
-  public Integer findCopyCountById(Integer entryId) {
+  public void updateDeleteFilesByFileId(Integer fileId) {
     try (Connection conn = super.getConnection()) {
-      String query = "SELECT split_part(copy_status, '/', 1)  as copy_count FROM entry WHERE id = ? ";
+      String query = EntryQuery.UPDATE_DELETE_FILES_BY_FILE_ID;
+      PreparedStatement ps = conn.prepareStatement(query);
+      ps.setInt(1, fileId);
+
+      int count = ps.executeUpdate();
+      if (count == 0)
+        throw new RuntimeException("cant update deleted files on this entry");
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public Boolean findDeleteFilesById(Integer entryId) {
+    try (Connection conn = super.getConnection()) {
+      String query = EntryQuery.FIND_DELETE_FILES_BY_ID;
+
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setInt(1, entryId);
-
       ResultSet resultSet = ps.executeQuery();
-      Integer copyCount = null;
       while (resultSet.next()) {
-        copyCount = Integer.parseInt(resultSet.getString("copy_count"));
+        return resultSet.getBoolean("delete_files");
       }
-      return copyCount;
+      throw new RuntimeException("cant get the delete_files falg");
     } catch (Exception e) {
-      logger.error(e.getMessage());
-      return null;
-    }
-  }
-
-  @Override
-  public Integer findTakeownCountById(Integer entryId) {
-    try (Connection conn = super.getConnection()) {
-      String query = "SELECT split_part(takeown_status, '/', 1) as takeown_count FROM entry WHERE id = ? ";
-      PreparedStatement ps = conn.prepareStatement(query);
-      ps.setInt(1, entryId);
-
-      ResultSet resultSet = ps.executeQuery();
-      Integer takeownCount = null;
-      while (resultSet.next()) {
-        takeownCount = Integer.parseInt(resultSet.getString("takeown_count"));
-      }
-      return takeownCount;
-    } catch (Exception e) {
-      logger.error(e.getMessage());
-      return null;
+      logger.error(e.getMessage(), e);
+      throw new RuntimeException("cant get the delete files flag");
     }
   }
 }

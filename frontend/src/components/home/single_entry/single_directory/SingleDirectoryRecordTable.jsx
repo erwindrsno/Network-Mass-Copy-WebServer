@@ -62,9 +62,9 @@ function SingleDirectoryRecordTable() {
               <th scope="col" class="w-1/12 px-4 py-3 text-left">No.</th>
               <th scope="col" class="w-1/3 py-3 text-left">File name</th>
               <th scope="col" class="w-1/5 py-3 text-center">Size</th>
-              <th scope="col" class="w-1/4 py-3 text-center">Permissions</th>
+              <th scope="col" class="w-1/6 py-3 text-center">Permissions</th>
               <th scope="col" class="w-1/6 py-3 text-center">Copied at</th>
-              <th scope="col" class="w-1/5 py-3 text-center">Action</th>
+              <th scope="col" class="w-1/2 py-3 text-center">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -78,12 +78,8 @@ function SingleDirectoryRecordTable() {
                   <td class="py-3 text-center whitespace-nowrap justify-items-center">{formatDateTime(item.fileRecordComputer.copiedAt)}</td>
                   <td class="text-center text-sm px-2 py-1.5">
                     <div class="flex flex-col gap-1 w-min">
-                      <button onClick={() => viewFilePerDirectory(params.id, title, item.directory.id, item.directory.owner)} class="bg-blue-600 hover:bg-blue-700 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">View</button>
-                      <div class="flex gap-1">
-                        <button onClick={() => openModal(item.computer.ip_address, item.computer.host_name, item.directory.owner, item.directory.id, params.entry_id, true)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
-                        <button onClick={() => openModal(item.computer.ip_address, item.computer.host_name, item.directory.owner, item.directory.id, params.entry_id, false)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TakeownIcon></TakeownIcon></button>
-                        <button onClick={() => console.log("infoooo")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><InfoIcon></InfoIcon></button>
-                      </div>
+                      <button onClick={() => viewFilePerDirectory(params.id, title, item.directory.id, item.directory.owner)} class="bg-blue-600 hover:bg-blue-700 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer w-full">View</button>
+                      <button onClick={() => viewFilePerDirectory(params.id, title, item.directory.id, item.directory.owner)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">Delete</button>
                     </div>
                   </td>
                 </tr>

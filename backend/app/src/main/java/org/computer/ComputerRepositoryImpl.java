@@ -27,7 +27,7 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
   public List<Computer> findAll() {
     try (Connection conn = super.getConnection()) {
       List<Computer> listResultSet = new ArrayList<>();
-      String query = "SELECT * FROM computer";
+      String query = ComputerQuery.FIND_ALL;
       PreparedStatement ps = conn.prepareStatement(query);
       ResultSet resultSet = ps.executeQuery();
 
@@ -49,8 +49,7 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
   @Override
   public void save(Computer computer) {
     try (Connection conn = super.getConnection()) {
-
-      String query = "INSERT INTO computer(ip_address, host_name, lab_num) VALUES (?::INET,?,?);";
+      String query = ComputerQuery.SAVE;
       PreparedStatement ps = conn.prepareStatement(query);
 
       ps.setString(1, computer.getIp_address());
@@ -58,7 +57,8 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
       ps.setInt(3, computer.getLab_num());
 
       int insertCount = ps.executeUpdate();
-      logger.info(insertCount + " rows inserted");
+      if (insertCount == 0)
+        throw new Exception("cant insert it!");
     } catch (Exception e) {
       logger.error(e.getMessage());
     }
@@ -68,8 +68,7 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
   public List<Computer> findByLabNum(int lab_num) {
     List<Computer> listResultSet = new ArrayList<>();
     try (Connection conn = super.getConnection()) {
-      String query = "SELECT * FROM computer WHERE lab_num = ?";
-
+      String query = ComputerQuery.FIND_BY_LAB_NUM;
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setInt(1, lab_num);
 
@@ -92,8 +91,7 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
   @Override
   public Computer findById(Integer id) {
     try (Connection conn = super.getConnection()) {
-      String query = "SELECT * FROM computer WHERE id = ?";
-
+      String query = ComputerQuery.FIND_BY_ID;
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setInt(1, id);
 
@@ -116,8 +114,7 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
   @Override
   public Computer findByIpAddress(String ip) {
     try (Connection conn = super.getConnection()) {
-      String query = "SELECT * FROM computer WHERE ip_address = ?::INET";
-
+      String query = ComputerQuery.FIND_BY_IP_ADDR;
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setString(1, ip);
 
@@ -140,8 +137,7 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
   @Override
   public Computer findByHostname(String hostname) {
     try (Connection conn = super.getConnection()) {
-      String query = "SELECT * FROM computer WHERE host_name = ?";
-
+      String query = ComputerQuery.FIND_BY_HOSTNAME;
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setString(1, hostname);
 
@@ -164,7 +160,7 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
   @Override
   public boolean destroyById(Integer id) {
     try (Connection conn = super.getConnection()) {
-      String query = "DELETE FROM computer WHERE id = ?";
+      String query = ComputerQuery.DESTROY_BY_ID;
 
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setInt(1, id);
@@ -184,7 +180,7 @@ public class ComputerRepositoryImpl extends BaseRepository<Computer> implements 
   public List<Integer> findAllLabNum() {
     try (Connection conn = super.getConnection()) {
       List<Integer> listResultSet = new ArrayList<>();
-      String query = "SELECT DISTINCT ON(lab_num) lab_num FROM computer ORDER BY lab_num ASC";
+      String query = ComputerQuery.FIND_ALL_LAB_NUM;
 
       PreparedStatement ps = conn.prepareStatement(query);
 

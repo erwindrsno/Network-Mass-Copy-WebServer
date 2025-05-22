@@ -1,19 +1,22 @@
 import Header from '../components/header/Header.jsx';
-// import SingleEntryRecordTable from "../components/home/single_entry/SingleEntryRecordTable.jsx";
-import SingleEntryRecordTable2 from "../components/home/single_entry/SingleEntryRecordTable2.jsx";
-import { FileDropdownContextProvider } from '../components/utils/FileDropdownContextProvider.jsx';
-import { useParams, useLocation } from "@solidjs/router";
+import SingleEntryRecordTable from "../components/home/single_entry/SingleEntryRecordTable.jsx";
+import { useParams, useLocation, useNavigate } from "@solidjs/router";
 
 function SingleEntryRecordPage() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const title = location.state.title;
   return (
     <div class="w-full h-full flex flex-col bg-gray-100 gap-8">
       <Header />
       <main class="w-7xl flex flex-col justify-self-center self-center gap-3">
-        <h2 class="text-2xl">{location.state.title}</h2>
-        <SingleEntryRecordTable2 title={location.state.title} />
+        <div class="flex justify-between">
+          <h2 class="text-2xl">{title}</h2>
+          <button onClick={() => navigate("add", { state: { title: title } })}>+ Add directory</button>
+        </div>
+        <SingleEntryRecordTable title={title} />
       </main>
-    </div>
+    </div >
   )
 }
 

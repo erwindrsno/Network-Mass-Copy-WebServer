@@ -1,14 +1,15 @@
-import { createResource, createSignal, Show, createMemo, createEffect } from 'solid-js';
+import { createResource, createSignal, Show, createMemo, createEffect, onMount, onCleanup } from 'solid-js';
 import { useAuthContext } from "../../utils/AuthContextProvider.jsx";
 import { createStore } from "solid-js/store"
 import Pagination from '../../utils/Pagination.jsx'
 import { useParams } from "@solidjs/router";
-import { useFileDropdownContext } from "../../utils/FileDropdownContextProvider.jsx";
-import { CopyIcon, TakeownIcon, InfoIcon } from '../../../assets/Icons.jsx';
+import { CopyIcon, TakeownIcon, TrashcanIcon } from '../../../assets/Icons.jsx';
 import { formatDateTime } from '../../utils/DateTimeDisplayFormatter.jsx';
 import SingleEntrySudoModal from "./SingleEntrySudoModal.jsx";
+import { useWebSocketContext } from '../../utils/WebSocketContextProvider.jsx';
+import { useNavigate, action } from "@solidjs/router";
 
-const fetchFileRecord = async (token, id) => {
+const fetchPerEntry = async (token, id) => {
   const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/${id}`, {
     method: "GET",
     credentials: "include",
@@ -24,7 +25,7 @@ const fetchFileRecord = async (token, id) => {
   return result;
 }
 
-const authSudoAction = async (event, token, entryId, isCopy, closeModal, fileRecord, fileRecordComputerId) => {
+const authSudoAction = async (event, token, entryId, isCopy, closeModal, directory) => {
   event.preventDefault();
 
   const formData = new FormData(event.currentTarget)
@@ -44,19 +45,53 @@ const authSudoAction = async (event, token, entryId, isCopy, closeModal, fileRec
     console.log(isCopy());
     if (isCopy()) {
       console.log("handle copy");
-      handleCopySingleFileRecord(token, entryId, fileRecord, fileRecordComputerId, closeModal);
+      handleCopyByDirectory(token, entryId, directory, closeModal);
     } else if (isCopy() === false) {
-      // handleTakeownByEntry(token, id, closeModal);
-      console.log("handle takeown");
+      handleTakeownByDirectory(token, entryId, directory, closeModal);
     } else {
       console.log("nothing to handle!");
     }
   }
 }
 
-const handleCopySingleFileRecord = async (token, entryId, fileRecord, fileRecordComputerId, closeModal) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/file/${fileRecord.id}/copy/file_computer/${fileRecordComputerId()}/entry/${entryId()}`, {
+const handleCopyByDirectory = async (token, entryId, directory, closeModal) => {
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/directory/${directory.id}/entry/${entryId()}/copy`, {
     method: "GET",
+    credentials: "include",
+    headers: {
+      "Authorization": `Bearer ${token()}`
+    },
+  })
+  if (!response.ok && response.status === 401) {
+    console.log("UNAUTH!")
+  }
+  if (response.ok && response.status === 200) {
+    console.log("SUCCEED!");
+  }
+  closeModal();
+}
+
+const handleTakeownByDirectory = async (token, entryId, directory, closeModal) => {
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/directory/${directory.id}/entry/${entryId()}/takeown`, {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      "Authorization": `Bearer ${token()}`
+    },
+  })
+  if (!response.ok && response.status === 401) {
+    console.log("UNAUTH!")
+  }
+  if (response.ok && response.status === 200) {
+    console.log("SUCCEED!");
+  }
+  closeModal();
+}
+
+const handleDeleteByDirectory = async (token, entryId, directoryId, closeModal) => {
+  if (!confirm(`Are you sure you want to delete?`)) return;
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/directory/${directoryId}/entry/${entryId}/delete`, {
+    method: "DELETE",
     credentials: "include",
     headers: {
       "Authorization": `Bearer ${token()}`
@@ -73,25 +108,26 @@ const handleCopySingleFileRecord = async (token, entryId, fileRecord, fileRecord
 
 function SingleEntryRecordTable(props) {
   const maxItems = 8;
+  const navigate = useNavigate();
   const params = useParams();
+  const title = props.title;
+  const { socket, setSocket } = useWebSocketContext();
   const { token, setToken } = useAuthContext();
-  const { currFilename, setCurrFilename } = useFileDropdownContext();
   const [isCopy, setIsCopy] = createSignal(null);
   const [entryId, setEntryId] = createSignal(null);
   const [isModalToggled, toggleModal] = createSignal(false);
-  const [fileRecord, setFileRecord] = createStore({
+  const [directory, setDirectory] = createStore({
     id: null,
     owner: ""
   });
-  const [fileRecordComputerId, setFileRecordComputerId] = createSignal(null);
 
   const [computer, setComputer] = createStore({
     ip_addr: "",
     host_name: ""
   })
 
-  const [fileRecords, { mutate, refetch }] = createResource(
-    () => fetchFileRecord(token, params.id)
+  const [dirPerEntry, { mutate, refetch }] = createResource(
+    () => fetchPerEntry(token, params.entry_id)
   );
   const [paginated, setPaginated] = createSignal({
     currentPage: 1,
@@ -99,29 +135,19 @@ function SingleEntryRecordTable(props) {
     totalPages: 1
   });
 
-  const filteredFiles = createMemo(() => {
-    //jika files masih dalam proses fetching
-    if (fileRecords.loading) {
-      return [];
-    } else if (fileRecords()) {
-      return fileRecords().filter((file) => file.fileRecord.filename === currFilename());
-    }
-    //jika files gagal fetching
-    else {
-      return [];
-    }
-  });
+  const viewFilePerDirectory = (entryId, title, directoryId, owner) => {
+    navigate(`directory/${directoryId}`, { state: { title: title, owner: owner } });
+  }
 
-  const openModal = (ip, host_name, owner, fileRecordId, fileRecordComputerId, entryId, flag) => {
+  const openModal = (ip, host_name, owner, directoryId, entryId, flag) => {
     setComputer({
       "ip_addr": ip,
       "host_name": host_name
     })
-    setFileRecord({
-      "id": fileRecordId,
+    setDirectory({
+      "id": directoryId,
       "owner": owner
     })
-    setFileRecordComputerId(fileRecordComputerId);
     setEntryId(entryId);
     setIsCopy(flag);
     toggleModal(prev => !prev);
@@ -132,7 +158,7 @@ function SingleEntryRecordTable(props) {
       "ip_addr": "",
       "host_name": ""
     })
-    setFileRecord({
+    setDirectory({
       "id": null,
       "owner": ""
     })
@@ -141,6 +167,25 @@ function SingleEntryRecordTable(props) {
     toggleModal(prev => !prev);
   }
 
+  onMount(() => {
+    const ws = socket();
+    if (!ws) return;
+
+    const onMessage = (event) => {
+      const message = event.data;
+
+      console.log(message);
+      if (message === "refetch") {
+        refetch();
+      }
+    };
+
+    ws.addEventListener("message", onMessage);
+
+    onCleanup(() => {
+      ws.removeEventListener("message", onMessage);
+    });
+  });
   return (
     <>
       <div class="shadow-md rounded-lg overflow-hidden">
@@ -148,29 +193,34 @@ function SingleEntryRecordTable(props) {
           <thead class="text-xs text-gray-700 bg-gray-300">
             <tr>
               <th scope="col" class="w-1/12 px-4 py-3 text-left">No.</th>
-              <th scope="col" class="w-1/5 py-3 text-left">Hostname | IP address</th>
+              <th scope="col" class="w-1/6 py-3 text-center">Hostname | IP address</th>
               <th scope="col" class="w-1/5 py-3 text-center">Owner</th>
-              <th scope="col" class="w-1/6 py-3 text-center">Copied at</th>
-              <th scope="col" class="w-1/6 py-3 text-center">Takeowned at</th>
-              <th scope="col" class="w-min py-3 text-center">Permissions</th>
-              <th scope="col" class="w-1/6 py-3 text-center">Action</th>
+              <th scope="col" class="w-1/5 py-3 text-left">Path</th>
+              <th scope="col" class="w-1/6 py-3 text-center">Copied</th>
+              <th scope="col" class="w-1/3 py-3 text-center">Takeowned at</th>
+              <th scope="col" class="w-1/3 py-3 text-center">Deleted at</th>
+              <th scope="col" class="w-1/5 py-3 text-center">Action</th>
             </tr>
           </thead>
           <tbody>
             <For each={paginated().items} fallback={<p>Loading...</p>}>
-              {(file, index) => (
-                <tr key={file.fileRecord.id} class="bg-white border-b border-gray-200 hover:bg-gray-50">
+              {(item, index) => (
+                <tr key={item.directory.id} class="bg-white border-b border-gray-200 hover:bg-gray-50">
                   <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * maxItems + index() + 1}</td>
-                  <td class="py-3 text-left whitespace-nowrap">{file.computer.host_name} | {file.computer.ip_address}</td>
-                  <td class="py-3 text-center whitespace-nowrap">{file.fileRecord.owner}</td>
-                  <td class="py-3 text-center whitespace-nowrap justify-items-center">{formatDateTime(file.fileRecordComputer.copiedAt)}</td>
-                  <td class="py-3 text-center whitespace-nowrap">{"null"}</td>
-                  <td class="py-3 text-center whitespace-nowrap">{file.fileRecord.permissions}</td>
+                  <td class="py-3 text-center whitespace-nowrap">{item.computer.host_name} | {item.computer.ip_address}</td>
+                  <td class="py-3 text-center whitespace-nowrap">{item.directory.owner}</td>
+                  <td class="py-3 text-left whitespace-nowrap truncate">{item.directory.path}</td>
+                  <td class="py-3 text-center whitespace-nowrap">{`${item.directory.copied} / ${item.directory.fileCount}`}</td>
+                  <td class="py-3 text-center whitespace-nowrap justify-items-center">{formatDateTime(item.directory.takeOwnedAt)}</td>
+                  <td class="py-3 text-center whitespace-nowrap justify-items-center">{formatDateTime(item.directory.deletedAt)}</td>
                   <td class="text-center text-sm px-2 py-1.5">
-                    <div class="flex gap-1 justify-center">
-                      <button onClick={() => openModal(file.computer.ip_address, file.computer.host_name, file.fileRecord.owner, file.fileRecord.id, file.fileRecordComputer.id, params.id, true)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
-                      <button onClick={() => console.log(file)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TakeownIcon></TakeownIcon></button>
-                      <button onClick={() => console.log("infoooo")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><InfoIcon></InfoIcon></button>
+                    <div class="flex flex-col gap-1 w-min">
+                      <button onClick={() => viewFilePerDirectory(params.entry_id, title, item.directory.id, item.directory.owner)} class="bg-blue-600 hover:bg-blue-700 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">View</button>
+                      <div class="flex gap-1">
+                        <button onClick={() => openModal(item.computer.ip_address, item.computer.host_name, item.directory.owner, item.directory.id, params.entry_id, true)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
+                        <button onClick={() => openModal(item.computer.ip_address, item.computer.host_name, item.directory.owner, item.directory.id, params.entry_id, false)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TakeownIcon></TakeownIcon></button>
+                        <button onClick={() => handleDeleteByDirectory(token, params.entry_id, item.directory.id, closeModal)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TrashcanIcon></TrashcanIcon></button>
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -178,13 +228,14 @@ function SingleEntryRecordTable(props) {
             </For>
           </tbody>
         </table>
+
         <Show when={isModalToggled() && isCopy() !== null}>
-          <SingleEntrySudoModal entryId={entryId} closeModal={closeModal} authSudoAction={authSudoAction} isCopy={isCopy} fileRecord={fileRecord} fileRecordComputerId={fileRecordComputerId} computer={computer} />
+          <SingleEntrySudoModal entryId={entryId} closeModal={closeModal} authSudoAction={authSudoAction} isCopy={isCopy} directory={directory} computer={computer} title={title} />
         </Show>
       </div>
 
 
-      <Pagination items={filteredFiles()} onPageChange={setPaginated} maxItems={maxItems} />
+      <Pagination items={dirPerEntry()} onPageChange={setPaginated} maxItems={maxItems} />
     </>
   )
 }

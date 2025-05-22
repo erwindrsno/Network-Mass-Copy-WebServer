@@ -10,4 +10,6 @@ public interface WebSocketClientService {
   void prepareSingleCopyMetadata(Integer entryId, AccessInfo accessInfo);
 
   void prepareTakeownMetadata(Integer entryId, AccessInfo accessInfo);
+
+  void prepareDeleteMetadata(Integer entryId, AccessInfo accessInfo);
 }

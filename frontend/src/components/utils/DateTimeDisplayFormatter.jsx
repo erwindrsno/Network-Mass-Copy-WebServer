@@ -1,6 +1,6 @@
 export const formatDateTime = (dateString) => {
   if (dateString == null) {
-    return <p class="block">Not yet.</p>;
+    return <p class="block">-</p>;
   }
   const date = new Date(dateString);
 

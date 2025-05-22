@@ -2,6 +2,7 @@ package org.joined_entry_file_filecomputer;
 
 import org.computer.Computer;
 import org.directory.Directory;
+import org.entry.Entry;
 import org.file_record.FileRecord;
 import org.file_record_computer.FileRecordComputer;
 
@@ -20,6 +21,7 @@ public class CustomDtoOne {
   private FileRecord fileRecord;
   private Computer computer;
   private Directory directory;
+  private Entry entry;
 
   public CustomDtoOne(FileRecord fileRecord, FileRecordComputer fileRecordComputer, Computer computer) {
     this.fileRecordComputer = fileRecordComputer;

@@ -52,7 +52,7 @@ public class EntryController {
     this.directoryService = directoryService;
   }
 
-  public void insertEntry(Context ctx) {
+  public void createEntry(Context ctx) {
     try {
       ObjectMapper objectMapper = new ObjectMapper();
       String authHeader = ctx.header("Authorization");
@@ -74,14 +74,18 @@ public class EntryController {
           .count(count)
           .isFromOxam(false)
           .userId(userId)
-          .deletable(true)
+          .deleteFiles(false)
           .build();
 
       if (ctx.path().equals("/entry/oxam")) {
         entry.setFromOxam(true);
+        entry.setBasePath("D:\\Ujian\\");
+      } else {
+        String basePath = ctx.formParam("path");
+        entry.setBasePath(basePath);
       }
-      Integer entryId = this.entryService.createEntry(entry);
 
+      Integer entryId = this.entryService.createEntry(entry);
       StringBuilder baseFolder = new StringBuilder("upload/");
       String folderName = baseFolder.append(entryId).append("/").toString();
 
@@ -101,16 +105,17 @@ public class EntryController {
         // filter berdasarkan owner
         // untuk tiap owner, dibkin direktorinya
         Directory dirPerOwner = Directory.builder()
-            .path("D:\\Ujian\\" + owner + " - " + title)
+            .path(entry.getBasePath() + owner + " - " + title)
             .copied(0)
             .owner(owner)
             .fileCount(ctx.uploadedFiles("files").size())
             .build();
 
-        Integer directoryId = this.directoryService.insertDirectory(dirPerOwner);
+        Integer directoryId = this.directoryService.createDirectory(dirPerOwner);
 
         for (UploadedFile uploadedFile : ctx.uploadedFiles("files")) {
-          String filePath = "D:\\Ujian\\" + owner + " - " + title + "\\" + uploadedFile.filename();
+          String filePath = "D:\\Ujian\\" + owner + " - " + title + "\\" +
+              uploadedFile.filename();
 
           FileRecord fileRecord = FileRecord.builder()
               .owner(owner)
@@ -142,6 +147,10 @@ public class EntryController {
     ctx.json(this.entryService.getAllEntries());
   }
 
+  public void getAllDeletedEntries(Context ctx) {
+    ctx.json(this.entryService.getAllDeletedEntries());
+  }
+
   public void getFile(Context ctx) {
     Integer entryId = Integer.parseInt(ctx.pathParam("id"));
     ctx.json(this.fileRecordService.getFileInfo(entryId));
@@ -161,6 +170,11 @@ public class EntryController {
   public void softDeleteEntryById(Context ctx) {
     Integer entryId = Integer.parseInt(ctx.pathParam("id"));
     this.fileRecordService.deleteFileById(entryId);
+    Boolean shouldDeleteFilesInClients = this.entryService.getDeleteFilesFlagById(entryId);
+    if (shouldDeleteFilesInClients) {
+      AccessInfo accessInfo = this.customDtoOneService.getMetadataByEntryId(entryId);
+      this.wsClientService.prepareDeleteMetadata(entryId, accessInfo);
+    }
     this.entryService.softDeleteEntryById(entryId);
   }
 

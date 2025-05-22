@@ -31,6 +31,11 @@ public class FileRecordServiceImpl implements FileRecordService {
   }
 
   @Override
+  public List<Integer> bulkCreate(Integer directoryId, List<FileRecord> listFileRecord) {
+    return this.fileRecordRepository.bulkSave(directoryId, listFileRecord);
+  }
+
+  @Override
   public List<FileRecord> getFileInfo(Integer entryId) {
     return this.fileRecordRepository.findByEntryId(entryId);
   }

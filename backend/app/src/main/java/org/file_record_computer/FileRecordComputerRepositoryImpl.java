@@ -2,9 +2,9 @@ package org.file_record_computer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.List;
 
 import org.file_record.FileRecordRepositoryImpl;
 import org.main.BaseRepository;
@@ -29,8 +29,7 @@ public class FileRecordComputerRepositoryImpl extends BaseRepository<FileRecordC
   @Override
   public void save(FileRecordComputer fileRecordComputer) {
     try (Connection conn = super.getConnection()) {
-
-      String query = "INSERT INTO file_computer(file_id, computer_id) VALUES(?, ?)";
+      String query = FileRecordComputerQuery.SAVE;
       PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
       ps.setInt(1, fileRecordComputer.getFileRecordId());
@@ -38,7 +37,9 @@ public class FileRecordComputerRepositoryImpl extends BaseRepository<FileRecordC
 
       int insertCount = ps.executeUpdate();
       logger.info(insertCount + " rows inserted");
-
+      if (insertCount == 0) {
+        throw new RuntimeException("cant insert file compouter");
+      }
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
       // return null;
@@ -46,36 +47,28 @@ public class FileRecordComputerRepositoryImpl extends BaseRepository<FileRecordC
   }
 
   @Override
-  public void updateCopyTimestampByEntryId(Integer entryId, Timestamp copiedAt) {
+  public void bulkSave(List<FileRecordComputer> listFileRecordComputer) {
     try (Connection conn = super.getConnection()) {
-      String updateClause = "UPDATE file_computer";
-      String setClause = "SET copied_at = ?";
-      String fromClause = "FROM file";
-      String whereClause = "WHERE file.entry_id = ?";
-      String secondWhereClause = "AND file.id = file_computer.file_id";
+      String query = FileRecordComputerQuery.BULK_SAVE;
+      PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
-      String query = updateClause + " " + setClause + " " + fromClause + " " + whereClause + " " + secondWhereClause;
+      for (FileRecordComputer fileRecordComputer : listFileRecordComputer) {
+        ps.setInt(1, fileRecordComputer.getFileRecordId());
+        ps.setInt(2, fileRecordComputer.getComputerId());
+        ps.addBatch();
+      }
 
-      PreparedStatement ps = conn.prepareStatement(query);
-      ps.setTimestamp(1, copiedAt);
-      ps.setInt(2, entryId);
+      ps.executeBatch();
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
+      // return null;
     }
   }
 
   @Override
-  public void updateCopiedAt(String ip_addr, Integer fileId, Timestamp copiedAt) {
+  public void updateCopiedAtByFileId(String ip_addr, Integer fileId, Timestamp copiedAt) {
     try (Connection conn = super.getConnection()) {
-      String updateClause = "UPDATE file_computer";
-      String setClause = "SET copied_at = ?";
-      String fromClause = "FROM file";
-      String firstWhereClause = "WHERE file.id = file_computer.file_id";
-      String thirdWhereClause = "AND file.id = ?";
-
-      String query = updateClause + " " + setClause + " " + fromClause + " " + firstWhereClause + " "
-          + " " + thirdWhereClause;
-
+      String query = FileRecordComputerQuery.UPDATE_COPIED_AT_BY_FILE_ID;
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setTimestamp(1, copiedAt);
       ps.setInt(2, fileId);
@@ -83,19 +76,6 @@ public class FileRecordComputerRepositoryImpl extends BaseRepository<FileRecordC
       ps.executeUpdate();
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
-    }
-  }
-
-  @Override
-  public void destroyByEntryId(Integer entryId) {
-    try (Connection conn = super.getConnection()) {
-      String query = "DELETE FROM file_computer WHERE entry_id = ?";
-      PreparedStatement ps = conn.prepareStatement(query);
-      ps.setInt(1, entryId);
-
-      ps.executeUpdate();
-    } catch (Exception e) {
-      logger.error(e.getMessage());
     }
   }
 }
