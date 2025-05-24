@@ -60,8 +60,11 @@ public class UserServiceImpl implements UserService {
     User retrievedUser = this.userRepository.findUserByUsername(user.getUsername());
 
     // jika username yang diinput tidak ada di db
-    if (retrievedUser == null)
+    if (retrievedUser == null) {
       return null;
+    }
+
+    logger.info("the password is: " + retrievedUser.getPassword());
 
     Result result = BCrypt.verifyer().verify(user.getPassword().toCharArray(), retrievedUser.getPassword());
     if (result.verified == true) {

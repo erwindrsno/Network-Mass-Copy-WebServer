@@ -1,36 +1,26 @@
-import { createSignal } from "solid-js";
-import { action, useNavigate } from "@solidjs/router";
-import { useAuthContext } from "../../utils/AuthContextProvider.jsx";
+import { useNavigate } from "@solidjs/router";
+import { useAuthContext } from "@utils/AuthContextProvider.jsx";
+import { apiAddUser } from "@apis/UserApi.jsx";
+import toast, { Toaster } from 'solid-toast';
 
 function AddUserForm() {
   const navigate = useNavigate()
   const { token, setToken } = useAuthContext();
 
-  const handleAddUser = action(async (formData) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": `Bearer ${token()}`
-      },
-      body: new URLSearchParams({
-        username: formData.get('username'),
-        password: formData.get('password'),
-        display_name: formData.get('display_name')
-      }),
-    })
-    if (!response.ok && response.status === 401) {
-      console.log("UNAUTH!")
-    } else if (response.ok && response.status === 201) {
-      console.log("OKKKK")
-      navigate('/admin/user')
+  const handleAddUser = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const result = await apiAddUser(formData, token);
+
+    if (result.success) {
+      toast.success("new user added.");
+      navigate("/admin/user");
     }
-    console.log(formData)
-  })
+  };
+
   return (
     <div class="flex flex-col gap-5 border border-gray-300 rounded-md px-4 py-4 w-lg justify-between bg-gray-50">
-      <form action={handleAddUser} method="post" class="flex flex-col gap-5">
+      <form onSubmit={handleAddUser} method="post" class="flex flex-col gap-5">
         <div class="flex flex-col gap-1.5 font-medium">
           <label for="username">Username</label>
           <input type="text" name="username" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal" placeholder="admin" required />

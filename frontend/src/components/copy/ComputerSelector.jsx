@@ -25,19 +25,25 @@ function ComputerSelector(props) {
     setLabNum(Number(event.target.value))
   }
 
-  const handleClickedComputer = (host_name, ip_address) => {
-    const newComputer = { host_name, ip_address }
+  const handleClickedComputer = (host_name, ip_address, isSelected) => {
+    const newComputer = { host_name, ip_address };
+
     setSelectedComputers((prev) => {
-      const alreadyExists = prev.some(
-        (comp) => comp.host_name === host_name && comp.ip_address === ip_address
-      );
-
-      if (alreadyExists) return prev; // avoid duplicate
-      return [...prev, newComputer]; // append
+      if (!isSelected) {
+        // Remove the computer from the list
+        return prev.filter(
+          (comp) => comp.ip_address !== ip_address || comp.host_name !== host_name
+        );
+      } else {
+        // Only add if it doesn't already exist
+        const alreadyExists = prev.some(
+          (comp) => comp.host_name === host_name && comp.ip_address === ip_address
+        );
+        if (alreadyExists) return prev;
+        return [...prev, newComputer];
+      }
     });
-  }
-
-
+  };
   return (
     <div class="flex flex-col gap-4">
       <select name="lab_num" onChange={handleLabNumChange} value={labNum()} class="bg-gray-50 rounded-sm border border-slate-300">
@@ -59,7 +65,7 @@ function ComputerSelector(props) {
 
               return (
                 <div class={`text-center flex flex-col border rounded-sm border-gray-300 relative p-0 z-40 cursor-pointer ${isSelected(item.ip_address) ? "bg-green-300" : "bg-sky-100"
-                  }`} onClick={() => handleClickedComputer(item.host_name, item.ip_address)}>
+                  }`} onClick={() => handleClickedComputer(item.host_name, item.ip_address, isSelected)}>
                   <p class="text-lg">{item.host_name}</p>
                   <p class="text-sm">{item.ip_address}</p>
                 </div>

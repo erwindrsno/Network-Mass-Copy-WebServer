@@ -1,12 +1,10 @@
-import { createSignal } from 'solid-js'
 import { useNavigate } from '@solidjs/router'
-
 import UserTable from './UserTable.jsx'
 
-function UserCRUD(){
+function UserCRUD() {
 
   const navigate = useNavigate()
-  return(
+  return (
     <div class="w-3xl flex flex-col items-center">
       <div class="w-full mb-2 flex flex-row justify-between">
         <h1 class="ml-0.5 text-2xl">User</h1>

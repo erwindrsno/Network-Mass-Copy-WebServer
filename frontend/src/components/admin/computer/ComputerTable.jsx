@@ -1,28 +1,12 @@
-import { createResource, createSignal, createMemo, createEffect, For } from 'solid-js';
-import { action, useNavigate } from "@solidjs/router";
-import Pagination from '../../utils/Pagination.jsx';
-import { useAuthContext } from "../../utils/AuthContextProvider.jsx";
-
-const fetchComputer = async (token) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/computer`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Authorization": `Bearer ${token()}`
-    },
-  })
-  if (!response.ok && response.status === 401) {
-    console.log("UNAUTH!")
-  }
-  const result = await response.json();
-  return result
-}
-
+import { createResource, createSignal, createMemo, createEffect, For, Show } from 'solid-js';
+import Pagination from '@utils/Pagination.jsx';
+import { useAuthContext } from "@utils/AuthContextProvider.jsx";
+import { apiDeleteComputer, apiFetchComputer } from '@apis/ComputerApi.jsx';
 
 function ComputerTable(props) {
   const maxItems = 10;
   const { token, setToken } = useAuthContext();
-  const [computers, { mutate, refetch }] = createResource(() => fetchComputer(token));
+  const [computers, { mutate, refetch }] = createResource(() => apiFetchComputer(token));
 
   const [paginated, setPaginated] = createSignal({
     currentPage: 1,
@@ -46,19 +30,10 @@ function ComputerTable(props) {
   const handleDelete = async (computerId) => {
     if (!confirm("Are you sure you want to delete this computer?")) return;
     console.log("To be deleted is  : " + computerId)
-    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/computer/id/${computerId}`, {
-      method: "DELETE",
-      credentials: "include",
-      headers: {
-        "Authorization": `Bearer ${token()}`
-      },
-    })
-    if (!response.ok && response.status === 401) {
-      console.log("UNATUH!")
-    } else {
-      refetch()
+    const result = await apiDeleteComputer(computerId, token);
+    if (result.success) {
+      refetch();
     }
-    console.log(response)
   }
 
   return (

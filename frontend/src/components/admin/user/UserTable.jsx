@@ -1,28 +1,12 @@
 import { createResource, createSignal } from 'solid-js';
-import { useNavigate } from '@solidjs/router'
-import { useAuthContext } from "../../utils/AuthContextProvider.jsx";
-import Pagination from '../../utils/Pagination.jsx'
-
-const fetchUser = async (token) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Authorization": `Bearer ${token()}`
-    },
-  })
-  if (!response.ok && response.status === 401) {
-    console.log("UNAUTH!")
-  }
-  const result = await response.json();
-  return result;
-}
+import { useAuthContext } from "@utils/AuthContextProvider.jsx";
+import { apiFetchUser, apiDeleteUser } from '@apis/UserApi.jsx';
+import Pagination from '@utils/Pagination.jsx'
 
 function UserTable() {
   const maxItems = 10;
-  const navigate = useNavigate()
   const { token, setToken } = useAuthContext();
-  const [users, { mutate, refetch }] = createResource(() => fetchUser(token));
+  const [users, { mutate, refetch }] = createResource(() => apiFetchUser(token));
   const [paginated, setPaginated] = createSignal({
     currentPage: 1,
     items: [],
@@ -31,20 +15,11 @@ function UserTable() {
 
   const handleDelete = async (userId) => {
     if (!confirm(`Are you sure you want to delete this user with name ${userId}?`)) return;
-    console.log("To be deleted is  : " + userId)
-    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user/id/${userId}`, {
-      method: "DELETE",
-      credentials: "include",
-      headers: {
-        "Authorization": `Bearer ${token()}`
-      },
-    })
-    if (!response.ok && response.status === 401) {
-      console.log("UNATUH!")
-    } else {
-      refetch()
+    const result = await apiDeleteUser(userId, token);
+    if (result.success) {
+      console.log("user deletion ok");
+      refetch();
     }
-    console.log(response)
   }
 
   return (

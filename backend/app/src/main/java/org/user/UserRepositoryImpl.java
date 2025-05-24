@@ -99,12 +99,13 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
         User retrievedUser = User.builder()
             .id(resultSet.getInt("id"))
             .username(resultSet.getString("username"))
+            .password(resultSet.getString("password"))
             .display_name(resultSet.getString("display_name"))
             .build();
 
         return retrievedUser;
       }
-      throw new RuntimeException("cant find user by username");
+      return null;
     } catch (Exception e) {
       logger.error(e.getMessage());
       throw new RuntimeException("cant find user by username");

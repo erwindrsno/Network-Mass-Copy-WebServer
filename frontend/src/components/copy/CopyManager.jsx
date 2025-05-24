@@ -1,4 +1,3 @@
-import OwnerInput from "./OwnerInput";
 import PermissionInput from "./PermissionInput";
 import FileInput from "./FileInput";
 import ComputerSelector from "./ComputerSelector.jsx";
@@ -11,14 +10,12 @@ function CopyManager() {
   const navigate = useNavigate();
   const { files, setFiles } = useFileUploadContext();
   const { token, setToken } = useAuthContext();
-  const [owners, setOwners] = createSignal([]);
   const [permission, setPermission] = createSignal([]);
   const [title, setTitle] = createSignal("");
   const [selectedComputers, setSelectedComputers] = createSignal([]);
 
   createEffect(() => {
     console.log("===");
-    console.log(owners());
     console.log(permission());
     console.log(files());
     console.log(selectedComputers());
@@ -27,8 +24,8 @@ function CopyManager() {
 
   const handleSubmit = (async (event) => {
     event.preventDefault();
+    const owner = event.target.owner.value;
     const formatRecords = () => {
-      const shuffledOwners = [...owners()].sort(() => Math.random() - 0.5); // Shuffle
       const result = [];
 
       selectedComputers().forEach((computer, index) => {
@@ -37,7 +34,6 @@ function CopyManager() {
           const permOrder = ["read", "write", "execute"];
           return permOrder.map(p => perms.includes(p) ? "1" : "0").join("");
         };
-        const owner = shuffledOwners[index % shuffledOwners.length]; // wrap if shorter
         result.push({
           hostname,
           owner,
@@ -92,7 +88,8 @@ function CopyManager() {
         <input type="text" name="title" value="" />
         <label for="path">Path</label>
         <input type="text" name="path" value="" />
-        <OwnerInput owners={owners} setOwners={setOwners} />
+        <label for="owner">Owner</label>
+        <input type="text" name="owner" value="" />
         <PermissionInput permission={permission} setPermission={setPermission} />
         <FileInput />
         <ComputerSelector selectedComputers={selectedComputers} setSelectedComputers={setSelectedComputers} />

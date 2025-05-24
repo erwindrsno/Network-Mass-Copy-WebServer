@@ -44,6 +44,7 @@ public class UserController {
   public void authUser(Context ctx) {
     String username = ctx.formParam("username");
     String password = ctx.formParam("password");
+
     User user = User.builder()
         .username(username)
         .password(password)

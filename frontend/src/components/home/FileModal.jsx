@@ -1,52 +1,26 @@
 import { Portal } from "solid-js/web";
 import { createResource, createSignal, Show } from 'solid-js';
-import { useAuthContext } from "../utils/AuthContextProvider.jsx";
-import { DownloadIcon, CloseModalIcon, TrashcanIcon } from "../../assets/Icons.jsx";
-
-const fetchFilesInfo = async (token, id) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/${id}/file`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Authorization": `Bearer ${token()}`
-    },
-  })
-  if (!response.ok && response.status === 401) {
-    console.log("UNAUTH!")
-  }
-  const result = await response.json();
-  console.log(result);
-  return result;
-}
-
-const handleDownload = async (token, entryId, filename) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/file/download/${entryId()}/${filename}`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Authorization": `Bearer ${token()}`
-    },
-  })
-  if (!response.ok && response.status === 401) {
-    console.log("UNAUTH!")
-  }
-  const blob = await response.blob();
-
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename; // nama file yang direkomendasi untuk download
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  window.URL.revokeObjectURL(url); // Clean up the URL
-}
+import { useAuthContext } from "@utils/AuthContextProvider.jsx";
+import { DownloadIcon, CloseModalIcon, TrashcanIcon } from "@icons/Icons.jsx";
+import { apiFetchFilesInfo, apiDownloadFile } from "@apis/FileModalApi";
 
 function FileModal(props) {
-  const title = () => props.title;
-  const entryId = () => props.entryId;
+  const title = props.title;
+  const entryId = props.entryId;
   const { token, setToken } = useAuthContext();
-  const [filesInfo, { mutate, refetch }] = createResource(props.entryId(), () => fetchFilesInfo(token, props.entryId()));
+  const [filesInfo, { mutate, refetch }] = createResource(entryId(), () => apiFetchFilesInfo(entryId, token));
+
+  const handleDownload = async (filename) => {
+    const result = await apiDownloadFile(entryId, filename, token);
+    const url = window.URL.createObjectURL(result);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename; // nama file yang direkomendasi untuk download
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  }
 
   return (
     <Portal>
@@ -71,7 +45,7 @@ function FileModal(props) {
                         {(file.filesize / 10240).toFixed(2)} MB
                       </span>
                       <button
-                        onClick={() => handleDownload(token, props.entryId, file.filename)}
+                        onClick={() => handleDownload(file.filename)}
                         class="bg-blue-600 text-white text-xs px-1 py-1 rounded hover:bg-blue-700 transition cursor-pointer"
                       >
                         <DownloadIcon></DownloadIcon>

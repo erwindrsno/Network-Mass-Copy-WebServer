@@ -98,7 +98,8 @@ public class DirectoryServiceImpl implements DirectoryService {
 
         toBeInsertedList.add(fileRecord);
       }
-      this.customDtoOneService.insertFileRecordsAndFileRecordsComputerByDirectoryId(dirId, compId, toBeInsertedList);
+      this.customDtoOneService.insertFileRecordsAndFileRecordsComputerByDirectoryId(dirId,
+          compId, toBeInsertedList);
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
     }

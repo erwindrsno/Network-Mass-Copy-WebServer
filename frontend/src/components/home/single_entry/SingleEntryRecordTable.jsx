@@ -1,120 +1,23 @@
 import { createResource, createSignal, Show, createMemo, createEffect, onMount, onCleanup } from 'solid-js';
-import { useAuthContext } from "../../utils/AuthContextProvider.jsx";
+import { useAuthContext } from "@utils/AuthContextProvider.jsx";
 import { createStore } from "solid-js/store"
-import Pagination from '../../utils/Pagination.jsx'
-import { useParams } from "@solidjs/router";
-import { CopyIcon, TakeownIcon, TrashcanIcon } from '../../../assets/Icons.jsx';
-import { formatDateTime } from '../../utils/DateTimeDisplayFormatter.jsx';
+import Pagination from '@utils/Pagination.jsx'
+import { CopyIcon, TakeownIcon, TrashcanIcon } from '@icons/Icons.jsx';
+import { formatDateTime } from '@utils/DateTimeDisplayFormatter.jsx';
 import SingleEntrySudoModal from "./SingleEntrySudoModal.jsx";
-import { useWebSocketContext } from '../../utils/WebSocketContextProvider.jsx';
-import { useNavigate, action } from "@solidjs/router";
-
-const fetchPerEntry = async (token, id) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/${id}`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Authorization": `Bearer ${token()}`
-    },
-  })
-  if (!response.ok && response.status === 401) {
-    console.log("UNAUTH!")
-  }
-  const result = await response.json();
-  console.log(result);
-  return result;
-}
-
-const authSudoAction = async (event, token, entryId, isCopy, closeModal, directory) => {
-  event.preventDefault();
-
-  const formData = new FormData(event.currentTarget)
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user/sudo`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Authorization": `Bearer ${token()}`
-    },
-    body: formData,
-  })
-
-  if (!response.ok && response.status === 401) {
-    toast.error("Sudo action not permit.");
-  }
-  if (response.ok && response.status === 200) {
-    console.log(isCopy());
-    if (isCopy()) {
-      console.log("handle copy");
-      handleCopyByDirectory(token, entryId, directory, closeModal);
-    } else if (isCopy() === false) {
-      handleTakeownByDirectory(token, entryId, directory, closeModal);
-    } else {
-      console.log("nothing to handle!");
-    }
-  }
-}
-
-const handleCopyByDirectory = async (token, entryId, directory, closeModal) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/directory/${directory.id}/entry/${entryId()}/copy`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Authorization": `Bearer ${token()}`
-    },
-  })
-  if (!response.ok && response.status === 401) {
-    console.log("UNAUTH!")
-  }
-  if (response.ok && response.status === 200) {
-    console.log("SUCCEED!");
-  }
-  closeModal();
-}
-
-const handleTakeownByDirectory = async (token, entryId, directory, closeModal) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/directory/${directory.id}/entry/${entryId()}/takeown`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Authorization": `Bearer ${token()}`
-    },
-  })
-  if (!response.ok && response.status === 401) {
-    console.log("UNAUTH!")
-  }
-  if (response.ok && response.status === 200) {
-    console.log("SUCCEED!");
-  }
-  closeModal();
-}
-
-const handleDeleteByDirectory = async (token, entryId, directoryId, closeModal) => {
-  if (!confirm(`Are you sure you want to delete?`)) return;
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/directory/${directoryId}/entry/${entryId}/delete`, {
-    method: "DELETE",
-    credentials: "include",
-    headers: {
-      "Authorization": `Bearer ${token()}`
-    },
-  })
-  if (!response.ok && response.status === 401) {
-    console.log("UNAUTH!")
-  }
-  if (response.ok && response.status === 200) {
-    console.log("SUCCEED!");
-  }
-  closeModal();
-}
+import { useWebSocketContext } from '@utils/WebSocketContextProvider.jsx';
+import { useNavigate, useParams, action } from "@solidjs/router";
+import { apiFetchSingleEntry, apiCopySingleDirectory, apiTakeownSingleDirectory, apiDeleteSingleDirectory } from '@apis/SingleEntryApi.jsx';
 
 function SingleEntryRecordTable(props) {
   const maxItems = 8;
   const navigate = useNavigate();
   const params = useParams();
+  const entryId = params.entry_id;
   const title = props.title;
   const { socket, setSocket } = useWebSocketContext();
   const { token, setToken } = useAuthContext();
-  const [isCopy, setIsCopy] = createSignal(null);
-  const [entryId, setEntryId] = createSignal(null);
+  const [action, setAction] = createSignal("");
   const [isModalToggled, toggleModal] = createSignal(false);
   const [directory, setDirectory] = createStore({
     id: null,
@@ -127,7 +30,7 @@ function SingleEntryRecordTable(props) {
   })
 
   const [dirPerEntry, { mutate, refetch }] = createResource(
-    () => fetchPerEntry(token, params.entry_id)
+    () => apiFetchSingleEntry(params.entry_id, token)
   );
   const [paginated, setPaginated] = createSignal({
     currentPage: 1,
@@ -135,11 +38,11 @@ function SingleEntryRecordTable(props) {
     totalPages: 1
   });
 
-  const viewFilePerDirectory = (entryId, title, directoryId, owner) => {
-    navigate(`directory/${directoryId}`, { state: { title: title, owner: owner } });
+  const viewFilePerDirectory = (entryId, title, directoryId, owner, hostname, ip_addr) => {
+    navigate(`directory/${directoryId}`, { state: { title: title, owner: owner, hostname: hostname, ip_addr: ip_addr } });
   }
 
-  const openModal = (ip, host_name, owner, directoryId, entryId, flag) => {
+  const openModal = (ip, host_name, owner, directoryId, action) => {
     setComputer({
       "ip_addr": ip,
       "host_name": host_name
@@ -148,8 +51,7 @@ function SingleEntryRecordTable(props) {
       "id": directoryId,
       "owner": owner
     })
-    setEntryId(entryId);
-    setIsCopy(flag);
+    setAction(action);
     toggleModal(prev => !prev);
   }
 
@@ -162,8 +64,7 @@ function SingleEntryRecordTable(props) {
       "id": null,
       "owner": ""
     })
-    setEntryId(null);
-    setIsCopy(null);
+    setAction("");
     toggleModal(prev => !prev);
   }
 
@@ -186,6 +87,27 @@ function SingleEntryRecordTable(props) {
       ws.removeEventListener("message", onMessage);
     });
   });
+
+  const actionMap = new Map([
+    ['copy', async () => {
+      const result = await apiCopySingleDirectory(entryId, directory, token);
+      if (result.success) {
+        closeModal();
+      }
+    }],
+    ['takeown', async () => {
+      const result = await apiTakeownSingleDirectory(entryId, directory, token);
+      if (result.success) {
+        closeModal();
+      }
+    }],
+    ['delete', async () => {
+      const result = await apiDeleteSingleDirectory(entryId, directory, token);
+      if (result.success) {
+        closeModal();
+      }
+    }]
+  ]);
   return (
     <>
       <div class="shadow-md rounded-lg overflow-hidden">
@@ -215,11 +137,11 @@ function SingleEntryRecordTable(props) {
                   <td class="py-3 text-center whitespace-nowrap justify-items-center">{formatDateTime(item.directory.deletedAt)}</td>
                   <td class="text-center text-sm px-2 py-1.5">
                     <div class="flex flex-col gap-1 w-min">
-                      <button onClick={() => viewFilePerDirectory(params.entry_id, title, item.directory.id, item.directory.owner)} class="bg-blue-600 hover:bg-blue-700 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">View</button>
+                      <button onClick={() => viewFilePerDirectory(params.entry_id, title, item.directory.id, item.directory.owner, item.computer.host_name, item.computer.ip_address)} class="bg-blue-600 hover:bg-blue-700 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">View</button>
                       <div class="flex gap-1">
-                        <button onClick={() => openModal(item.computer.ip_address, item.computer.host_name, item.directory.owner, item.directory.id, params.entry_id, true)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
-                        <button onClick={() => openModal(item.computer.ip_address, item.computer.host_name, item.directory.owner, item.directory.id, params.entry_id, false)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TakeownIcon></TakeownIcon></button>
-                        <button onClick={() => handleDeleteByDirectory(token, params.entry_id, item.directory.id, closeModal)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TrashcanIcon></TrashcanIcon></button>
+                        <button onClick={() => openModal(item.computer.ip_address, item.computer.host_name, item.directory.owner, item.directory.id, "copy")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
+                        <button onClick={() => openModal(item.computer.ip_address, item.computer.host_name, item.directory.owner, item.directory.id, "takeown")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TakeownIcon></TakeownIcon></button>
+                        <button onClick={() => openModal(item.computer.ip_address, item.computer.host_name, item.directory.owner, item.directory.id, "delete")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TrashcanIcon></TrashcanIcon></button>
                       </div>
                     </div>
                   </td>
@@ -229,8 +151,8 @@ function SingleEntryRecordTable(props) {
           </tbody>
         </table>
 
-        <Show when={isModalToggled() && isCopy() !== null}>
-          <SingleEntrySudoModal entryId={entryId} closeModal={closeModal} authSudoAction={authSudoAction} isCopy={isCopy} directory={directory} computer={computer} title={title} />
+        <Show when={isModalToggled() && action() !== ""}>
+          <SingleEntrySudoModal closeModal={closeModal} action={action} actionMap={actionMap} directory={directory} computer={computer} title={title} />
         </Show>
       </div>
 

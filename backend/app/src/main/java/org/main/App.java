@@ -59,12 +59,11 @@ public class App {
       config.router.apiBuilder(() -> {
         before(ctx -> {
           ctx.header("Access-Control-Allow-Origin", "http://localhost:3000");
-          ctx.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+          ctx.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
           ctx.header("Access-Control-Allow-Credentials", "true");
           ctx.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
           if (ctx.method() == HandlerType.OPTIONS) {
-            logger.info("before OPTIONS");
-            logger.info(ctx.path());
+            logger.info(ctx.method() + ": " + ctx.path());
             ctx.status(204);
             ctx.skipRemainingHandlers();
           } else {
@@ -129,10 +128,10 @@ public class App {
               get(entryController::getFile);
             });
             path("/copy", () -> {
-              get(entryController::copyFileByEntry);
+              patch(entryController::copyFileByEntry);
             });
             path("takeown", () -> {
-              get(entryController::takeownFileByEntry);
+              patch(entryController::takeownFileByEntry);
             });
           });
         });
@@ -159,16 +158,14 @@ public class App {
           post(directoryController::createDirectoryByEntryId);
           path("/{directory_id}", () -> {
             get(directoryController::getFileRecordByDirectoryId);
-            path("/entry/{entry_id}", () -> {
-              path("/copy", () -> {
-                get(directoryController::copyFilesByDirectoryId);
-              });
-              path("/takeown", () -> {
-                get(directoryController::takeownByDirectoryId);
-              });
-              path("/delete", () -> {
-                delete(directoryController::deleteByDirectoryId);
-              });
+            path("/copy", () -> {
+              patch(directoryController::copyFilesByDirectoryId);
+            });
+            path("/takeown", () -> {
+              patch(directoryController::takeownByDirectoryId);
+            });
+            path("/delete", () -> {
+              delete(directoryController::deleteByDirectoryId);
             });
           });
         });

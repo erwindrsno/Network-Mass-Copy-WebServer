@@ -1,17 +1,39 @@
 import { Portal } from "solid-js/web";
-import { createEffect, Show } from "solid-js";
+import { createEffect, Show, Switch, Match } from "solid-js";
 import { CloseModalIcon } from "../../assets/Icons";
 import { useAuthContext } from "../utils/AuthContextProvider";
+import { apiAuthSudoAction } from "@apis/AuthApi";
 
 function SudoModal(props) {
   const title = () => props.title;
-  const entryId = () => props.entryId;
-  const isCopy = props.isCopy;
+  const action = props.action;
+  const actionMap = props.actionMap;
   const { token, setToken } = useAuthContext();
 
-  createEffect(() => {
-    console.log(isCopy());
-  })
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const result = await apiAuthSudoAction(formData, token);
+    if (result.success) {
+      switch (action()) {
+        case "copy":
+          actionMap.get("copy")?.();
+          break;
+
+        case "takeown":
+          actionMap.get("takeown")?.();
+          break;
+
+        case "delete":
+          actionMap.get("delete")?.();
+          break;
+
+        default:
+          console.log("nothing to handle.");
+          break;
+      }
+    }
+  }
   return (
     <Portal>
       <div class="fixed inset-0 bg-black opacity-20 z-40" onClick={() => { console.log("clicked!") }}></div>
@@ -24,13 +46,23 @@ function SudoModal(props) {
               <button onClick={props.closeModal} class="cursor-pointer bg-gray-200 hover:bg-gray-300 rounded-sm"><CloseModalIcon /></button>
             </div>
             <div class="flex flex-col gap-5 items-center border border-gray-300 rounded-lg p-2 bg-gray-50">
-              <Show when={isCopy()} fallback={<p class="text-center">Anda akan melakukan pengalihan hak akses file dengan entri:</p>}>
-                <p>Anda akan melakukan penyalinan file dengan entri:</p>
-              </Show>
+              <Switch fallback={<p>Not found.</p>}>
+                <Match when={action() === "copy"}>
+                  <p class="text-center">Anda akan melakukan <span class="text-red-500 font-semibold">penyalinan</span> file pada entri:</p>
+                </Match>
+                <Match when={action() === "takeown"}>
+                  <p class="text-center">Anda akan melakukan <span class="text-red-500 font-semibold">pengalihan hak akses</span> pada entri:</p>
+                </Match>
+                <Match when={action() === "delete"}>
+                  <div class="flex flex-col gap-1">
+                    <p class="text-center">Anda akan melakukan <span class="text-red-500 font-semibold">penghapusan</span> pada entri:</p>
+                    <p class="text-gray-400 text-xs">Catatan: Anda juga akan menghapus file jika file sudah tersalin pada computer client.</p>
+                  </div>
+                </Match>
+              </Switch>
               <p class="font-bold text-lg text-center">{title()}</p>
-              <form onSubmit={event =>
-                props.authSudoAction(event, token, props.entryId, props.isCopy, props.closeModal)} class="flex flex-col gap-2">
-                <label for="sudo" class="text-center text-sm text-gray-500">Konfirmasi aksi anda dengan mengetik password akun yang sedang anda gunakan!</label>
+              <form onSubmit={handleSubmit} class="flex flex-col gap-2">
+                <label for="sudo" class="text-center text-sm text-gray-400">Konfirmasi aksi anda dengan mengetik password akun yang sedang anda gunakan!</label>
                 <input type="password" name="sudo" class="w-full outline-1 outline-gray-300 rounded-md px-2 font-normal text-md" placeholder="Ketik password anda" required />
                 <button type="submit" class="w-full bg-blue-600 border rounded-md py-1 text-blue-50 font-semibold hover:bg-blue-700 cursor-pointer">Execute</button>
               </form>

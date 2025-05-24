@@ -1,8 +1,9 @@
 import { createSignal } from "solid-js";
 import { action, useNavigate } from "@solidjs/router";
-import { useAuthContext } from "../utils/AuthContextProvider.jsx";
-import { OpenedEyeIcon, ClosedEyeIcon } from "../../assets/Icons.jsx";
+import { useAuthContext } from "@utils/AuthContextProvider.jsx";
+import { OpenedEyeIcon, ClosedEyeIcon } from "@icons/Icons.jsx";
 import toast, { Toaster } from 'solid-toast';
+import { apiLogin } from "@apis/AuthApi.jsx";
 
 function LoginForm() {
   const { token, setToken } = useAuthContext();
@@ -15,28 +16,19 @@ function LoginForm() {
     setShowPassword(!showPassword());
   }
 
-  const handleLogin = action(async (formData) => {
-    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user/login`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: formData,
-    });
-    if (!response.ok && response.status === 401) {
-      toast.error("Credentials incorrect, please try again.");
-    } else {
-      const result = await response.json();
+  async function handleLogin(event) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const result = await apiLogin(formData);
+
+    if (result !== null) {
       sessionStorage.setItem("token", result.token);
       setToken(result.token);
 
       navigate("/home", { replace: true });
       toast.success("Login succeed!");
     }
-    console.log("Username " + formData.get('username'));
-    console.log("Response status is : " + response.status);
-  })
+  }
 
   return (
     <main class="flex flex-col gap-5 border border-gray-300 rounded-md px-4 py-6 w-md justify-between">
@@ -44,7 +36,7 @@ function LoginForm() {
         <h1 class="text-center text-4xl font-semibold">Net Copy</h1>
         <h4 class="text-center text-md font-normal text-gray-400">Login page</h4>
       </div>
-      <form action={handleLogin} method="post" class="flex flex-col gap-5">
+      <form onSubmit={handleLogin} method="post" class="flex flex-col gap-5">
         <div class="flex flex-col gap-1.5 font-medium">
           <label for="username">Username</label>
           <input type="text" name="username" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal" required />

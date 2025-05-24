@@ -1,14 +1,12 @@
 import { createResource, createSignal, onMount, onCleanup, Show } from 'solid-js';
-import { useAuthContext } from "../../utils/AuthContextProvider.jsx";
-// import FileModal from "./FileModal.jsx";
-import { CopyIcon, TakeownIcon, TrashcanIcon } from "../../../assets/Icons.jsx";
+import { useAuthContext } from '@utils/AuthContextProvider.jsx';
 import { useNavigate, action } from "@solidjs/router";
-import Pagination from '../../utils/Pagination.jsx'
-import { formatDateTime } from '../../utils/DateTimeDisplayFormatter.jsx';
-import { displayIcon } from '../../utils/DisplayFromOxamIcon.jsx';
+import Pagination from '@utils/Pagination.jsx';
+import { formatDateTime } from '@utils/DateTimeDisplayFormatter.jsx';
+import { displayIcon } from '@utils/DisplayFromOxamIcon.jsx';
+import { useWebSocketContext } from '@utils/WebSocketContextProvider.jsx';
 import SudoModal from '../SudoModal.jsx';
 import toast, { Toaster } from 'solid-toast';
-import { useWebSocketContext } from '../../utils/WebSocketContextProvider.jsx';
 
 
 function DeletedEntryRecordTable() {

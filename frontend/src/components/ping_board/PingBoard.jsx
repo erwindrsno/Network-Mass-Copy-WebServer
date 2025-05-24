@@ -1,29 +1,13 @@
-import { createEffect, createResource, createSignal, createMemo, onCleanup } from "solid-js";
+import { createEffect, createResource, createSignal, createMemo, onCleanup, onMount } from "solid-js";
 import { useAuthContext } from "../utils/AuthContextProvider.jsx";
 import { useWebSocketContext } from "../utils/WebSocketContextProvider.jsx";
+import { apiFetchComputer } from "@apis/ComputerApi.jsx";
 import toast, { Toaster } from 'solid-toast';
-
-const fetchComputer = async (token) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/computer/`, {
-    method: "GET",
-    credentials: "include",
-    headers: {
-      "Authorization": `Bearer ${token()}`
-    },
-  })
-  if (!response.ok && response.status === 401) {
-    console.log("UNAUTH!")
-  }
-  const result = await response.json();
-  return result
-}
-
 
 function PingBoard() {
   const { token, setToken } = useAuthContext();
   const { socket, setSocket, data, setdata } = useWebSocketContext();
-  const [computers, { mutate, refetch }] = createResource(() => fetchComputer(token));
-  const [activeComputers, setActiveComputers] = createSignal([]);
+  const [computers, { mutate, refetch }] = createResource(() => apiFetchComputer(token));
   const [labNum, setLabNum] = createSignal(1);
   const [hasPinged, setHasPinged] = createSignal(false);
 

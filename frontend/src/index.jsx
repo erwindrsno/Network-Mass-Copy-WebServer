@@ -6,28 +6,24 @@ import 'solid-devtools';
 import toast, { Toaster } from 'solid-toast';
 
 import './index.css';
-// import App from './App';
 
-import LoginPage from './pages/LoginPage.jsx';
-import HomePage from './pages/HomePage.jsx';
-import CopyOxamPage from './pages/CopyOxamPage.jsx';
-import CopyPage from './pages/CopyPage.jsx';
-
-import ComputerPage from './pages/admin/ComputerPage.jsx';
-import UserPage from './pages/admin/UserPage.jsx';
-import AddComputerPage from './pages/admin/AddComputerPage.jsx';
-import AddUserPage from './pages/admin/AddUserPage.jsx';
-import SingleEntryRecordPage from './pages/SingleEntryRecordPage';
-import PingBoardPage from "./pages/PingBoardPage.jsx";
+import LoginPage from "@pages/LoginPage";
+import HomePage from "@pages/HomePage";
+import CopyOxamPage from "@pages/CopyOxamPage";
+import CopyPage from '@pages/CopyPage';
+import ComputerPage from '@pages/admin/ComputerPage';
+import AddComputerPage from '@pages/admin/AddComputerPage';
+import UserPage from '@pages/admin/UserPage';
+import AddUserPage from '@pages/admin/AddUserPage'; '@pages/admin/AddUserPage';
+import SingleEntryRecordPage from '@pages/SingleEntryRecordPage';
+import SingleDirectoryRecordPage from "@pages/SingleDirectoryRecordPage";
+import DeletedSingleEntryRecordPage from '@pages/DeletedSingleEntryRecordPage';
+import AddDirectoryPerEntry from '@pages/AddDirectoryPerEntry';
+import PingBoardPage from '@pages/PingBoardPage';
 
 import ProtectedRouteWrapper from './components/utils/ProtectedRouteWrapper.jsx';
 import { AuthContextProvider } from './components/utils/AuthContextProvider.jsx';
 import { WebSocketContextProvider } from './components/utils/WebSocketContextProvider';
-import { FileActionContextProvider } from './components/utils/FileActionContextProvider';
-import SingleDirectoryRecordPage from './pages/SingleDirectoryRecordPage';
-import DeletedEntryRecordTable from './components/home/deleted/DeletedEntryRecordTable';
-import DeletedSingleEntryRecordPage from './pages/DeletedSingleEntryRecordPage.jsx';
-import AddDirectoryPerEntry from './pages/AddDirectoryPerEntry';
 
 const wrapper = document.getElementById('root');
 

@@ -31,14 +31,14 @@ public class DirectoryController {
 
   public void copyFilesByDirectoryId(Context ctx) {
     Integer directoryId = Integer.parseInt(ctx.pathParam("directory_id"));
-    Integer entryId = Integer.parseInt(ctx.pathParam("entry_id"));
+    Integer entryId = Integer.parseInt(ctx.formParam("entry_id"));
     AccessInfo accessInfo = this.customDtoOneService.getMetadataByDirectoryId(directoryId);
     this.wsClient.prepareCopyMetadata(entryId, accessInfo);
   }
 
   public void takeownByDirectoryId(Context ctx) {
     Integer directoryId = Integer.parseInt(ctx.pathParam("directory_id"));
-    Integer entryId = Integer.parseInt(ctx.pathParam("entry_id"));
+    Integer entryId = Integer.parseInt(ctx.formParam("entry_id"));
     AccessInfo accessInfo = this.customDtoOneService.getMetadataByDirectoryId(directoryId);
     this.wsClient.prepareTakeownMetadata(entryId, accessInfo);
   }
@@ -49,9 +49,8 @@ public class DirectoryController {
   }
 
   public void deleteByDirectoryId(Context ctx) {
-    logger.info("received deleting command");
     Integer directoryId = Integer.parseInt(ctx.pathParam("directory_id"));
-    Integer entryId = Integer.parseInt(ctx.pathParam("entry_id"));
+    Integer entryId = Integer.parseInt(ctx.formParam("entry_id"));
     AccessInfo accessInfo = this.customDtoOneService.getMetadataByDirectoryId(directoryId);
     this.wsClient.prepareDeleteMetadata(entryId, accessInfo);
   }
@@ -61,6 +60,11 @@ public class DirectoryController {
     Integer labNum = Integer.parseInt(ctx.formParam("lab_num"));
     Integer hostNum = Integer.parseInt(ctx.formParam("host_num"));
     String owner = ctx.formParam("owner");
-    this.directoryService.createDirectoryByEntryId(entryId, labNum, hostNum, owner);
+    logger.info(entryId + "");
+    logger.info(labNum + "");
+    logger.info(hostNum + "");
+    logger.info(owner + "");
+    this.directoryService.createDirectoryByEntryId(entryId, labNum, hostNum,
+        owner);
   }
 }

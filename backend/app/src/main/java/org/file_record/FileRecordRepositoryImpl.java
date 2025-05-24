@@ -62,10 +62,10 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
       for (FileRecord fileRecord : listFileRecord) {
         ps.setString(1, fileRecord.getPath());
         ps.setString(2, fileRecord.getOwner());
-        ps.setInt(3, fileRecord.getEntryId());
+        ps.setString(3, fileRecord.getFilename());
         ps.setInt(4, fileRecord.getPermissions());
         ps.setLong(5, fileRecord.getFilesize());
-        ps.setString(6, fileRecord.getFilename());
+        ps.setInt(6, fileRecord.getEntryId());
         ps.setInt(7, directoryId);
         ps.addBatch();
       }

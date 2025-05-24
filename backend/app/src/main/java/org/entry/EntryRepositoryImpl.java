@@ -183,8 +183,10 @@ public class EntryRepositoryImpl extends BaseRepository<Entry> implements EntryR
       ps.setInt(1, fileId);
 
       int count = ps.executeUpdate();
-      if (count == 0)
+      // logger.info("count is: " + count);
+      if (count == 0) {
         throw new RuntimeException("cant update deleted files on this entry");
+      }
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
     }

@@ -1,35 +1,26 @@
-import { action, useNavigate, useParams } from "@solidjs/router";
-import { useAuthContext } from "../../utils/AuthContextProvider.jsx";
+import { useNavigate, useParams } from "@solidjs/router";
+import { useAuthContext } from "@utils/AuthContextProvider.jsx";
 import { createSignal } from "solid-js";
+import { apiAddDirectory } from "@apis/AddDirectoryApi";
 
 function AddDirectoryForm(props) {
   const { token, setToken } = useAuthContext();
+  const navigate = useNavigate();
   const params = useParams();
   const entryId = params.entry_id;
   const [labNum, setLabNum] = createSignal(1);
 
-  const handleAddDirectory = action(async (formData) => {
-
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
-    }
+  const handleAddDirectory = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     formData.append("entry_id", entryId);
-    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/directory`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": `Bearer ${token()}`
-      },
-      body: formData,
-    })
+    const encodedForm = new URLSearchParams(formData);
 
-    if (!response.ok && response.status === 401) {
-      console.log("UNAUTH!")
-    } else if (response.ok && response.status === 200) {
-      navigate('/admin/computer')
+    const result = await apiAddDirectory(encodedForm, token);
+    if (result.success) {
+      navigate("/home");
     }
-  })
+  }
 
   const handleLabNumChange = (event) => {
     setLabNum(Number(event.target.value));
@@ -37,7 +28,7 @@ function AddDirectoryForm(props) {
   }
 
   return (
-    <form action={handleAddDirectory} class="flex flex-col space-y-4 w-full px-5" method="post">
+    <form onSubmit={handleAddDirectory} class="flex flex-col space-y-4 w-full px-5" method="post">
       <div class="w-full flex flex-col space-y-1">
         <label for="lab_num" class="text-lg">Lab number</label>
         <select name="lab_num" value={labNum()} onChange={handleLabNumChange} class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal">

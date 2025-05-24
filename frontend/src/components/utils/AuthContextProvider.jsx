@@ -1,5 +1,4 @@
 import { createSignal, createContext, useContext } from "solid-js";
-import { createStore } from "solid-js/store";
 
 const AuthContext = createContext();
 

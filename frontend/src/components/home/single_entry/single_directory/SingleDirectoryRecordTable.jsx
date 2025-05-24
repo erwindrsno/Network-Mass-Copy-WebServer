@@ -1,12 +1,10 @@
 import { createResource, createSignal, Show, createMemo, createEffect, onMount, onCleanup } from 'solid-js';
-import { useAuthContext } from "../../../utils/AuthContextProvider.jsx";
-import { createStore } from "solid-js/store"
-import Pagination from '../../../utils/Pagination.jsx'
-import { useParams } from "@solidjs/router";
-import { CopyIcon, TakeownIcon, InfoIcon } from '../../../../assets/Icons.jsx';
-import { formatDateTime } from '../../../utils/DateTimeDisplayFormatter.jsx';
-// import SingleEntrySudoModal from "./SingleEntrySudoModal.jsx";
-import { useWebSocketContext } from '../../../utils/WebSocketContextProvider.jsx';
+import Pagination from '@utils/Pagination.jsx';
+import { formatDateTime } from '@utils/DateTimeDisplayFormatter.jsx';
+import { useParams, useLocation } from "@solidjs/router";
+import { CopyIcon, TakeownIcon, TrashcanIcon } from '@icons/Icons.jsx';
+import { useAuthContext } from '@utils/AuthContextProvider.jsx';
+import SingleDirectorySudoModal from './SingleDirectorySudoModal.jsx';
 import { useNavigate, action } from "@solidjs/router";
 
 const fetchPerDirectory = async (token, entryId, directoryId) => {
@@ -25,25 +23,66 @@ const fetchPerDirectory = async (token, entryId, directoryId) => {
   return result;
 }
 
+const authSudoAction = async (event, token, id, isCopy, closeModal) => {
+  event.preventDefault();
+
+  const formData = new FormData(event.currentTarget)
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user/sudo`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Authorization": `Bearer ${token()}`
+    },
+    body: formData,
+  })
+
+  if (!response.ok && response.status === 401) {
+    toast.error("Sudo action not permit.");
+  }
+  if (response.ok && response.status === 200) {
+    console.log(isCopy());
+    if (isCopy()) {
+      console.log("handle copy");
+      handleCopyByEntry(token, id, closeModal);
+    } else if (isCopy() === false) {
+      handleTakeownByEntry(token, id, closeModal);
+      console.log("handle takeown");
+    } else {
+      console.log("nothing to handle!");
+    }
+  }
+}
+
 function SingleDirectoryRecordTable() {
   const maxItems = 8;
   const navigate = useNavigate();
+  const location = useLocation();
   const params = useParams();
-  // const title = props.title;
-  const { socket, setSocket } = useWebSocketContext();
+  const computer = {
+    hostname: location.state.hostname,
+    ip_addr: location.state.ip_addr
+  }
+  const owner = location.state.owner;
+  const entryId = params.entry_id;
+  const [fileId, setFileId] = createSignal(null);
+  const [filename, setFilename] = createSignal("");
   const { token, setToken } = useAuthContext();
   const [isCopy, setIsCopy] = createSignal(null);
-  // const [entryId, setEntryId] = createSignal(null);
   const [isModalToggled, toggleModal] = createSignal(false);
-  // const [directory, setDirectory] = createStore({
-  //   id: null,
-  //   owner: ""
-  // });
 
-  // const [computer, setComputer] = createStore({
-  //   ip_addr: "",
-  //   host_name: ""
-  // })
+  const openModal = (file_id, filename, flag) => {
+    setFileId(file_id);
+    setFilename(filename);
+    setIsCopy(flag);
+    toggleModal(prev => !prev);
+  }
+
+  const closeModal = () => {
+    setFileId(null);
+    setFilename("");
+    setIsCopy(null);
+    toggleModal(prev => !prev);
+  }
 
   const [fileRecordPerDir, { mutate, refetch }] = createResource(
     () => fetchPerDirectory(token, params.entry_id, params.dir_id)
@@ -53,6 +92,14 @@ function SingleDirectoryRecordTable() {
     items: [],
     totalPages: 1
   });
+
+  createEffect(() => {
+    console.log(owner);
+    console.log(location.state.title);
+  })
+
+
+
   return (
     <>
       <div class="shadow-md rounded-lg overflow-hidden">
@@ -77,9 +124,9 @@ function SingleDirectoryRecordTable() {
                   <td class="py-3 text-center whitespace-nowrap truncate">{item.fileRecord.permissions}</td>
                   <td class="py-3 text-center whitespace-nowrap justify-items-center">{formatDateTime(item.fileRecordComputer.copiedAt)}</td>
                   <td class="text-center text-sm px-2 py-1.5">
-                    <div class="flex flex-col gap-1 w-min">
-                      <button onClick={() => viewFilePerDirectory(params.id, title, item.directory.id, item.directory.owner)} class="bg-blue-600 hover:bg-blue-700 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer w-full">View</button>
-                      <button onClick={() => viewFilePerDirectory(params.id, title, item.directory.id, item.directory.owner)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">Delete</button>
+                    <div class="flex flex-row gap-1 w-min">
+                      <button onClick={() => openModal(item.id, item.fileRecord.filename, true)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
+                      <button onClick={() => openModal(item.id, item.fileRecord.filename, false)} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TrashcanIcon /></button>
                     </div>
                   </td>
                 </tr>
@@ -89,7 +136,7 @@ function SingleDirectoryRecordTable() {
         </table>
 
         <Show when={isModalToggled() && isCopy() !== null}>
-          <SingleEntrySudoModal entryId={entryId} closeModal={closeModal} authSudoAction={authSudoAction} isCopy={isCopy} directory={directory} computer={computer} title={title} />
+          <SingleDirectorySudoModal entryId={entryId} closeModal={closeModal} authSudoAction={authSudoAction} isCopy={isCopy} computer={computer} filename={filename} owner={owner} />
         </Show>
       </div>
 

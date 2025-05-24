@@ -28,7 +28,7 @@ public class EntryQuery {
   public static final String UPDATE_DELETE_FILES_BY_DIRECTORY_ID = """
       UPDATE entry
       SET delete_files = true
-      WHERE delete_files = false AND (
+      WHERE AND (
       	SELECT COUNT(*) > 0 AS has_copied_files
       	FROM directory
       	WHERE id = ?
@@ -38,7 +38,7 @@ public class EntryQuery {
   public static final String UPDATE_DELETE_FILES_BY_FILE_ID = """
       UPDATE entry
       SET delete_files = true
-      WHERE delete_files = false AND (
+      WHERE (
       	SELECT copied_at IS NOT NULL
       	FROM file_computer
       	WHERE file_computer.file_id = ?

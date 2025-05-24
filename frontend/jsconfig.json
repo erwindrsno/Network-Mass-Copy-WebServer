@@ -8,8 +8,25 @@
     "esModuleInterop": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": ["vite/client"],
+    "types": [
+      "vite/client"
+    ],
     "noEmit": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "baseUrl": "./",
+    "paths": {
+      "@pages/*": [
+        "src/pages/*"
+      ],
+      "@utils/*": [
+        "src/components/utils/*"
+      ],
+      "@icons/*": [
+        "src/assets/*"
+      ],
+      "@apis/*": [
+        "src/apis/*"
+      ],
+    }
   }
 }
