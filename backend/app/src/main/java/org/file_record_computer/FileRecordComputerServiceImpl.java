@@ -34,4 +34,10 @@ public class FileRecordComputerServiceImpl implements FileRecordComputerService 
   public void bulkCreate(List<FileRecordComputer> listFileRecordComputer) {
     this.fileRecordComputerRepository.bulkSave(listFileRecordComputer);
   }
+
+  @Override
+  public void updateDeletedAtById(Integer fileId) {
+    Timestamp deletedAt = TimeUtil.nowTimestamp();
+    this.fileRecordComputerRepository.updateDeletedAtById(fileId, deletedAt);
+  }
 }

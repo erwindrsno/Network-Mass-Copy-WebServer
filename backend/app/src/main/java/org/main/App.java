@@ -123,7 +123,6 @@ public class App {
           });
           path("/{id}", () -> {
             get(entryController::getFileRecordByEntryId);
-            delete(entryController::softDeleteEntryById);
             path("/file", () -> {
               get(entryController::getFile);
             });
@@ -133,6 +132,9 @@ public class App {
             path("takeown", () -> {
               patch(entryController::takeownFileByEntry);
             });
+            path("delete", () -> {
+              delete(entryController::softDeleteEntryById);
+            });
           });
         });
 
@@ -140,9 +142,10 @@ public class App {
           path("/{id}", () -> {
             get(fileRecordController::getFileInfo);
             path("/copy", () -> {
-              path("/file_computer/{file_computer_id}/entry/{entry_id}", () -> {
-                get(fileRecordController::copyFile);
-              });
+              patch(fileRecordController::copyFile);
+            });
+            path("/delete", () -> {
+              delete(fileRecordController::deleteFile);
             });
           });
           path("/download", () -> {

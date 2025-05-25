@@ -86,9 +86,6 @@ public class UserController {
   public void invalidateUser(Context ctx) {
     logger.info("Logging out...");
     ctx.result("Log out OK ").status(200);
-    // Integer id = ctx.sessionAttribute("user_id");
-    // ctx.req().getSession().invalidate();
-    // ctx.result("Log out OK " + id).status(200);
   }
 
   public void validateSudoAction(Context ctx) {

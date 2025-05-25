@@ -78,4 +78,18 @@ public class FileRecordComputerRepositoryImpl extends BaseRepository<FileRecordC
       logger.error(e.getMessage(), e);
     }
   }
+
+  @Override
+  public void updateDeletedAtById(Integer fileId, Timestamp deletedAt) {
+    try (Connection conn = super.getConnection()) {
+      String query = FileRecordComputerQuery.UPDATE_DELETED_AT_BY_ID;
+      PreparedStatement ps = conn.prepareStatement(query);
+      ps.setTimestamp(1, deletedAt);
+      ps.setInt(2, fileId);
+      ps.executeUpdate();
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+      throw new RuntimeException("cant update deletedAt in filerecordcomputer");
+    }
+  }
 }

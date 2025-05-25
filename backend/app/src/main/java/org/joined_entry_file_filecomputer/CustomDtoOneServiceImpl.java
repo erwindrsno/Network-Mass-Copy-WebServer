@@ -50,7 +50,7 @@ public class CustomDtoOneServiceImpl implements CustomDtoOneService {
 
   @Override
   public List<CustomDtoOne> getFileRecordByDirectoryId(Integer directoryId) {
-    return this.customDtoOneRepository.findFileRecordCopiedAtByDirectoryId(directoryId);
+    return this.customDtoOneRepository.findFileRecordCopiedAtAndDeletedAtByDirectoryId(directoryId);
   }
 
   @Override

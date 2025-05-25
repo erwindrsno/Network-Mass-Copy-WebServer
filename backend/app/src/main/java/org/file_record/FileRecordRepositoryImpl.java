@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -162,8 +163,9 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
       }
       throw new RuntimeException("cant get the dir id");
     } catch (Exception e) {
-      logger.error(e.getMessage());
+      logger.error(e.getMessage(), e);
       throw new RuntimeException("cant get the dir id");
     }
   }
+
 }

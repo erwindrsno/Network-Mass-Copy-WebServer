@@ -16,4 +16,10 @@ public class FileRecordComputerQuery {
       WHERE file.id = file_computer.file_id
         AND file.id = ?;
       """;
+
+  public static final String UPDATE_DELETED_AT_BY_ID = """
+       UPDATE file_computer
+       SET deleted_at = ?
+       WHERE file_id = ?;
+      """;
 }

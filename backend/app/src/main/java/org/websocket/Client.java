@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.directory.DirectoryService;
 import org.entry.EntryService;
+import org.file_record.FileRecordService;
 import org.file_record_computer.FileRecordComputerService;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft;
@@ -110,6 +111,14 @@ public class Client extends WebSocketClient {
           this.directoryService.updateDeletedAtById(directoryId);
 
           send("webserver/to-webclient/refetch");
+        } catch (Exception e) {
+          logger.error(e.getMessage(), e);
+        }
+      } else if (action.startsWith("single-delete/")) {
+        try {
+          Integer fileId = Integer.parseInt(action.substring(14));
+          logger.info("");
+          this.fileRecordComputerService.updateDeletedAtById(fileId);
         } catch (Exception e) {
           logger.error(e.getMessage(), e);
         }

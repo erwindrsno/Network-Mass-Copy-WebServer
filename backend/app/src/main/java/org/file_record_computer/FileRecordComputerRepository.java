@@ -9,4 +9,6 @@ public interface FileRecordComputerRepository {
   void bulkSave(List<FileRecordComputer> listFileRecordComputer);
 
   void updateCopiedAtByFileId(String ip_addr, Integer fileId, Timestamp copiedAt);
+
+  void updateDeletedAtById(Integer fileId, Timestamp deletedAt);
 }

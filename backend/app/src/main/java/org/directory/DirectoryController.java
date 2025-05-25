@@ -17,14 +17,14 @@ public class DirectoryController {
   private Logger logger = LoggerFactory.getLogger(DirectoryController.class);
   private final DirectoryService directoryService;
   private final FileRecordService fileRecordService;
-  private final WebSocketClientService wsClient;
+  private final WebSocketClientService wsClientService;
   private final CustomDtoOneService customDtoOneService;
 
   @Inject
-  public DirectoryController(DirectoryService directoryService, WebSocketClientService wsClient,
+  public DirectoryController(DirectoryService directoryService, WebSocketClientService wsClientService,
       CustomDtoOneService customDtoOneService, FileRecordService fileRecordService) {
     this.directoryService = directoryService;
-    this.wsClient = wsClient;
+    this.wsClientService = wsClientService;
     this.customDtoOneService = customDtoOneService;
     this.fileRecordService = fileRecordService;
   }
@@ -33,14 +33,14 @@ public class DirectoryController {
     Integer directoryId = Integer.parseInt(ctx.pathParam("directory_id"));
     Integer entryId = Integer.parseInt(ctx.formParam("entry_id"));
     AccessInfo accessInfo = this.customDtoOneService.getMetadataByDirectoryId(directoryId);
-    this.wsClient.prepareCopyMetadata(entryId, accessInfo);
+    this.wsClientService.prepareCopyMetadata(entryId, accessInfo);
   }
 
   public void takeownByDirectoryId(Context ctx) {
     Integer directoryId = Integer.parseInt(ctx.pathParam("directory_id"));
     Integer entryId = Integer.parseInt(ctx.formParam("entry_id"));
     AccessInfo accessInfo = this.customDtoOneService.getMetadataByDirectoryId(directoryId);
-    this.wsClient.prepareTakeownMetadata(entryId, accessInfo);
+    this.wsClientService.prepareTakeownMetadata(entryId, accessInfo);
   }
 
   public void getFileRecordByDirectoryId(Context ctx) {
@@ -52,7 +52,7 @@ public class DirectoryController {
     Integer directoryId = Integer.parseInt(ctx.pathParam("directory_id"));
     Integer entryId = Integer.parseInt(ctx.formParam("entry_id"));
     AccessInfo accessInfo = this.customDtoOneService.getMetadataByDirectoryId(directoryId);
-    this.wsClient.prepareDeleteMetadata(entryId, accessInfo);
+    this.wsClientService.prepareDeleteMetadata(entryId, accessInfo);
   }
 
   public void createDirectoryByEntryId(Context ctx) {
@@ -60,10 +60,6 @@ public class DirectoryController {
     Integer labNum = Integer.parseInt(ctx.formParam("lab_num"));
     Integer hostNum = Integer.parseInt(ctx.formParam("host_num"));
     String owner = ctx.formParam("owner");
-    logger.info(entryId + "");
-    logger.info(labNum + "");
-    logger.info(hostNum + "");
-    logger.info(owner + "");
     this.directoryService.createDirectoryByEntryId(entryId, labNum, hostNum,
         owner);
   }

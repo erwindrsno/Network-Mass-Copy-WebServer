@@ -18,4 +18,5 @@ public class FileRecordQuery {
   public static final String FIND_DIRECTORY_ID_BY_ID = """
       SELECT directory_id FROM file WHERE id = ?
       """;
+
 }

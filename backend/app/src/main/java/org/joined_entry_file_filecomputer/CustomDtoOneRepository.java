@@ -14,7 +14,7 @@ public interface CustomDtoOneRepository {
 
   AccessInfo getAccessInfoByFileId(Integer fileId);
 
-  List<CustomDtoOne> findFileRecordCopiedAtByDirectoryId(Integer directoryId);
+  List<CustomDtoOne> findFileRecordCopiedAtAndDeletedAtByDirectoryId(Integer directoryId);
 
   List<CustomDtoOne> findFileRecordMetadataByEntryId(Integer entryId);
 }

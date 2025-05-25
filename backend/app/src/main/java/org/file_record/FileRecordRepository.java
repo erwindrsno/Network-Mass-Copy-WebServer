@@ -1,5 +1,6 @@
 package org.file_record;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 public interface FileRecordRepository {
@@ -16,4 +17,5 @@ public interface FileRecordRepository {
   void destroyByEntryId(Integer entryId);
 
   Integer findDirectoryIdById(Integer fileId);
+
 }

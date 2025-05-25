@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import org.directory.DirectoryService;
 import org.entry.EntryService;
+import org.file_record.FileRecordService;
 import org.file_record_computer.FileRecordComputerService;
 import org.joined_entry_file_filecomputer.AccessInfo;
 import org.slf4j.Logger;
@@ -24,15 +25,11 @@ import com.google.inject.Inject;
 public class WebSocketClientServiceImpl implements WebSocketClientService {
   private final Client wsClient;
   private Logger logger = LoggerFactory.getLogger(WebSocketClientService.class);
-  private final EntryService entryService;
-  private final DirectoryService directoryService;
 
   @Inject
   public WebSocketClientServiceImpl(Client wsClient, FileRecordComputerService fileRecordComputerService,
       EntryService entryService, DirectoryService directoryService) {
     this.wsClient = wsClient;
-    this.entryService = entryService;
-    this.directoryService = directoryService;
     this.wsClient.injectDependencies(fileRecordComputerService, entryService, directoryService);
   }
 
@@ -180,6 +177,22 @@ public class WebSocketClientServiceImpl implements WebSocketClientService {
 
       logger.info("try deleting...");
       this.wsClient.setContextAndInitSend(context, "delete");
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public void prepareSingleDeleteMetadata(Integer entryId, AccessInfo accessInfo) {
+    try {
+      Context context = Context.builder()
+          .entryId(entryId)
+          .listFai(accessInfo.getListFai())
+          .listDai(accessInfo.getListDai())
+          .build();
+
+      logger.info("try deleting...");
+      this.wsClient.setContextAndInitSend(context, "single-delete");
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
     }

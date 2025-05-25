@@ -5,9 +5,6 @@ import java.util.List;
 import org.file_record.FileRecord;
 
 public interface CustomDtoOneService {
-  // List<CustomDtoOne> getJoinedFileRecordsDtoByEntryIdAndFilename(Integer
-  // entryId, String filename);
-
   List<CustomDtoOne> getJoinedFileRecordsDtoByEntryId(Integer entryId);
 
   AccessInfo getMetadataByEntryId(Integer entryId);

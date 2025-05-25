@@ -12,4 +12,6 @@ public interface WebSocketClientService {
   void prepareTakeownMetadata(Integer entryId, AccessInfo accessInfo);
 
   void prepareDeleteMetadata(Integer entryId, AccessInfo accessInfo);
+
+  void prepareSingleDeleteMetadata(Integer entryId, AccessInfo accessInfo);
 }

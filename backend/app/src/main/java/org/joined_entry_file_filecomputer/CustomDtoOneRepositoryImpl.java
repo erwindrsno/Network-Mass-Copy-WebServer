@@ -254,10 +254,10 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
   }
 
   @Override
-  public List<CustomDtoOne> findFileRecordCopiedAtByDirectoryId(Integer directoryId) {
+  public List<CustomDtoOne> findFileRecordCopiedAtAndDeletedAtByDirectoryId(Integer directoryId) {
     try (Connection conn = super.getConnection()) {
       List<CustomDtoOne> listResultSet = new ArrayList<>();
-      String query = CustomDtoQuery.FIND_FILE_RECORD_COPIED_AT_BY_DIRECTORY_ID;
+      String query = CustomDtoQuery.FIND_FILE_RECORD_COPIED_AT_AND_DELETED_AT_BY_DIRECTORY_ID;
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setInt(1, directoryId);
 
@@ -274,6 +274,7 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
         FileRecordComputer fileRecordComputer = FileRecordComputer.builder()
             .id(resultSet.getInt("file_computer_id"))
             .copiedAt(resultSet.getTimestamp("copied_at"))
+            .deletedAt(resultSet.getTimestamp("deleted_at"))
             .build();
 
         CustomDtoOne customDtoOne = CustomDtoOne.builder()

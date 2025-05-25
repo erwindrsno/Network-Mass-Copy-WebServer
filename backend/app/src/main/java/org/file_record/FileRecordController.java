@@ -1,16 +1,12 @@
 package org.file_record;
 
 import java.io.InputStream;
-import java.net.http.WebSocket;
-import java.util.List;
 
 import org.directory.DirectoryService;
 import org.joined_entry_file_filecomputer.AccessInfo;
 import org.joined_entry_file_filecomputer.CustomDtoOneService;
-import org.joined_entry_file_filecomputer.CustomDtoOneServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.websocket.FileAccessInfo;
 import org.websocket.WebSocketClientService;
 
 import com.google.inject.Inject;
@@ -67,8 +63,15 @@ public class FileRecordController {
 
   public void copyFile(Context ctx) {
     Integer fileId = Integer.parseInt(ctx.pathParam("id"));
-    Integer entryId = Integer.parseInt(ctx.pathParam("entry_id"));
+    Integer entryId = Integer.parseInt(ctx.formParam("entry_id"));
     AccessInfo accessInfo = this.customDtoOneService.getMetadataByFileId(fileId);
     this.wsClientService.prepareSingleCopyMetadata(entryId, accessInfo);
+  }
+
+  public void deleteFile(Context ctx) {
+    Integer fileId = Integer.parseInt(ctx.pathParam("id"));
+    Integer entryId = Integer.parseInt(ctx.formParam("entry_id"));
+    AccessInfo accessInfo = this.customDtoOneService.getMetadataByFileId(fileId);
+    this.wsClientService.prepareSingleDeleteMetadata(entryId, accessInfo);
   }
 }

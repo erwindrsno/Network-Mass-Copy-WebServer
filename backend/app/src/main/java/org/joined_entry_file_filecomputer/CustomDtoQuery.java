@@ -63,12 +63,12 @@ public class CustomDtoQuery {
       WHERE directory.id = ?;
         """;
 
-  public static final String FIND_FILE_RECORD_COPIED_AT_BY_DIRECTORY_ID = """
+  public static final String FIND_FILE_RECORD_COPIED_AT_AND_DELETED_AT_BY_DIRECTORY_ID = """
       SELECT
           file.id AS id, file.file_name,
           file.permissions, file.size,
           file_computer.id AS file_computer_id,
-          file_computer.copied_at
+          file_computer.copied_at, file_computer.deleted_at
       FROM file
       INNER JOIN file_computer ON file.id = file_computer.file_id
       WHERE directory_id = ?;
