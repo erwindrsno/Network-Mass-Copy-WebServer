@@ -45,7 +45,7 @@ export const apiTakeownEntry = async (entryId, token) => {
 }
 
 export const apiDeleteEntry = async (entryId, token) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/${entryId()}`, {
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/${entryId()}/delete`, {
     method: "DELETE",
     credentials: "include",
     headers: {

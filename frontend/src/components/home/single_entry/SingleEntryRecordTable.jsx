@@ -38,7 +38,7 @@ function SingleEntryRecordTable(props) {
     totalPages: 1
   });
 
-  const viewFilePerDirectory = (entryId, title, directoryId, owner, hostname, ip_addr) => {
+  const viewFilePerDirectory = (title, directoryId, owner, hostname, ip_addr) => {
     navigate(`directory/${directoryId}`, { state: { title: title, owner: owner, hostname: hostname, ip_addr: ip_addr } });
   }
 
@@ -137,7 +137,7 @@ function SingleEntryRecordTable(props) {
                   <td class="py-3 text-center whitespace-nowrap justify-items-center">{formatDateTime(item.directory.deletedAt)}</td>
                   <td class="text-center text-sm px-2 py-1.5">
                     <div class="flex flex-col gap-1 w-min">
-                      <button onClick={() => viewFilePerDirectory(params.entry_id, title, item.directory.id, item.directory.owner, item.computer.host_name, item.computer.ip_address)} class="bg-blue-600 hover:bg-blue-700 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">View</button>
+                      <button onClick={() => viewFilePerDirectory(title, item.directory.id, item.directory.owner, item.computer.host_name, item.computer.ip_address)} class="bg-blue-600 hover:bg-blue-700 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">View</button>
                       <div class="flex gap-1">
                         <button onClick={() => openModal(item.computer.ip_address, item.computer.host_name, item.directory.owner, item.directory.id, "copy")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
                         <button onClick={() => openModal(item.computer.ip_address, item.computer.host_name, item.directory.owner, item.directory.id, "takeown")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TakeownIcon></TakeownIcon></button>

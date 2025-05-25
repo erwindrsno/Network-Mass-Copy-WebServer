@@ -25,7 +25,7 @@ function ProfileDropdown() {
       sessionStorage.removeItem("token");
       socket().close();
     }
-    navigate("/", { replace: true })
+    navigate("/")
   }
 
   return (

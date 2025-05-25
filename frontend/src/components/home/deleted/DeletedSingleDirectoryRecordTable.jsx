@@ -76,7 +76,6 @@ function SingleDirectoryRecordTable() {
               <th scope="col" class="w-1/6 py-3 text-center">Permissions</th>
               <th scope="col" class="w-1/6 py-3 text-center">Copied at</th>
               <th scope="col" class="w-1/6 py-3 text-center">Deleted at</th>
-              <th scope="col" class="w-1/2 py-3 text-center">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -89,12 +88,6 @@ function SingleDirectoryRecordTable() {
                   <td class="py-3 text-center whitespace-nowrap truncate">{item.fileRecord.permissions}</td>
                   <td class="py-3 text-center whitespace-nowrap justify-items-center">{formatDateTime(item.fileRecordComputer.copiedAt)}</td>
                   <td class="py-3 text-center whitespace-nowrap justify-items-center">{formatDateTime(item.fileRecordComputer.deletedAt)}</td>
-                  <td class="text-center text-sm px-2 py-1.5">
-                    <div class="flex flex-row gap-1 w-min">
-                      <button onClick={() => openModal(item.fileRecord.id, item.fileRecord.filename, "copy")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
-                      <button onClick={() => openModal(item.fileRecord.id, item.fileRecord.filename, "delete")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TrashcanIcon /></button>
-                    </div>
-                  </td>
                 </tr>
               )}
             </For>
