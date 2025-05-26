@@ -1,10 +1,11 @@
 import PermissionInput from "./PermissionInput";
 import FileInput from "./FileInput";
 import ComputerSelector from "./ComputerSelector.jsx";
-import { FileUploadContextProvider, useFileUploadContext } from "../utils/FileUploadContextProvider";
-import { createSignal, createEffect, createResource } from "solid-js";
-import { action, useNavigate } from "@solidjs/router";
-import { useAuthContext } from "../utils/AuthContextProvider.jsx";
+import { useFileUploadContext } from "@utils/FileUploadContextProvider";
+import { createSignal, createEffect } from "solid-js";
+import { useNavigate } from "@solidjs/router";
+import { useAuthContext } from "@utils/AuthContextProvider.jsx";
+import { apiCreateNonOxamEntry } from "@apis/EntryApi";
 
 function CopyManager() {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ function CopyManager() {
   const handleSubmit = (async (event) => {
     event.preventDefault();
     const owner = event.target.owner.value;
+
     const formatRecords = () => {
       const result = [];
 
@@ -60,23 +62,11 @@ function CopyManager() {
       formData.append("count", records.length * files().length);
       formData.append("host_count", records.length);
 
-      console.log("myformdata is:");
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
+      const result = await apiCreateNonOxamEntry(formData, token);
+      if (result.success) {
+        navigate("/home");
       }
-
-      const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Authorization": `Bearer ${token()}`
-        },
-        body: formData,
-      });
-      navigate("/home");
-      console.log(response);
     } catch (err) {
-      // return err;
       console.error(err);
     }
   });

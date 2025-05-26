@@ -24,7 +24,7 @@ public class FileAccessInfo {
   String owner;
 
   @JsonProperty("permissions")
-  int permissions;
+  String permissions;
 
   @JsonProperty("file_name")
   String filename;

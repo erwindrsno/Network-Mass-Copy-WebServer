@@ -14,7 +14,7 @@ public class FileRecord {
   private String path;
   private String owner;
   private String filename;
-  private Integer permissions;
+  private String permissions;
   private long filesize;
   private Integer entryId;
   private Integer directoryId;

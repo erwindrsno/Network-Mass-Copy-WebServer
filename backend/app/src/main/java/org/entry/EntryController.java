@@ -1,7 +1,5 @@
 package org.entry;
 
-import java.util.List;
-
 import org.computer.ComputerService;
 import org.directory.Directory;
 import org.directory.DirectoryService;
@@ -22,6 +20,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import io.javalin.http.Context;
+import io.javalin.http.Handler;
+import io.javalin.http.HandlerType;
 import io.javalin.http.UploadedFile;
 import io.javalin.util.FileUtil;
 
@@ -80,9 +80,11 @@ public class EntryController {
       if (ctx.path().equals("/entry/oxam")) {
         entry.setFromOxam(true);
         entry.setBasePath("D:\\Ujian\\");
+        logger.info("D:\\Ujian\\");
       } else {
-        String basePath = ctx.formParam("path");
+        String basePath = ctx.formParam("path").toString();
         entry.setBasePath(basePath);
+        logger.info(basePath);
       }
 
       Integer entryId = this.entryService.createEntry(entry);
@@ -100,9 +102,13 @@ public class EntryController {
       for (JsonNode receivedFileRecord : root) {
         String hostname = receivedFileRecord.get("hostname").asText();
         String owner = receivedFileRecord.get("owner").asText();
-        int permissions = receivedFileRecord.get("permissions").asInt();
+        String permissions = "";
+        if (ctx.path().equals("/entry/oxam") && ctx.method() == HandlerType.POST) {
+          permissions += "111";
+        } else if (ctx.path().equals("/entry") && ctx.method() == HandlerType.POST) {
+          permissions += receivedFileRecord.get("permissions").asText();
+        }
 
-        // filter berdasarkan owner
         // untuk tiap owner, dibkin direktorinya
         Directory dirPerOwner = Directory.builder()
             .path(entry.getBasePath() + owner + " - " + title)

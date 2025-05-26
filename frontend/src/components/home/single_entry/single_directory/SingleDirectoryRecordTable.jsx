@@ -4,6 +4,7 @@ import { formatDateTime } from '@utils/DateTimeDisplayFormatter.jsx';
 import { useParams, useLocation } from "@solidjs/router";
 import { CopyIcon, TakeownIcon, TrashcanIcon } from '@icons/Icons.jsx';
 import { useAuthContext } from '@utils/AuthContextProvider.jsx';
+import { useWebSocketContext } from '@utils/WebSocketContextProvider.jsx';
 import SingleDirectorySudoModal from './SingleDirectorySudoModal.jsx';
 import { apiFetchSingleDirectory, apiCopySingleFile, apiDeleteSingleFile } from '@apis/SingleDirectoryApi.jsx';
 import { useNavigate, action } from "@solidjs/router";
@@ -23,6 +24,7 @@ function SingleDirectoryRecordTable() {
   const [fileId, setFileId] = createSignal(null);
   const [filename, setFilename] = createSignal("");
   const { token, setToken } = useAuthContext();
+  const { socket, setSocket } = useWebSocketContext();
   const [action, setAction] = createSignal("");
   const [isModalToggled, toggleModal] = createSignal(false);
 
@@ -62,6 +64,26 @@ function SingleDirectoryRecordTable() {
     currentPage: 1,
     items: [],
     totalPages: 1
+  });
+
+  onMount(() => {
+    const ws = socket();
+    if (!ws) return;
+
+    const onMessage = (event) => {
+      const message = event.data;
+
+      console.log(message);
+      if (message === "refetch") {
+        refetch();
+      }
+    };
+
+    ws.addEventListener("message", onMessage);
+
+    onCleanup(() => {
+      ws.removeEventListener("message", onMessage);
+    });
   });
 
   return (

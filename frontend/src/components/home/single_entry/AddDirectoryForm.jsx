@@ -46,7 +46,7 @@ function AddDirectoryForm(props) {
 
       <div class="w-full flex flex-col space-y-1">
         <label for="owner" class="text-lg">Owner</label>
-        <input type="text" name="owner" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal" placeholder="E.g: ftis\\i20002" />
+        <input type="text" name="owner" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal" placeholder="E.g: i20002" />
       </div>
 
       <button type="submit" class="w-full bg-blue-600 border rounded-md py-1 text-blue-50 font-semibold hover:bg-blue-700 cursor-pointer">Add</button>

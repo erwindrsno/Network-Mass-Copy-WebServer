@@ -11,7 +11,7 @@ public class ComputerQuery {
       """;
 
   public static final String FIND_BY_LAB_NUM = """
-          SELECT * FROM computer WHERE lab_num = ?
+      SELECT * FROM computer WHERE lab_num = ?
       """;
 
   public static final String FIND_BY_ID = """

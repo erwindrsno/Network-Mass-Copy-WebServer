@@ -11,14 +11,22 @@ function PermissionInput(props) {
 
       if (checked) {
         if (!updated.includes(value)) updated.push(value);
-        // Ensure "read" is added if "write" is checked
+        // untuk pastikan read selalu tercentang apabila terdapat write
         if (value === "write" && !updated.includes("read")) {
           updated.push("read");
         }
+        // untuk pastikan read selalu tercentang apabila terdapat execute
+        if (value === "execute" && !updated.includes("read")) {
+          updated.push("read");
+        }
       } else {
-        // Prevent removing "read" if "write" is still selected
+        // untuk pastikan read tidak boleh di uncheck apabila write masih tercentang
         if (value === "read" && updated.includes("write")) {
           return updated; // block unchecking read if write is present
+        }
+        // untuk pastikan read tidak boleh di uncheck apabila exeucte masih tercentang
+        if (value === "read" && updated.includes("execute")) {
+          return updated;
         }
 
         updated = updated.filter((perm) => perm !== value);

@@ -3,7 +3,6 @@ package org.joined_entry_file_filecomputer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,7 +97,7 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
         Integer id = resultSet.getInt("id");
         String filePath = resultSet.getString("path");
         String owner = resultSet.getString("owner");
-        Integer permissions = resultSet.getInt("permissions");
+        String permissions = resultSet.getString("permissions");
         String filename = resultSet.getString("file_name");
         Integer dirId = resultSet.getInt("directory_id");
         String ip_address = resultSet.getString("ip_address");
@@ -154,7 +153,7 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
         Integer id = resultSet.getInt("id");
         String filePath = resultSet.getString("path");
         String owner = resultSet.getString("owner");
-        Integer permissions = resultSet.getInt("permissions");
+        String permissions = resultSet.getString("permissions");
         String filename = resultSet.getString("file_name");
         Integer dirId = resultSet.getInt("directory_id");
         String ip_address = resultSet.getString("ip_address");
@@ -213,7 +212,7 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
         Integer id = resultSet.getInt("id");
         String filePath = resultSet.getString("path");
         String owner = resultSet.getString("owner");
-        Integer permissions = resultSet.getInt("permissions");
+        String permissions = resultSet.getString("permissions");
         String filename = resultSet.getString("file_name");
         Integer dirId = resultSet.getInt("directory_id");
         String ip_address = resultSet.getString("ip_address");
@@ -267,7 +266,7 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
         FileRecord fileRecord = FileRecord.builder()
             .id(resultSet.getInt("id"))
             .filename(resultSet.getString("file_name"))
-            .permissions(resultSet.getInt("permissions"))
+            .permissions(resultSet.getString("permissions"))
             .filesize(resultSet.getLong("size"))
             .build();
 
@@ -304,7 +303,7 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
         FileRecord fileRecord = FileRecord.builder()
             .filename(resultSet.getString("file_name"))
             .filesize(resultSet.getLong("size"))
-            .permissions(resultSet.getInt("permissions"))
+            .permissions(resultSet.getString("permissions"))
             .build();
 
         Entry entry = Entry.builder()

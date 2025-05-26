@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
       ps.setString(1, fileRecord.getPath());
       ps.setString(2, fileRecord.getOwner());
       ps.setString(3, fileRecord.getFilename());
-      ps.setInt(4, fileRecord.getPermissions());
+      ps.setString(4, fileRecord.getPermissions());
       ps.setLong(5, fileRecord.getFilesize());
       ps.setInt(6, fileRecord.getEntryId());
       ps.setInt(7, fileRecord.getDirectoryId());
@@ -64,7 +63,7 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
         ps.setString(1, fileRecord.getPath());
         ps.setString(2, fileRecord.getOwner());
         ps.setString(3, fileRecord.getFilename());
-        ps.setInt(4, fileRecord.getPermissions());
+        ps.setString(4, fileRecord.getPermissions());
         ps.setLong(5, fileRecord.getFilesize());
         ps.setInt(6, fileRecord.getEntryId());
         ps.setInt(7, directoryId);

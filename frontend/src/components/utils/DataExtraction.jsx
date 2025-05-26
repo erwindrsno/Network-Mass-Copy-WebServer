@@ -10,8 +10,8 @@ export const extractDataFromTxt = (file) => {
 
       const title = lines[0]; // first line
       const records = lines.slice(1).map(line => {
-        const [hostname, owner, permissions] = line.split('|').map(field => field.trim());
-        return { hostname, owner, permissions };
+        const [hostname, owner] = line.split('|').map(field => field.trim());
+        return { hostname, owner };
       });
 
       resolve({ title, records });

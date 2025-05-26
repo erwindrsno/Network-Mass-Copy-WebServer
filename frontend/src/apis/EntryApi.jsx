@@ -58,3 +58,41 @@ export const apiDeleteEntry = async (entryId, token) => {
     return { success: true };
   }
 }
+
+export const apiCreateNonOxamEntry = async (formData, token) => {
+  const encodedForm = new URLSearchParams(formData);
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Authorization": `Bearer ${token()}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: encodedForm,
+  });
+
+  if (!response.ok || response.status === 401) {
+    console.log("UNAUTH! or SOmething went wrong")
+  } else if (response.ok && response.status === 200) {
+    return { success: true };
+  }
+}
+
+export const apicreateOxamEntry = async (formData, token) => {
+  const encodedForm = new URLSearchParams(formData);
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/oxam`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Authorization": `Bearer ${token()}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: encodedForm,
+  });
+
+  if (!response.ok || response.status === 401) {
+    console.log("UNAUTH! or SOmething went wrong")
+  } else if (response.ok && response.status === 200) {
+    return { success: true };
+  }
+}

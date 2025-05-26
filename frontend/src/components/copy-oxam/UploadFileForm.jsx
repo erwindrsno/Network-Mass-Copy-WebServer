@@ -1,8 +1,9 @@
 import FileManager from "./FileManager.jsx"
 import { FileUploadContextProvider, useFileUploadContext } from "../utils/FileUploadContextProvider.jsx";
 import { action, useNavigate } from "@solidjs/router";
-import { extractDataFromTxt } from "../utils/DataExtraction.jsx";
-import { useAuthContext } from "../utils/AuthContextProvider.jsx";
+import { extractDataFromTxt } from "@utils/DataExtraction.jsx";
+import { useAuthContext } from "@utils/AuthContextProvider.jsx";
+import { apicreateOxamEntry } from "@apis/EntryApi.jsx";
 
 function UploadFileForm() {
   const { files, setFiles } = useFileUploadContext();
@@ -15,6 +16,7 @@ function UploadFileForm() {
     try {
       const { title, records } = await extractDataFromTxt(file);
 
+      // console.log(records);
       formData.append("title", title);
       formData.append("records", JSON.stringify(records));
       for (const file of files()) {
@@ -24,21 +26,8 @@ function UploadFileForm() {
       formData.append("host_count", records.length);
       formData.delete("access_list");
 
-      const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/oxam`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Authorization": `Bearer ${token()}`
-        },
-        body: formData,
-      });
-      console.log(response.status);
-      console.log(response.ok);
-      if (!response.ok && response.status === 401) {
-        console.log("UNAUTH!");
-      }
-      if (response.status === 200) {
-        console.log("MUST NAV TO HOME");
+      const result = await apicreateOxamEntry(formData, token);
+      if (result.success) {
         navigate("/home");
       }
     } catch (err) {

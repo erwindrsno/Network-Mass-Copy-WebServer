@@ -3,7 +3,7 @@ package org.file_record;
 public class FileRecordQuery {
   public static final String SAVE = """
       INSERT INTO file(path, owner, file_name, permissions, size, entry_id, directory_id)
-      VALUES(?, ?, ?, ?, ?, ?, ?)
+      VALUES(?, ?, ?, ?::BIT(3), ?, ?, ?)
           """;
 
   public static final String FIND_BY_ENTRY_ID = """
