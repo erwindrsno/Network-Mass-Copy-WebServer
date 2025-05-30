@@ -54,6 +54,7 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
       ps.setString(1, user.getUsername());
       ps.setString(2, user.getPassword());
       ps.setString(3, user.getDisplay_name());
+      ps.setString(4, user.getRole());
 
       int insertCount = ps.executeUpdate();
       logger.info(insertCount + " rows inserted");
@@ -101,6 +102,7 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
             .username(resultSet.getString("username"))
             .password(resultSet.getString("password"))
             .display_name(resultSet.getString("display_name"))
+            .role(resultSet.getString("role"))
             .build();
 
         return retrievedUser;

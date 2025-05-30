@@ -26,7 +26,13 @@ public class UserController {
     String username = ctx.formParam("username");
     String password = ctx.formParam("password");
     String display_name = ctx.formParam("display_name");
-    User user = new User(null, username, password, display_name);
+    String role = ctx.formParam("role");
+    User user = User.builder()
+        .username(username)
+        .password(password)
+        .display_name(display_name)
+        .role(role)
+        .build();
     boolean isSucceed = this.userService.createUser(user);
     if (isSucceed) {
       ctx.result("user creation OK").status(201);
@@ -103,5 +109,15 @@ public class UserController {
     } else {
       ctx.status(401);
     }
+  }
+
+  public String getUserRole(Context ctx) {
+    String authHeader = ctx.header("Authorization");
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      ctx.status(401).result("Missing or invalid Authorization header");
+      logger.info("Invalid token");
+    }
+    String token = authHeader.substring("Bearer ".length());
+    return this.userService.getUserRoleFromJWT(token);
   }
 }

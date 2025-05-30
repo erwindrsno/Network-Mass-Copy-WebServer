@@ -20,4 +20,6 @@ public interface UserService {
   boolean validateSudoAction(String token, String password);
 
   Integer getUserIdFromJWT(String token);
+
+  String getUserRoleFromJWT(String token);
 }

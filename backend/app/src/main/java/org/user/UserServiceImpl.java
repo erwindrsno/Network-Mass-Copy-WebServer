@@ -64,8 +64,6 @@ public class UserServiceImpl implements UserService {
       return null;
     }
 
-    logger.info("the password is: " + retrievedUser.getPassword());
-
     Result result = BCrypt.verifyer().verify(user.getPassword().toCharArray(), retrievedUser.getPassword());
     if (result.verified == true) {
       return retrievedUser;
@@ -81,6 +79,7 @@ public class UserServiceImpl implements UserService {
           .withIssuer("auth0")
           .withClaim("id", authedUser.getId())
           .withClaim("display_name", authedUser.getDisplay_name())
+          .withClaim("role", authedUser.getRole())
           .withExpiresAt(new Date(System.currentTimeMillis() + 1 * 60 * 60 * 1000)) // 1 hours
           .sign(algorithm);
       return token;
@@ -139,6 +138,24 @@ public class UserServiceImpl implements UserService {
 
       Integer userId = decodedJWT.getClaim("id").asInt();
       return userId;
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+      return null;
+    }
+  }
+
+  @Override
+  public String getUserRoleFromJWT(String token) {
+    DecodedJWT decodedJWT;
+    try {
+      Algorithm algorithm = Algorithm.HMAC512("Secr3t");
+      JWTVerifier verifier = JWT.require(algorithm)
+          .withIssuer("auth0")
+          .build();
+      decodedJWT = verifier.verify(token);
+
+      String userRole = decodedJWT.getClaim("role").asString();
+      return userRole;
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
       return null;

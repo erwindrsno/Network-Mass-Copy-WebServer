@@ -6,7 +6,7 @@ public class UserQuery {
       """;
 
   public static final String SAVE = """
-      INSERT INTO users(username, password, display_name) VALUES (?,?,?);
+      INSERT INTO users(username, password, display_name, role) VALUES (?,?,?,?);
       """;
 
   public static final String FIND_BY_ID = """

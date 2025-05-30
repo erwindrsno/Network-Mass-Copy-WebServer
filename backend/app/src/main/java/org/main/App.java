@@ -73,9 +73,25 @@ public class App {
           }
         });
 
+        before("/user", (ctx) -> {
+          String userRole = userController.getUserRole(ctx);
+          if (ctx.method() == HandlerType.GET || ctx.method() == HandlerType.POST) {
+            if (!userRole.equals("superadmin")) {
+              throw new UnauthorizedResponse("Unauthorized! Not superadmin.");
+            }
+          }
+        });
+
+        before("/computer", (ctx) -> {
+          String userRole = userController.getUserRole(ctx);
+          if (ctx.method() == HandlerType.GET || ctx.method() == HandlerType.POST) {
+            if (!userRole.equals("superadmin")) {
+              throw new UnauthorizedResponse("Unauthorized! Not superadmin.");
+            }
+          }
+        });
+
         path("/user", () -> {
-          get(userController::getAllUsers);
-          post(userController::insertUser);
           path("/id/{id}", () -> {
             get(userController::getUsersById);
             delete(userController::deleteUserById);
@@ -89,6 +105,9 @@ public class App {
           path("/sudo", () -> {
             post(userController::validateSudoAction);
           });
+
+          get(userController::getAllUsers);
+          post(userController::insertUser);
         });
 
         path("/computer", () -> {

@@ -41,6 +41,8 @@ public class FileRecordRepositoryImpl extends BaseRepository<FileRecord> impleme
 
       int insertCount = ps.executeUpdate();
 
+      logger.info("inserting...");
+
       try (ResultSet rs = ps.getGeneratedKeys()) {
         if (rs.next()) {
           return rs.getInt(1);

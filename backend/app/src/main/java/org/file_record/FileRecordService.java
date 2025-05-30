@@ -14,7 +14,7 @@ public interface FileRecordService {
 
   List<String> getOwnerByEntryId(Integer entryId);
 
-  void deleteFileById(Integer entryId);
+  void deleteFileAtUploadByEntryId(Integer entryId);
 
   void deleteByEntryId(Integer entryId);
 

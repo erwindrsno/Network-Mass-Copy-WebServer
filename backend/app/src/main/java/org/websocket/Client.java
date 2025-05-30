@@ -119,6 +119,7 @@ public class Client extends WebSocketClient {
           Integer fileId = Integer.parseInt(action.substring(14));
           logger.info("");
           this.fileRecordComputerService.updateDeletedAtById(fileId);
+          send("webserver/to-webclient/refetch");
         } catch (Exception e) {
           logger.error(e.getMessage(), e);
         }

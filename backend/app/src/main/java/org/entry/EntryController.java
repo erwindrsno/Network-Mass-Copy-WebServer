@@ -20,8 +20,8 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import io.javalin.http.Context;
-import io.javalin.http.Handler;
 import io.javalin.http.HandlerType;
+import io.javalin.http.UnauthorizedResponse;
 import io.javalin.http.UploadedFile;
 import io.javalin.util.FileUtil;
 
@@ -91,6 +91,8 @@ public class EntryController {
       StringBuilder baseFolder = new StringBuilder("upload/");
       String folderName = baseFolder.append(entryId).append("/").toString();
 
+      logger.info("entry id is: " + entryId);
+
       ctx.uploadedFiles("files")
           .forEach(uploadedFile -> FileUtil.streamToFile(uploadedFile.content(),
               folderName + uploadedFile.filename()));
@@ -134,6 +136,7 @@ public class EntryController {
               .build();
 
           Integer fileRecordId = this.fileRecordService.createFileRecord(fileRecord);
+          logger.info("filerecord id is: " + fileRecordId);
           Integer computerId = this.computerService.getComputersByHostname(hostname).getId();
 
           FileRecordComputer fileRecordComputer = FileRecordComputer.builder()
@@ -141,9 +144,9 @@ public class EntryController {
               .computerId(computerId)
               .build();
           this.fileRecordComputerService.createFileRecordComputer(fileRecordComputer);
-          ctx.status(200);
         }
       }
+      ctx.status(200);
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
     }
@@ -174,12 +177,22 @@ public class EntryController {
   }
 
   public void softDeleteEntryById(Context ctx) {
+    String authHeader = ctx.header("Authorization");
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      ctx.status(401).result("Missing or invalid Authorization header");
+      logger.info("Invalid token");
+    }
+    String token = authHeader.substring("Bearer ".length());
+    String userRole = this.userService.getUserRoleFromJWT(token);
+
     Integer entryId = Integer.parseInt(ctx.pathParam("id"));
-    this.fileRecordService.deleteFileById(entryId);
+    this.fileRecordService.deleteFileAtUploadByEntryId(entryId);
     Boolean shouldDeleteFilesInClients = this.entryService.getDeleteFilesFlagById(entryId);
-    if (shouldDeleteFilesInClients) {
+    if (shouldDeleteFilesInClients && userRole.equals("superadmin")) {
       AccessInfo accessInfo = this.customDtoOneService.getMetadataByEntryId(entryId);
       this.wsClientService.prepareDeleteMetadata(entryId, accessInfo);
+    } else {
+      throw new UnauthorizedResponse("Unauthorized! Not superadmin.");
     }
     this.entryService.softDeleteEntryById(entryId);
   }
