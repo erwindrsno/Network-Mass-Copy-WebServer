@@ -17,7 +17,6 @@ import UserPage from '@pages/admin/UserPage';
 import AddUserPage from '@pages/admin/AddUserPage'; '@pages/admin/AddUserPage';
 import SingleEntryRecordPage from '@pages/SingleEntryRecordPage';
 import SingleDirectoryRecordPage from "@pages/SingleDirectoryRecordPage";
-import DeletedSingleEntryRecordPage from '@pages/DeletedSingleEntryRecordPage';
 import AddDirectoryPerEntry from '@pages/AddDirectoryPerEntry';
 import PingBoardPage from '@pages/PingBoardPage';
 
@@ -46,10 +45,6 @@ render(
           <Route path="/" component={LoginPage} />
           <Route path="/home">
             <Route path="/" component={() => ProtectedRouteWrapper(HomePage)} />
-            <Route path="/deleted_entry">
-              <Route path="/" component={() => ProtectedRouteWrapper(HomePage)} />
-              <Route path="/:entry_id" component={() => ProtectedRouteWrapper(DeletedSingleEntryRecordPage)} />
-            </Route>
             <Route path="/copy-oxam" component={() => ProtectedRouteWrapper(CopyOxamPage)} />
             <Route path="/copy" component={() => ProtectedRouteWrapper(CopyPage)} />
             <Route path="/entry/:entry_id">

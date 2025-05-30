@@ -33,6 +33,13 @@ function AddUserForm() {
           <label for="display_name">Display name</label>
           <input type="text" name="display_name" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal w-full" placeholder="Administrator" required />
         </div>
+        <div class="flex flex-col gap-1.5 font-medium">
+          <label for="role">Role</label>
+          <select name="role" class="outline-1 outline-gray-300 rounded-md py-1 px-2 font-normal w-full">
+            <option value="superadmin">Super admin</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
         <div class="form-example">
           <input type="submit" value="Add" class="w-full bg-blue-600 border rounded-md py-1 text-blue-50 font-semibold hover:bg-blue-700 cursor-pointer" />
         </div>

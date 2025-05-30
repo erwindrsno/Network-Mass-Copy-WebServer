@@ -3,7 +3,7 @@ import { FileUploadContextProvider, useFileUploadContext } from "../utils/FileUp
 import { action, useNavigate } from "@solidjs/router";
 import { extractDataFromTxt } from "@utils/DataExtraction.jsx";
 import { useAuthContext } from "@utils/AuthContextProvider.jsx";
-import { apicreateOxamEntry } from "@apis/EntryApi.jsx";
+import { apiCreateOxamEntry } from "@apis/EntryApi.jsx";
 
 function UploadFileForm() {
   const { files, setFiles } = useFileUploadContext();
@@ -16,7 +16,6 @@ function UploadFileForm() {
     try {
       const { title, records } = await extractDataFromTxt(file);
 
-      // console.log(records);
       formData.append("title", title);
       formData.append("records", JSON.stringify(records));
       for (const file of files()) {
@@ -26,9 +25,12 @@ function UploadFileForm() {
       formData.append("host_count", records.length);
       formData.delete("access_list");
 
-      const result = await apicreateOxamEntry(formData, token);
+      const result = await apiCreateOxamEntry(formData, token);
       if (result.success) {
+        // console.log("success");
         navigate("/home");
+      } else {
+        console.log("error");
       }
     } catch (err) {
       console.error('File reading failed:', err);

@@ -1,4 +1,3 @@
-import DeletedEntryRecordTable from '../components/home/deleted/DeletedEntryRecordTable.jsx';
 import EntryRecordTable from '../components/home/EntryRecordTable.jsx';
 import Header from '../components/header/Header.jsx';
 import { useLocation, useNavigate } from '@solidjs/router';

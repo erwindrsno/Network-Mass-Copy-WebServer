@@ -15,14 +15,6 @@ function CopyManager() {
   const [title, setTitle] = createSignal("");
   const [selectedComputers, setSelectedComputers] = createSignal([]);
 
-  createEffect(() => {
-    console.log("===");
-    console.log(permission());
-    console.log(files());
-    console.log(selectedComputers());
-    console.log(title());
-  })
-
   const handleSubmit = (async (event) => {
     event.preventDefault();
     const owner = event.target.owner.value;

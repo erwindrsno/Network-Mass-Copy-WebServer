@@ -60,15 +60,13 @@ export const apiDeleteEntry = async (entryId, token) => {
 }
 
 export const apiCreateNonOxamEntry = async (formData, token) => {
-  const encodedForm = new URLSearchParams(formData);
   const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry`, {
     method: "POST",
     credentials: "include",
     headers: {
       "Authorization": `Bearer ${token()}`,
-      "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: encodedForm,
+    body: formData,
   });
 
   if (!response.ok || response.status === 401) {
@@ -78,16 +76,14 @@ export const apiCreateNonOxamEntry = async (formData, token) => {
   }
 }
 
-export const apicreateOxamEntry = async (formData, token) => {
-  const encodedForm = new URLSearchParams(formData);
+export const apiCreateOxamEntry = async (formData, token) => {
   const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/entry/oxam`, {
     method: "POST",
     credentials: "include",
     headers: {
-      "Authorization": `Bearer ${token()}`,
-      "Content-Type": "application/x-www-form-urlencoded",
+      "Authorization": `Bearer ${token()}`
     },
-    body: encodedForm,
+    body: formData,
   });
 
   if (!response.ok || response.status === 401) {

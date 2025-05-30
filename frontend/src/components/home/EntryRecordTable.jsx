@@ -8,6 +8,7 @@ import { formatDateTime } from '@utils/DateTimeDisplayFormatter.jsx';
 import { displayIcon } from '@utils/DisplayFromOxamIcon.jsx';
 import SudoModal from './SudoModal.jsx';
 import toast, { Toaster } from 'solid-toast';
+import { extractClaims } from '@utils/ExtractClaims.jsx';
 import { useWebSocketContext } from '@utils/WebSocketContextProvider.jsx';
 import { apiFetchEntry, apiCopyEntry, apiTakeownEntry, apiDeleteEntry } from '@apis/EntryApi.jsx';
 
@@ -16,6 +17,7 @@ function EntryRecordTable() {
   const maxItems = 8;
   const navigate = useNavigate();
   const { token, setToken } = useAuthContext();
+  const { role } = extractClaims(token());
   const { socket, setSocket } = useWebSocketContext();
   const [action, setAction] = createSignal("");
   const [entries, { mutate, refetch }] = createResource(() => apiFetchEntry(token));
@@ -63,6 +65,8 @@ function EntryRecordTable() {
       const result = await apiDeleteEntry(entryId, token);
       if (result.success) {
         closeModal();
+        refetch();
+        // navigate("/home")
       }
     }]
   ]);
@@ -75,7 +79,7 @@ function EntryRecordTable() {
     const onMessage = (event) => {
       const message = event.data;
 
-      console.log(message);
+      console.log("websocket: " + message);
       if (message === "refetch") {
         refetch();
       }
@@ -117,7 +121,13 @@ function EntryRecordTable() {
                       <div class="flex gap-1">
                         <button onClick={() => openModal(entry.title, entry.id, "copy")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
                         <button onClick={() => openModal(entry.title, entry.id, "takeown")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TakeownIcon></TakeownIcon></button>
-                        <button onClick={() => openModal(entry.title, entry.id, "delete")}
+                        <button onClick={() => {
+                          if (role === "superadmin") {
+                            openModal(entry.title, entry.id, "delete")
+                          } else {
+                            toast.error("You are not allow to delete copied entry")
+                          }
+                        }}
                           class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TrashcanIcon /></button>
                       </div>
                     </div>
