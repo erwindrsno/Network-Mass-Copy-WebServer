@@ -40,11 +40,6 @@ public class EntryServiceImpl implements EntryService {
   }
 
   @Override
-  public void updateDeletableById(boolean deletable, Integer entryId) {
-    this.entryRepository.updateDeletableById(deletable, entryId);
-  }
-
-  @Override
   public void softDeleteEntryById(Integer entryId) {
     Timestamp deletedAt = TimeUtil.nowTimestamp();
     this.entryRepository.softDeleteById(entryId, deletedAt);

@@ -11,8 +11,6 @@ public interface EntryService {
 
   String getTitleById(Integer entryId);
 
-  void updateDeletableById(boolean deletable, Integer entryId);
-
   void softDeleteEntryById(Integer entryId);
 
   void updateDeleteFilesByDirectoryId(Integer directoryId);

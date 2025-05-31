@@ -130,21 +130,6 @@ public class EntryRepositoryImpl extends BaseRepository<Entry> implements EntryR
   }
 
   @Override
-  public void updateDeletableById(boolean deletable, Integer entryId) {
-    try (Connection conn = super.getConnection()) {
-      String query = EntryQuery.UPDATE_DELETABLE_BY_ID;
-      PreparedStatement ps = conn.prepareStatement(query);
-      ps.setBoolean(1, deletable);
-      ps.setInt(2, entryId);
-
-      ps.executeUpdate();
-    } catch (Exception e) {
-      logger.error(e.getMessage());
-      throw new RuntimeException("cant update deletable with this entry", e);
-    }
-  }
-
-  @Override
   public void softDeleteById(Integer entryId, Timestamp deletedAt) {
     try (Connection conn = super.getConnection()) {
       String query = EntryQuery.UPDATE_DELETED_AT_BY_ID;

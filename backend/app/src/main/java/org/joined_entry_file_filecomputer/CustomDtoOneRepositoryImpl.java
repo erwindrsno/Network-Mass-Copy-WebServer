@@ -34,6 +34,7 @@ public class CustomDtoOneRepositoryImpl extends BaseRepository<CustomDtoOne> imp
   @Override
   public List<CustomDtoOne> findJoinedByEntryId(Integer entryId) {
     try (Connection conn = super.getConnection()) {
+      logger.info("HELP");
       List<CustomDtoOne> listResultSet = new ArrayList<>();
       String query = CustomDtoQuery.FIND_JOINED_BY_ENTRY_ID;
       PreparedStatement ps = conn.prepareStatement(query);

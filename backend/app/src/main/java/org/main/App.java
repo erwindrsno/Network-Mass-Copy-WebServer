@@ -150,7 +150,7 @@ public class App {
             post(entryController::createEntry);
           });
           path("/{id}", () -> {
-            get(entryController::getFileRecordByEntryId);
+            get(entryController::getDirectoryRecordByEntryId);
             path("/file", () -> {
               get(entryController::getFile);
             });

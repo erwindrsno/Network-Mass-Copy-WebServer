@@ -50,12 +50,6 @@ function FileModal(props) {
                       >
                         <DownloadIcon></DownloadIcon>
                       </button>
-                      <button
-                        onClick={() => props.removeFile(index())}
-                        class="bg-red-500 text-white text-xs px-1 py-1 rounded hover:bg-red-600 transition cursor-pointer"
-                      >
-                        <TrashcanIcon></TrashcanIcon>
-                      </button>
                     </div>
                   </div>
                 )}

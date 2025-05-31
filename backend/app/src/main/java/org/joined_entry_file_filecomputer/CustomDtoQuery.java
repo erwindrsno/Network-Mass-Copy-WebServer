@@ -7,11 +7,11 @@ public class CustomDtoQuery {
           directory.deleted_at, directory.copied, directory.file_count, MIN(computer.id) AS comp_id,
           MIN(computer.host_name) AS host_name, MIN(computer.ip_address) AS ip_address,
           MIN(computer.lab_num) AS lab_num, MIN(file_computer.id) as file_computer_id
-      FROM file
-      INNER JOIN entry ON file.entry_id = entry.id
-      INNER JOIN file_computer ON file.id = file_computer.file_id
+      FROM file_record
+      INNER JOIN entry ON file_record.entry_id = entry.id
+      INNER JOIN file_computer ON file_record.id = file_computer.file_record_id
       INNER JOIN computer ON file_computer.computer_id = computer.id
-      INNER JOIN directory ON file.directory_id = directory.id
+      INNER JOIN directory ON file_record.directory_id = directory.id
       WHERE entry.id = ?
       GROUP BY
           directory.id
@@ -19,72 +19,72 @@ public class CustomDtoQuery {
 
   public static final String GET_ACCESS_INFO_BY_ENTRY_ID = """
       SELECT
-          file.id, file.path, file.owner, file.permissions,
-          file.file_name, file.directory_id, computer.ip_address,
+          file_record.id, file_record.path, file_record.owner, file_record.permissions,
+          file_record.file_name, file_record.directory_id, computer.ip_address,
           directory.copied, directory.file_count, directory.path AS dir_path,
           directory.owner AS dir_owner
-      FROM file
-      INNER JOIN entry ON file.entry_id = entry.id
-      INNER JOIN file_computer ON file.id = file_computer.file_id
+      FROM file_record
+      INNER JOIN entry ON file_record.entry_id = entry.id
+      INNER JOIN file_computer ON file_record.id = file_computer.file_record_id
       INNER JOIN computer ON file_computer.computer_id = computer.id
-      INNER JOIN directory ON directory.id = file.directory_id
+      INNER JOIN directory ON directory.id = file_record.directory_id
       WHERE entry.id = ?;
         """;
 
   public static final String GET_ACCESS_INFO_BY_FILE_ID = """
       SELECT
-          file.id,
-          file.path,
-          file.owner,
-          file.permissions,
-          file.file_name,
-          file.directory_id,
+          file_record.id,
+          file_record.path,
+          file_record.owner,
+          file_record.permissions,
+          file_record.file_name,
+          file_record.directory_id,
           computer.ip_address,
           directory.copied,
           directory.file_count,
           directory.path AS dir_path
-      FROM file
-      INNER JOIN file_computer ON file.id = file_computer.file_id
+      FROM file_record
+      INNER JOIN file_computer ON file_record.id = file_computer.file_record_id
       INNER JOIN computer ON file_computer.computer_id = computer.id
-      INNER JOIN directory ON directory.id = file.directory_id
-      WHERE file.id = ?;
+      INNER JOIN directory ON directory.id = file_record.directory_id
+      WHERE file_record.id = ?;
         """;
 
   public static final String GET_ACCESS_INFO_BY_DIRECTORY_ID = """
       SELECT
-          file.id, file.path, file.owner, file.permissions,
-          file.file_name, file.directory_id, computer.ip_address,
+          file_record.id, file_record.path, file_record.owner, file_record.permissions,
+          file_record.file_name, file_record.directory_id, computer.ip_address,
           directory.copied, directory.file_count, directory.path AS dir_path,
           directory.owner AS dir_owner
-      FROM file
-      INNER JOIN file_computer ON file.id = file_computer.file_id
+      FROM file_record
+      INNER JOIN file_computer ON file_record.id = file_computer.file_record_id
       INNER JOIN computer ON file_computer.computer_id = computer.id
-      INNER JOIN directory ON directory.id = file.directory_id
+      INNER JOIN directory ON directory.id = file_record.directory_id
       WHERE directory.id = ?;
         """;
 
   public static final String FIND_FILE_RECORD_COPIED_AT_AND_DELETED_AT_BY_DIRECTORY_ID = """
       SELECT
-          file.id AS id, file.file_name,
-          file.permissions, file.size,
+          file_record.id AS id, file_record.file_name,
+          file_record.permissions, file_record.size,
           file_computer.id AS file_computer_id,
           file_computer.copied_at, file_computer.deleted_at
-      FROM file
-      INNER JOIN file_computer ON file.id = file_computer.file_id
+      FROM file_record
+      INNER JOIN file_computer ON file_record.id = file_computer.file_record_id
       WHERE directory_id = ?;
         """;
 
   public static final String FIND_FILE_RECORD_METADATA_BY_ENTRY_ID = """
-      SELECT file_name, entry.title, entry.base_path, file.size, file.permissions, directory.file_count
-          from file INNER JOIN entry
-          ON file.entry_id = entry.id
+      SELECT file_name, entry.title, entry.base_path, file_record.size, file_record.permissions, directory.file_count
+          FROM file_record INNER JOIN entry
+          ON file_record.entry_id = entry.id
           INNER JOIN directory
-          ON directory.id = file.directory_id
-          where file.entry_id = ?
+          ON directory.id = file_record.directory_id
+          WHERE file_record.entry_id = ?
       """;
 
   public static final String SAVE_FILE_RECORD_BY_DIRECTORY_ID = """
-      INSERT INTO file (path, owner, entry_id, permissions, size, file_name, directory_id)
+      INSERT INTO file_record (path, owner, entry_id, permissions, size, file_name, directory_id)
               VALUES(?,?,?,?,?,?,?)
       """;
 }

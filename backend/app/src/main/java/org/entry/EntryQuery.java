@@ -17,10 +17,6 @@ public class EntryQuery {
       SELECT title FROM entry WHERE id = ?
       """;
 
-  public static final String UPDATE_DELETABLE_BY_ID = """
-      UPDATE entry SET deletable = ? WHERE id = ?
-      """;
-
   public static final String UPDATE_DELETED_AT_BY_ID = """
       UPDATE entry SET deleted_at = ? WHERE id = ?
        """;
@@ -28,7 +24,7 @@ public class EntryQuery {
   public static final String UPDATE_DELETE_FILES_BY_DIRECTORY_ID = """
       UPDATE entry
       SET delete_files = true
-      WHERE AND (
+      WHERE (
       	SELECT COUNT(*) > 0 AS has_copied_files
       	FROM directory
       	WHERE id = ?
@@ -41,7 +37,7 @@ public class EntryQuery {
       WHERE (
       	SELECT copied_at IS NOT NULL
       	FROM file_computer
-      	WHERE file_computer.file_id = ?
+      	WHERE file_computer.file_record_id = ?
       )
       """;
 

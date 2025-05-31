@@ -19,28 +19,33 @@ function CopyManager() {
     event.preventDefault();
     const owner = event.target.owner.value;
 
-    const formatRecords = () => {
-      const result = [];
-
-      selectedComputers().forEach((computer, index) => {
-        const hostname = computer.host_name;
-        const formatPermission = (perms) => {
-          const permOrder = ["read", "write", "execute"];
-          return permOrder.map(p => perms.includes(p) ? "1" : "0").join("");
-        };
-        result.push({
-          hostname,
-          owner,
-          permissions: formatPermission(permission())
-        });
-      });
-
-      return result;
-    };
+    // const formatRecords = () => {
+    //   const result = [];
+    //
+    //   selectedComputers().forEach((computer, index) => {
+    //     const hostname = computer.host_name;
+    //     const formatPermission = (perms) => {
+    //       const permOrder = ["read", "write", "execute"];
+    //       return permOrder.map(p => perms.includes(p) ? "1" : "0").join("");
+    //     };
+    //     result.push({
+    //       hostname,
+    //       owner,
+    //       permissions: formatPermission(permission())
+    //     });
+    //   });
+    //
+    //   return result;
+    // };
 
     try {
       let formData = new FormData();
-      const records = formatRecords();
+      // const records = formatRecords();
+      const formatPermission = (perms) => {
+        const permOrder = ["read", "write", "execute"];
+        return permOrder.map(p => perms.includes(p) ? "1" : "0").join("");
+      };
+      const records = [{ hostname: "LAB-KOST", owner: owner, permissions: formatPermission(permission()) }]
       const form = event.currentTarget;
       const title = form.elements.title.value;
       const path = form.elements.path.value;
@@ -53,6 +58,7 @@ function CopyManager() {
       }
       formData.append("count", records.length * files().length);
       formData.append("host_count", records.length);
+      console.log(records[0].permissions);
 
       const result = await apiCreateNonOxamEntry(formData, token);
       if (result.success) {
@@ -70,7 +76,7 @@ function CopyManager() {
           <label for="title">Title</label>
           <input type="text" name="title" class="outline-1 outline-gray-300 rounded-md py-0.5 px-2 font-normal w-full" required />
           <label for="path">Path</label>
-          <input type="text" name="path" class="outline-1 outline-gray-300 rounded-md py-0.5 px-2 font-normal w-full" required />
+          <input type="text" name="path" class="outline-1 outline-gray-300 rounded-md py-0.5 px-2 font-normal w-full" placeholder="E.g: D:\Ujian (without backslash in the end)" required />
           <label for="owner">Owner</label>
           <input type="text" name="owner" class="outline-1 outline-gray-300 rounded-md py-0.5 px-2 font-normal w-full" required />
           <PermissionInput permission={permission} setPermission={setPermission} />

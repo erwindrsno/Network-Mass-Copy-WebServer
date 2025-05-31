@@ -12,8 +12,6 @@ public interface EntryRepository {
 
   String findTitleById(Integer entryId);
 
-  void updateDeletableById(boolean deletable, Integer entryId);
-
   void softDeleteById(Integer entryId, Timestamp deletedAt);
 
   void updateDeleteFilesByDirectoryId(Integer directoryId);
