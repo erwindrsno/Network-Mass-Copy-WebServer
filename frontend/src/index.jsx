@@ -18,11 +18,14 @@ import AddUserPage from '@pages/admin/AddUserPage'; '@pages/admin/AddUserPage';
 import SingleEntryRecordPage from '@pages/SingleEntryRecordPage';
 import SingleDirectoryRecordPage from "@pages/SingleDirectoryRecordPage";
 import AddDirectoryPerEntry from '@pages/AddDirectoryPerEntry';
-import PingBoardPage from '@pages/PingBoardPage';
+import StatusBoardPage from '@pages/StatusBoardPage';
+import DeletedEntryRecordPage from '@pages/DeletedEntryRecordPage.jsx';
+import DeletedSingleEntryRecordPage from '@pages/DeletedSingleEntryRecordPage.jsx';
+import DeletedSingleDirectoryRecordPage from "@pages/DeletedSingleDirectoryRecordPage";
 
-import ProtectedRouteWrapper from './components/utils/ProtectedRouteWrapper.jsx';
-import { AuthContextProvider } from './components/utils/AuthContextProvider.jsx';
-import { WebSocketContextProvider } from './components/utils/WebSocketContextProvider';
+import ProtectedRouteWrapper from '@utils/ProtectedRouteWrapper.jsx';
+import { AuthContextProvider } from '@utils/AuthContextProvider.jsx';
+import { SseContextProvider } from '@utils/SseContextProvider';
 
 const wrapper = document.getElementById('root');
 
@@ -39,8 +42,8 @@ if (!wrapper) {
 render(
   () => (
     <AuthContextProvider>
-      <WebSocketContextProvider>
-        <Toaster />
+      <SseContextProvider>
+        <Toaster position="bottom-right" />
         <Router>
           <Route path="/" component={LoginPage} />
           <Route path="/home">
@@ -52,7 +55,14 @@ render(
               <Route path="/directory/:dir_id" component={() => ProtectedRouteWrapper(SingleDirectoryRecordPage)} />
               <Route path="add" component={() => ProtectedRouteWrapper(AddDirectoryPerEntry)} />
             </Route>
-            <Route path="/ping_board" component={() => ProtectedRouteWrapper(PingBoardPage)} />
+            <Route path="/deleted_entry">
+              <Route path="/" component={() => ProtectedRouteWrapper(DeletedEntryRecordPage)} />
+              <Route path="/entry/:entry_id">
+                <Route path="/" component={() => ProtectedRouteWrapper(DeletedSingleEntryRecordPage)} />
+                <Route path="/directory/:dir_id" component={() => ProtectedRouteWrapper(DeletedSingleDirectoryRecordPage)} />
+              </Route>
+            </Route>
+            <Route path="/status_board" component={() => ProtectedRouteWrapper(StatusBoardPage)} />
           </Route>
 
           <Route path="/admin">
@@ -66,7 +76,7 @@ render(
             </Route>
           </Route>
         </Router>
-      </WebSocketContextProvider>
+      </SseContextProvider>
     </AuthContextProvider >
   ),
   wrapper

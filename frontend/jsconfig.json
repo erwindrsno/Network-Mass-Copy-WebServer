@@ -27,6 +27,9 @@
       "@apis/*": [
         "src/apis/*"
       ],
+      "@components/*": [
+        "src/components/*"
+      ]
     }
   }
 }

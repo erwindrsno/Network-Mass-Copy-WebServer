@@ -18,7 +18,8 @@ export default defineConfig({
       '@pages': '/src/pages',
       '@utils': '/src/components/utils',
       '@icons': '/src/assets',
-      '@apis': '/src/apis'
+      '@apis': '/src/apis',
+      '@components': '/src/components'
     }
   }
 });

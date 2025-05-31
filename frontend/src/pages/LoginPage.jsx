@@ -1,4 +1,4 @@
-import LoginForm from '../components/login/LoginForm.jsx'
+import LoginForm from '@components/login/LoginForm.jsx'
 
 function LoginPage() {
   return (

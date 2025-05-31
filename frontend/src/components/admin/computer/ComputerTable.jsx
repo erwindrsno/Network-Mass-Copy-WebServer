@@ -2,12 +2,14 @@ import { createResource, createSignal, createMemo, createEffect, For, Show } fro
 import Pagination from '@utils/Pagination.jsx';
 import { useAuthContext } from "@utils/AuthContextProvider.jsx";
 import { apiDeleteComputer, apiFetchComputer } from '@apis/ComputerApi.jsx';
+import Modal from '@components/admin/Modal.jsx';
 
 function ComputerTable(props) {
   const maxItems = 10;
   const { token, setToken } = useAuthContext();
+  const [tobeDeleteComp, setTobeDeleteComp] = createSignal(null);
   const [computers, { mutate, refetch }] = createResource(() => apiFetchComputer(token));
-
+  const [isModalToggled, toggleModal] = createSignal(false);
   const [paginated, setPaginated] = createSignal({
     currentPage: 1,
     items: [],
@@ -27,12 +29,23 @@ function ComputerTable(props) {
     }
   });
 
-  const handleDelete = async (computerId) => {
-    if (!confirm("Are you sure you want to delete this computer?")) return;
-    console.log("To be deleted is  : " + computerId)
-    const result = await apiDeleteComputer(computerId, token);
+  const openModal = (computerId, host_name) => {
+    setTobeDeleteComp({ id: computerId, name: host_name });
+    toggleModal(true);
+  }
+
+  const closeModal = () => {
+    toggleModal(false);
+    setTobeDeleteComp(null);
+  }
+
+  const deleteItem = async (event) => {
+    event.preventDefault();
+    const result = await apiDeleteComputer(tobeDeleteComp().id, token);
     if (result.success) {
+      console.log("computer deletion ok");
       refetch();
+      closeModal();
     }
   }
 
@@ -56,7 +69,7 @@ function ComputerTable(props) {
                   <td class="py-3 text-left whitespace-nowrap">{computer.host_name}</td>
                   <td class="py-3 text-left whitespace-nowrap">{computer.ip_address}</td>
                   <td class="text-center text-sm px-0.5">
-                    <button onClick={() => handleDelete(computer.id)} class="bg-red-500 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">Delete</button>
+                    <button onClick={() => openModal(computer.id, computer.host_name)} class="bg-red-500 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">Delete</button>
                   </td>
                 </tr>
               )}
@@ -64,6 +77,10 @@ function ComputerTable(props) {
           </tbody>
         </table>
       </div>
+
+      <Show when={isModalToggled()}>
+        <Modal closeModal={closeModal} deleteItem={deleteItem} item={tobeDeleteComp} />
+      </Show>
       <Show when={filteredComputers().length > 0} fallback={<p>No computers found or still loading...</p>}>
         <Pagination items={filteredComputers()} onPageChange={setPaginated} maxItems={maxItems} />
       </Show>

@@ -1,17 +1,16 @@
 import { A, useNavigate, action } from "@solidjs/router";
 import { Show } from "solid-js";
 import { useAuthContext } from "@utils/AuthContextProvider.jsx";
-import { useWebSocketContext } from "@utils/WebSocketContextProvider.jsx";
 import { extractClaims } from "@utils/ExtractClaims";
+import { useSseContext } from "@utils/SseContextProvider";
 
 function ProfileDropdown() {
-  const { socket, setSocket } = useWebSocketContext();
   const { token, setToken } = useAuthContext();
+  const { sse, setSse } = useSseContext();
   const { role } = extractClaims(token());
   const navigate = useNavigate()
 
   const handleLogout = async () => {
-    if (!confirm(`Are you sure you want to log out?`)) return;
     const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user/logout`, {
       method: "POST",
       credentials: "include",
@@ -23,12 +22,11 @@ function ProfileDropdown() {
       console.log("BAD");
       console.log(response)
     } else {
-      console.log(response)
+      setSse(null);
       setToken("");
       sessionStorage.removeItem("token");
-      socket().close();
+      navigate("/")
     }
-    navigate("/")
   }
 
   return (

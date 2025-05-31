@@ -16,6 +16,7 @@ import org.entry.EntryService;
 import org.file_record.FileRecordService;
 import org.file_record_computer.FileRecordComputerService;
 import org.joined_entry_file_filecomputer.AccessInfo;
+import org.main.SseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +29,10 @@ public class WebSocketClientServiceImpl implements WebSocketClientService {
 
   @Inject
   public WebSocketClientServiceImpl(Client wsClient, FileRecordComputerService fileRecordComputerService,
-      EntryService entryService, DirectoryService directoryService) {
+      EntryService entryService, DirectoryService directoryService, SseService sseService) {
     this.wsClient = wsClient;
-    this.wsClient.injectDependencies(fileRecordComputerService, entryService, directoryService);
+    this.wsClient.injectDependencies(fileRecordComputerService, entryService,
+        directoryService, sseService);
   }
 
   @Override

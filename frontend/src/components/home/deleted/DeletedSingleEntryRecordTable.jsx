@@ -4,13 +4,12 @@ import { createStore } from "solid-js/store"
 import Pagination from '@utils/Pagination.jsx'
 import { CopyIcon, TakeownIcon, TrashcanIcon } from '@icons/Icons.jsx';
 import { formatDateTime } from '@utils/DateTimeDisplayFormatter.jsx';
-import SingleEntrySudoModal from "./SingleEntrySudoModal.jsx";
 import { useSseContext } from '@utils/SseContextProvider.jsx';
 import { useNavigate, useParams, action } from "@solidjs/router";
 import { extractClaims } from '@utils/ExtractClaims.jsx';
 import { apiFetchSingleEntry, apiCopySingleDirectory, apiTakeownSingleDirectory, apiDeleteSingleDirectory } from '@apis/SingleEntryApi.jsx';
 
-function SingleEntryRecordTable(props) {
+function DeletedSingleEntryRecordTable(props) {
   const maxItems = 8;
   const navigate = useNavigate();
   const params = useParams();
@@ -79,26 +78,6 @@ function SingleEntryRecordTable(props) {
     }
   })
 
-  const actionMap = new Map([
-    ['copy', async () => {
-      const result = await apiCopySingleDirectory(entryId, directory, token);
-      if (result.success) {
-        closeModal();
-      }
-    }],
-    ['takeown', async () => {
-      const result = await apiTakeownSingleDirectory(entryId, directory, token);
-      if (result.success) {
-        closeModal();
-      }
-    }],
-    ['delete', async () => {
-      const result = await apiDeleteSingleDirectory(entryId, directory, token);
-      if (result.success) {
-        closeModal();
-      }
-    }]
-  ]);
   return (
     <>
       <div class="shadow-md rounded-lg overflow-hidden">
@@ -129,17 +108,6 @@ function SingleEntryRecordTable(props) {
                   <td class="text-center text-sm px-2 py-1.5">
                     <div class="flex flex-col gap-1 w-min">
                       <button onClick={() => viewFilePerDirectory(title, item.directory.id, item.directory.owner, item.computer.host_name, item.computer.ip_address)} class="bg-blue-600 hover:bg-blue-700 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">View</button>
-                      <div class="flex gap-1">
-                        <button onClick={() => openModal(item.computer.ip_address, item.computer.host_name, item.directory.owner, item.directory.id, "copy")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
-                        <button onClick={() => openModal(item.computer.ip_address, item.computer.host_name, item.directory.owner, item.directory.id, "takeown")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TakeownIcon></TakeownIcon></button>
-                        <button onClick={() => {
-                          if (role === "superadmin") {
-                            openModal(item.computer.ip_address, item.computer.host_name, item.directory.owner, item.directory.id, "delete")
-                          } else {
-                            toast.error("You are not allow to delete copied entry")
-                          }
-                        }} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TrashcanIcon></TrashcanIcon></button>
-                      </div>
                     </div>
                   </td>
                 </tr>
@@ -147,10 +115,6 @@ function SingleEntryRecordTable(props) {
             </For>
           </tbody>
         </table>
-
-        <Show when={isModalToggled() && action() !== ""}>
-          <SingleEntrySudoModal closeModal={closeModal} action={action} actionMap={actionMap} directory={directory} computer={computer} title={title} />
-        </Show>
       </div >
 
 
@@ -159,4 +123,4 @@ function SingleEntryRecordTable(props) {
   )
 }
 
-export default SingleEntryRecordTable;
+export default DeletedSingleEntryRecordTable;

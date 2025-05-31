@@ -1,6 +1,6 @@
-import Header from '../components/header/Header.jsx'
-import UploadFileForm from '../components/copy-oxam/UploadFileForm.jsx'
-import { FileUploadContextProvider, useFileUploadContext } from "../components/utils/FileUploadContextProvider.jsx";
+import Header from '@components/header/Header.jsx'
+import UploadFileForm from '@components/copy-oxam/UploadFileForm.jsx'
+import { FileUploadContextProvider, useFileUploadContext } from "@utils/FileUploadContextProvider.jsx";
 
 function CopyOxamPage() {
   return (

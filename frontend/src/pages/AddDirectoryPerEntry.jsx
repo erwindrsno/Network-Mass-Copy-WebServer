@@ -1,6 +1,6 @@
-import Header from '../components/header/Header.jsx';
+import Header from '@components/header/Header.jsx';
 import { useParams, useLocation, useNavigate } from "@solidjs/router";
-import AddDirectoryForm from '../components/home/single_entry/AddDirectoryForm.jsx';
+import AddDirectoryForm from '@components/home/single_entry/AddDirectoryForm.jsx';
 
 function AddDirectoryPerEntry() {
   const location = useLocation();

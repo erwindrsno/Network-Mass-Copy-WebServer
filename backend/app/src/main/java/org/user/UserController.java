@@ -60,7 +60,7 @@ public class UserController {
     if (authedUser != null) {
       String token = this.userService.generateToken(authedUser);
       // ctx.status(200).result(token);
-      ctx.json(Map.of("token", token)).status(200);
+      ctx.json(Map.of("token", token)).cookie("sse", "ok", 3600).status(200);
     } else {
       ctx.result("Log in FAILED").status(401);
     }

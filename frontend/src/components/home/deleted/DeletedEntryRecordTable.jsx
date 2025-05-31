@@ -1,26 +1,26 @@
 import { createResource, createSignal, onMount, onCleanup, Show, createEffect } from 'solid-js';
 import { useAuthContext } from "@utils/AuthContextProvider.jsx";
-import FileModal from "./FileModal.jsx";
+import FileModal from "@components/home/FileModal.jsx";
 import { CopyIcon, TakeownIcon, TrashcanIcon } from "@icons/Icons.jsx";
 import { useNavigate, action } from "@solidjs/router";
 import Pagination from '@utils/Pagination.jsx'
 import { formatDateTime } from '@utils/DateTimeDisplayFormatter.jsx';
 import { displayIcon } from '@utils/DisplayFromOxamIcon.jsx';
-import SudoModal from './SudoModal.jsx';
+import SudoModal from '@components/home/SudoModal.jsx';
 import toast, { Toaster } from 'solid-toast';
 import { extractClaims } from '@utils/ExtractClaims.jsx';
-import { apiFetchEntry, apiCopyEntry, apiTakeownEntry, apiDeleteEntry } from '@apis/EntryApi.jsx';
+import { apiFetchDeletedEntry, apiCopyEntry, apiTakeownEntry, apiDeleteEntry } from '@apis/EntryApi.jsx';
 import { useSseContext } from '@utils/SseContextProvider.jsx';
 
 
-function EntryRecordTable() {
+function DeletedEntryRecordTable() {
   const maxItems = 8;
   const navigate = useNavigate();
   const { token, setToken } = useAuthContext();
   const { sse, setSse, data, setData } = useSseContext();
   const { role } = extractClaims(token());
   const [action, setAction] = createSignal("");
-  const [entries, { mutate, refetch }] = createResource(() => apiFetchEntry(token));
+  const [entries, { mutate, refetch }] = createResource(() => apiFetchDeletedEntry(token));
   const [isModalToggled, toggleModal] = createSignal(false);
   const [title, setTitle] = createSignal("" || "N/A");
   const [entryId, setEntryId] = createSignal(null);
@@ -47,29 +47,6 @@ function EntryRecordTable() {
   const viewSingleEntryRecord = (id, title) => {
     navigate(`entry/${id}`, { state: { title: title } });
   }
-
-  const actionMap = new Map([
-    ['copy', async () => {
-      const result = await apiCopyEntry(entryId, token);
-      if (result.success) {
-        closeModal();
-      }
-    }],
-    ['takeown', async () => {
-      const result = await apiTakeownEntry(entryId, token);
-      if (result.success) {
-        closeModal();
-      }
-    }],
-    ['delete', async () => {
-      const result = await apiDeleteEntry(entryId, token);
-      if (result.success) {
-        closeModal();
-        refetch();
-        // navigate("/home")
-      }
-    }]
-  ]);
 
   createEffect(() => {
     if (!sse()) return;
@@ -106,18 +83,6 @@ function EntryRecordTable() {
                   <td class="text-center text-sm px-2 py-1.5">
                     <div class="flex flex-col gap-1 w-min">
                       <button onClick={() => viewSingleEntryRecord(entry.id, entry.title)} class="bg-blue-600 hover:bg-blue-700 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">View</button>
-                      <div class="flex gap-1">
-                        <button onClick={() => openModal(entry.title, entry.id, "copy")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
-                        <button onClick={() => openModal(entry.title, entry.id, "takeown")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TakeownIcon></TakeownIcon></button>
-                        <button onClick={() => {
-                          if (role === "superadmin") {
-                            openModal(entry.title, entry.id, "delete")
-                          } else {
-                            toast.error("You are not allow to delete copied entry")
-                          }
-                        }}
-                          class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TrashcanIcon /></button>
-                      </div>
                     </div>
                   </td>
                 </tr>
@@ -128,9 +93,6 @@ function EntryRecordTable() {
         <Show when={isModalToggled() && action() === "view"}>
           <FileModal title={title} entryId={entryId} closeModal={closeModal} />
         </Show>
-        <Show when={isModalToggled() && action() !== "view"}>
-          <SudoModal title={title} entryId={entryId} closeModal={closeModal} action={action} actionMap={actionMap} />
-        </Show>
       </div >
 
       <Pagination items={entries()} onPageChange={setPaginated} maxItems={maxItems} />
@@ -138,4 +100,4 @@ function EntryRecordTable() {
   )
 }
 
-export default EntryRecordTable;
+export default DeletedEntryRecordTable;

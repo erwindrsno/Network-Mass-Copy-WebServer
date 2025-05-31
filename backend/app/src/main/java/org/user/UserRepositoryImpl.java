@@ -36,6 +36,7 @@ public class UserRepositoryImpl extends BaseRepository<User> implements UserRepo
             .id(resultSet.getInt("id"))
             .username(resultSet.getString("username"))
             .display_name(resultSet.getString("display_name"))
+            .role(resultSet.getString("role"))
             .build();
         listResultSet.add(user);
       }

@@ -4,13 +4,12 @@ import { formatDateTime } from '@utils/DateTimeDisplayFormatter.jsx';
 import { useParams, useLocation } from "@solidjs/router";
 import { CopyIcon, TakeownIcon, TrashcanIcon } from '@icons/Icons.jsx';
 import { useAuthContext } from '@utils/AuthContextProvider.jsx';
-import SingleDirectorySudoModal from './SingleDirectorySudoModal.jsx';
 import { useSseContext } from '@utils/SseContextProvider.jsx';
 import { apiFetchSingleDirectory, apiCopySingleFile, apiDeleteSingleFile } from '@apis/SingleDirectoryApi.jsx';
 import { useNavigate, action } from "@solidjs/router";
 import { extractClaims } from '@utils/ExtractClaims.jsx';
 
-function SingleDirectoryRecordTable() {
+function DeletedSingleDirectoryRecordTable() {
   const maxItems = 8;
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,35 +28,6 @@ function SingleDirectoryRecordTable() {
   const { sse, setSse, data, setData } = useSseContext();
   const [action, setAction] = createSignal("");
   const [isModalToggled, toggleModal] = createSignal(false);
-
-  const openModal = (fileId, filename, action) => {
-    setFileId(fileId);
-    setFilename(filename);
-    setAction(action)
-    toggleModal(prev => !prev);
-  }
-
-  const closeModal = () => {
-    setFileId(null);
-    setFilename("");
-    setAction("");
-    toggleModal(prev => !prev);
-  }
-
-  const actionMap = new Map([
-    ['copy', async () => {
-      const result = await apiCopySingleFile(entryId, fileId, token);
-      if (result.success) {
-        closeModal();
-      }
-    }],
-    ['delete', async () => {
-      const result = await apiDeleteSingleFile(entryId, fileId, token);
-      if (result.success) {
-        closeModal();
-      }
-    }]
-  ]);
 
   const [fileRecordPerDir, { mutate, refetch }] = createResource(
     () => apiFetchSingleDirectory(directoryId, token)
@@ -89,7 +59,6 @@ function SingleDirectoryRecordTable() {
               <th scope="col" class="w-1/6 py-3 text-center">Permissions</th>
               <th scope="col" class="w-1/6 py-3 text-center">Copied at</th>
               <th scope="col" class="w-1/6 py-3 text-center">Deleted at</th>
-              <th scope="col" class="w-1/2 py-3 text-center">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -102,27 +71,11 @@ function SingleDirectoryRecordTable() {
                   <td class="py-3 text-center whitespace-nowrap truncate">{item.fileRecord.permissions}</td>
                   <td class="py-3 text-center whitespace-nowrap justify-items-center">{formatDateTime(item.fileRecordComputer.copiedAt)}</td>
                   <td class="py-3 text-center whitespace-nowrap justify-items-center">{formatDateTime(item.fileRecordComputer.deletedAt)}</td>
-                  <td class="text-center text-sm px-2 py-1.5">
-                    <div class="flex flex-row gap-1 w-min">
-                      <button onClick={() => openModal(item.fileRecord.id, item.fileRecord.filename, "copy")} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><CopyIcon></CopyIcon></button>
-                      <button onClick={() => {
-                        if (role === "superadmin") {
-                          openModal(item.fileRecord.id, item.fileRecord.filename, "delete")
-                        } else {
-                          toast.error("You are not allow to delete copied entry")
-                        }
-                      }} class="bg-gray-700 hover:bg-gray-900 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer"><TrashcanIcon /></button>
-                    </div>
-                  </td>
                 </tr>
               )}
             </For>
           </tbody>
         </table>
-
-        <Show when={isModalToggled() && action() !== ""}>
-          <SingleDirectorySudoModal closeModal={closeModal} computer={computer} filename={filename} owner={owner} action={action} actionMap={actionMap} />
-        </Show>
       </div >
 
 
@@ -131,4 +84,4 @@ function SingleDirectoryRecordTable() {
   )
 }
 
-export default SingleDirectoryRecordTable;
+export default DeletedSingleDirectoryRecordTable;

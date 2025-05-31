@@ -1,5 +1,7 @@
 package org.websocket;
 
+import static io.javalin.apibuilder.ApiBuilder.sse;
+
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -12,6 +14,7 @@ import org.file_record_computer.FileRecordComputerService;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft;
 import org.java_websocket.handshake.ServerHandshake;
+import org.main.SseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,12 +32,14 @@ public class Client extends WebSocketClient {
   private FileRecordComputerService fileRecordComputerService;
   private EntryService entryService;
   private DirectoryService directoryService;
+  private SseService sseService;
 
   public Client(URI serverUri, Draft draft) {
     super(serverUri, draft);
     this.mapper = new ObjectMapper();
   }
 
+  @Inject
   public Client(URI serverURI) {
     super(serverURI);
     this.mapper = new ObjectMapper();
@@ -42,10 +47,11 @@ public class Client extends WebSocketClient {
 
   @Inject
   public void injectDependencies(FileRecordComputerService fileRecordComputerService, EntryService entryService,
-      DirectoryService directoryService) {
+      DirectoryService directoryService, SseService sseService) {
     this.fileRecordComputerService = fileRecordComputerService;
     this.entryService = entryService;
     this.directoryService = directoryService;
+    this.sseService = sseService;
   }
 
   @Override
@@ -92,7 +98,8 @@ public class Client extends WebSocketClient {
           Integer directoryId = Integer.parseInt(action.substring(5));
           this.directoryService.updateFileCopiedCountById(directoryId);
 
-          send("webserver/to-webclient/refetch");
+          // send("webserver/to-webclient/refetch");
+          this.sseService.broadcast("message", "refetch");
         } catch (Exception e) {
           logger.error(e.getMessage(), e);
         }
@@ -101,7 +108,8 @@ public class Client extends WebSocketClient {
           Integer directoryId = Integer.parseInt(action.substring(8));
           this.directoryService.updateTakeownedAtById(directoryId);
 
-          send("webserver/to-webclient/refetch");
+          this.sseService.broadcast("message", "refetch");
+          // send("webserver/to-webclient/refetch");
         } catch (Exception e) {
           logger.error(e.getMessage(), e);
         }
@@ -110,7 +118,8 @@ public class Client extends WebSocketClient {
           Integer directoryId = Integer.parseInt(action.substring(7));
           this.directoryService.updateDeletedAtById(directoryId);
 
-          send("webserver/to-webclient/refetch");
+          this.sseService.broadcast("message", "refetch");
+          // send("webserver/to-webclient/refetch");
         } catch (Exception e) {
           logger.error(e.getMessage(), e);
         }
@@ -119,7 +128,7 @@ public class Client extends WebSocketClient {
           Integer fileId = Integer.parseInt(action.substring(14));
           logger.info("");
           this.fileRecordComputerService.updateDeletedAtById(fileId);
-          send("webserver/to-webclient/refetch");
+          this.sseService.broadcast("message", "refetch");
         } catch (Exception e) {
           logger.error(e.getMessage(), e);
         }

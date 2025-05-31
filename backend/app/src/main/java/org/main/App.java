@@ -2,6 +2,9 @@ package org.main;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.computer.ComputerController;
 import org.computer.ComputerModule;
 import org.directory.DirectoryController;
@@ -26,13 +29,14 @@ import com.google.inject.Injector;
 import io.javalin.Javalin;
 import io.javalin.http.HandlerType;
 import io.javalin.http.UnauthorizedResponse;
+import io.javalin.http.sse.SseClient;
 import io.javalin.json.JavalinJackson;
 
 public class App {
   private static Logger logger = LoggerFactory.getLogger(App.class);
 
   public static void main(String[] args) {
-    Injector injector = Guice.createInjector(new ComputerModule(), new UserModule(), new DatabaseModule(),
+    Injector injector = Guice.createInjector(new ComputerModule(), new UserModule(), new MainModule(),
         new FileRecordModule(), new EntryModule(), new FileRecordComputerModule(),
         new CustomDtoOneModule(), new WebSocketModule(), new DirectoryModule());
 
@@ -42,6 +46,7 @@ public class App {
     EntryController entryController = injector.getInstance(EntryController.class);
     DirectoryController directoryController = injector.getInstance(DirectoryController.class);
     WebSocketClient webSocketClient = injector.getInstance(WebSocketClient.class);
+    SseService sseService = injector.getInstance(SseService.class);
 
     try {
       webSocketClient.connectBlocking();
@@ -62,6 +67,10 @@ public class App {
           ctx.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
           ctx.header("Access-Control-Allow-Credentials", "true");
           ctx.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+          if (ctx.path().equals("/sse") && ctx.cookie("sse").equals("ok")) {
+            logger.info("YOU WRE HERE!");
+            return;
+          }
           if (ctx.method() == HandlerType.OPTIONS) {
             logger.info(ctx.method() + ": " + ctx.path());
             ctx.status(204);
@@ -192,6 +201,10 @@ public class App {
           });
         });
       });
+    });
+
+    app.sse("/sse", client -> {
+      sseService.addClient(client);
     });
 
     app.error(404, ctx -> {

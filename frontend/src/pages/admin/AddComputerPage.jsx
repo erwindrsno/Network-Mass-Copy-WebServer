@@ -1,5 +1,5 @@
-import Header from '../../components/header/Header.jsx'
-import AddComputerForm from '../../components/admin/computer/AddComputerForm.jsx'
+import Header from '@components/header/Header.jsx'
+import AddComputerForm from '@components/admin/computer/AddComputerForm'
 
 function AddComputerPage() {
   return (

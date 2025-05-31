@@ -1,15 +1,14 @@
 import { createEffect, createResource, createSignal, createMemo, onCleanup, onMount } from "solid-js";
 import { useAuthContext } from "../utils/AuthContextProvider.jsx";
-import { useWebSocketContext } from "../utils/WebSocketContextProvider.jsx";
 import { apiFetchComputer } from "@apis/ComputerApi.jsx";
 import toast, { Toaster } from 'solid-toast';
 
-function PingBoard() {
+function StatusBoard() {
   const { token, setToken } = useAuthContext();
-  const { socket, setSocket, data, setdata } = useWebSocketContext();
+  const { data, setData } = createSignal([]);
   const [computers, { mutate, refetch }] = createResource(() => apiFetchComputer(token));
   const [labNum, setLabNum] = createSignal(1);
-  const [hasPinged, setHasPinged] = createSignal(false);
+  const [hasChecked, setHasChecked] = createSignal(false);
 
   const [colorReady, setColorReady] = createSignal(false);
 
@@ -17,8 +16,8 @@ function PingBoard() {
     setLabNum(Number(event.target.value))
   }
 
-  const handlePing = () => {
-    setHasPinged(true)
+  const handlecheck = () => {
+    setHasChecked(true)
     toast("Polling...", {
       position: "top-center"
     });
@@ -41,27 +40,53 @@ function PingBoard() {
     }
   });
 
-  createEffect(() => {
-    if (!hasPinged()) {
+  onMount(() => {
+    if (!hasChecked()) {
       return;
     }
-    let intervalPolling;
+    const ws = new WebSocket(`${import.meta.env.VITE_WEBSOCKET_SERVER_URL}`);
+    setSocket(ws);
 
-    if (socket().readyState === WebSocket.OPEN) {
-      intervalPolling = setInterval(() => {
-        if (socket().readyState === WebSocket.OPEN) {
-          socket().send(`webclient/monitor/${labNum()}`);
-        } else {
-          console.warn("WebSocket is not open");
+    ws.onopen = () => {
+      console.log("WebSocket connected");
+
+      if (socket() && socket().readyState === WebSocket.OPEN) {
+        console.log("And in ready state");
+      } else {
+        console.warn("WebSocket is not open");
+      }
+      if (token() === "") {
+        socket().close();
+      }
+    };
+
+    ws.onmessage = (event) => {
+      const message = event.data;
+
+      if (message.startsWith("monitor/")) {
+        const jsonPayload = message.slice("monitor/".length);
+        try {
+          const openedConnections = JSON.parse(jsonPayload);
+          setData(() => openedConnections);
+        } catch (error) {
+          console.error("Failed to parse monitor JSON:", error);
         }
-      }, 2000);
-    } else {
-      console.warn("WebSocket is not open");
-    }
+      }
+    };
+
+    ws.onerror = (err) => {
+      console.error("WebSocket error:", err);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket closed");
+    };
 
     onCleanup(() => {
-      clearInterval(intervalPolling);
-      console.log("Interval cleaned.");
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+      console.log("WebSocket cleaned up");
     });
   });
 
@@ -75,12 +100,12 @@ function PingBoard() {
       </select>
 
       <div class="flex flex-row gap-4">
-        <button class="bg-green-500 px-3 py-1 rounded-sm text-white cursor-pointer" onClick={handlePing}>Poll!</button>
+        <button class="bg-green-500 px-3 py-1 rounded-sm text-white cursor-pointer" onClick={handlecheck}>Check!</button>
         <div class="w-[2px] h-full bg-gray-300"></div>
         <div class="flex flex-col">
           <p class="block">Legends:</p>
           <div class="flex flex-row gap-16">
-            <p><span class="inline-block w-3 h-3 bg-sky-100 rounded-full"></span> = Not yet polled.</p>
+            <p><span class="inline-block w-3 h-3 bg-sky-100 rounded-full"></span> = Not checked yet.</p>
             <p><span class="inline-block w-3 h-3 bg-green-500 rounded-full"></span> = Connected</p>
             <p><span class="inline-block w-3 h-3 bg-red-500 rounded-full"></span> = Not connected</p>
           </div>
@@ -94,7 +119,7 @@ function PingBoard() {
               const isActive = () => data().includes(item.ip_address);
 
               const showColor = () => {
-                if (!hasPinged() || !colorReady()) {
+                if (!hasChecked() || !colorReady()) {
                   return "bg-gray-300";
                 }
                 if (colorReady()) {
@@ -104,7 +129,7 @@ function PingBoard() {
 
               return (
                 <div class="bg-sky-100 text-center flex flex-col border rounded-sm border-gray-300 relative p-0 z-40">
-                  <Show when={hasPinged() && colorReady()} >
+                  <Show when={hasChecked() && colorReady()} >
                     <span class="absolute top-0 right-0 flex size-3 z-50">
                       <span class="absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
                       <span class={`relative inline-flex size-3 rounded-full ${showColor()}`}></span>
@@ -123,4 +148,4 @@ function PingBoard() {
   )
 }
 
-export default PingBoard;
+export default StatusBoard;

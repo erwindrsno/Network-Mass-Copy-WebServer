@@ -65,18 +65,20 @@ function CopyManager() {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
-        <label for="title">Title</label>
-        <input type="text" name="title" value="" />
-        <label for="path">Path</label>
-        <input type="text" name="path" value="" />
-        <label for="owner">Owner</label>
-        <input type="text" name="owner" value="" />
-        <PermissionInput permission={permission} setPermission={setPermission} />
-        <FileInput />
-        <ComputerSelector selectedComputers={selectedComputers} setSelectedComputers={setSelectedComputers} />
-        <button type="submit" class="w-full bg-blue-600 border rounded-md py-1 text-blue-50 font-semibold hover:bg-blue-700 cursor-pointer">Add</button>
-      </form>
+      <div class="w-full justify-items-center">
+        <form onSubmit={handleSubmit} class="flex gap-1.5 flex-col">
+          <label for="title">Title</label>
+          <input type="text" name="title" class="outline-1 outline-gray-300 rounded-md py-0.5 px-2 font-normal w-full" required />
+          <label for="path">Path</label>
+          <input type="text" name="path" class="outline-1 outline-gray-300 rounded-md py-0.5 px-2 font-normal w-full" required />
+          <label for="owner">Owner</label>
+          <input type="text" name="owner" class="outline-1 outline-gray-300 rounded-md py-0.5 px-2 font-normal w-full" required />
+          <PermissionInput permission={permission} setPermission={setPermission} />
+          <FileInput />
+          <ComputerSelector selectedComputers={selectedComputers} setSelectedComputers={setSelectedComputers} />
+          <button type="submit" class="w-full bg-blue-600 border rounded-md py-1 text-blue-50 font-semibold hover:bg-blue-700 cursor-pointer">Add</button>
+        </form>
+      </div>
     </>
   )
 }

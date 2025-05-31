@@ -22,7 +22,7 @@ function PermissionInput(props) {
       } else {
         // untuk pastikan read tidak boleh di uncheck apabila write masih tercentang
         if (value === "read" && updated.includes("write")) {
-          return updated; // block unchecking read if write is present
+          return updated;
         }
         // untuk pastikan read tidak boleh di uncheck apabila exeucte masih tercentang
         if (value === "read" && updated.includes("execute")) {
@@ -40,14 +40,20 @@ function PermissionInput(props) {
     <>
       <p>Permission Input</p>
       <div class="flex flex-col">
-        <input type="checkbox" name="read" value="read" checked={permission().includes("read")} onChange={handleChangeCheckBox} />
-        <label for="read">Read</label>
+        <div class="flex flex-row gap-5 ">
+          <label for="read" class="w-24">Read</label>
+          <input type="checkbox" name="read" value="read" checked={permission().includes("read")} onChange={handleChangeCheckBox} />
+        </div>
 
-        <input type="checkbox" name="write" value="write" checked={permission().includes("write")} onChange={handleChangeCheckBox} />
-        <label for="write">Write</label>
+        <div class="flex flex-row gap-5">
+          <label for="write" class="w-24">Write</label>
+          <input type="checkbox" name="write" value="write" checked={permission().includes("write")} onChange={handleChangeCheckBox} />
+        </div>
 
-        <input type="checkbox" name="execute" value="execute" checked={permission().includes("execute")} onChange={handleChangeCheckBox} />
-        <label for="execute">Execute</label>
+        <div class="flex flex-row gap-5">
+          <label for="execute" class="w-24">Execute</label>
+          <input type="checkbox" name="execute" value="execute" checked={permission().includes("execute")} onChange={handleChangeCheckBox} />
+        </div>
       </div>
     </>
   )

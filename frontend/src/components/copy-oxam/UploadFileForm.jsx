@@ -42,7 +42,7 @@ function UploadFileForm() {
       <div class="flex flex-col space-y-1">
         <label for="access_list" class="text-lg">Access list</label>
         <input type="file" name="access_list"
-          class="text-slate-500 font-medium text-sm bg-gray-100 file:cursor-pointer cursor-pointer file:border-0 file:py-2 file:px-4 file:mr-4 file:bg-gray-800 file:hover:bg-gray-700 file:text-white rounded" />
+          class="text-slate-500 font-medium text-sm bg-gray-100 file:cursor-pointer cursor-pointer file:border-0 file:py-2 file:px-4 file:mr-4 file:bg-gray-800 file:hover:bg-gray-700 file:text-white rounded" required />
       </div>
 
       <div class="flex flex-col space-y-1">

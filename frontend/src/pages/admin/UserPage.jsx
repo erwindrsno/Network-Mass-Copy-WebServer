@@ -4,13 +4,13 @@ import UserCRUD from '../../components/admin/user/UserCRUD.jsx'
 
 function UserPage() {
   return (
-    <div class="w-full h-full flex flex-col bg-gray-100">
+    <div class={`w-full h-full flex flex-col bg-gray-100`} >
       <Header />
       <main class="w-full flex flex-col justify-self-center items-center">
         <Navbar />
         <UserCRUD />
       </main>
-    </div>
+    </ div>
   )
 }
 
