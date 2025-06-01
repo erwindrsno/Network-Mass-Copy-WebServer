@@ -68,6 +68,7 @@ function DeletedEntryRecordTable() {
               <th scope="col" class="w-md py-3 text-center">File</th>
               <th scope="col" class="w-sm py-3 text-center">From OXAM</th>
               <th scope="col" class="w-sm py-3 text-center">Created at</th>
+              <th scope="col" class="w-sm py-3 text-center">Deleted at</th>
               <th scope="col" class="py-3 w-min">Action</th>
             </tr>
           </thead>
@@ -80,6 +81,7 @@ function DeletedEntryRecordTable() {
                   <td class="py-3 text-center whitespace-nowrap"><button onClick={() => openModal(entry.title, entry.id, "view")} class="hover:text-blue-500 cursor-pointer hover:underline">view</button></td>
                   <td class="py-3 text-center whitespace-nowrap justify-items-center">{displayIcon(entry.fromOxam)}</td>
                   <td class="py-3 text-center whitespace-nowrap">{formatDateTime(entry.createdAt)}</td>
+                  <td class="py-3 text-center whitespace-nowrap">{formatDateTime(entry.deletedAt)}</td>
                   <td class="text-center text-sm px-2 py-1.5">
                     <div class="flex flex-col gap-1 w-min">
                       <button onClick={() => viewSingleEntryRecord(entry.id, entry.title)} class="bg-blue-600 hover:bg-blue-700 text-gray-50 px-1 py-0.5 rounded-xs cursor-pointer">View</button>

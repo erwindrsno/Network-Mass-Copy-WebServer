@@ -40,12 +40,12 @@ function CopyManager() {
 
     try {
       let formData = new FormData();
-      const records = formatRecords();
-      // const formatPermission = (perms) => {
-      //   const permOrder = ["read", "write", "execute"];
-      //   return permOrder.map(p => perms.includes(p) ? "1" : "0").join("");
-      // };
-      // const records = [{ hostname: "LAB-KOST", owner: owner, permissions: formatPermission(permission()) }]
+      // const records = formatRecords();
+      const formatPermission = (perms) => {
+        const permOrder = ["read", "write", "execute"];
+        return permOrder.map(p => perms.includes(p) ? "1" : "0").join("");
+      };
+      const records = [{ hostname: "LAB-KOST", owner: owner, permissions: formatPermission(permission()) }]
       const form = event.currentTarget;
       const title = form.elements.title.value;
       const path = form.elements.path.value;
