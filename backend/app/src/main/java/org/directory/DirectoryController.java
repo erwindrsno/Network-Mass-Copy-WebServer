@@ -16,17 +16,15 @@ import io.javalin.http.Context;
 public class DirectoryController {
   private Logger logger = LoggerFactory.getLogger(DirectoryController.class);
   private final DirectoryService directoryService;
-  private final FileRecordService fileRecordService;
   private final WebSocketClientService wsClientService;
   private final CustomDtoOneService customDtoOneService;
 
   @Inject
   public DirectoryController(DirectoryService directoryService, WebSocketClientService wsClientService,
-      CustomDtoOneService customDtoOneService, FileRecordService fileRecordService) {
+      CustomDtoOneService customDtoOneService) {
     this.directoryService = directoryService;
     this.wsClientService = wsClientService;
     this.customDtoOneService = customDtoOneService;
-    this.fileRecordService = fileRecordService;
   }
 
   public void copyFilesByDirectoryId(Context ctx) {

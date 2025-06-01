@@ -23,5 +23,4 @@ public class Directory {
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Bangkok")
   private Timestamp deletedAt;
   private String owner;
-  private Integer userId;
 }

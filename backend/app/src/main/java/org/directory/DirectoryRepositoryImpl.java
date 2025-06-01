@@ -59,7 +59,6 @@ public class DirectoryRepositoryImpl extends BaseRepository<Directory> implement
       PreparedStatement ps = conn.prepareStatement(query);
       ps.setInt(1, entryId);
       ResultSet resultSet = ps.executeQuery();
-      logger.info("yesyeyssyeey");
 
       while (resultSet.next()) {
         Integer id = resultSet.getInt("id");

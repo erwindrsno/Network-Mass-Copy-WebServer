@@ -27,7 +27,7 @@ public class DirectoryServiceImpl implements DirectoryService {
   private final ComputerService computerService;
 
   @Inject
-  public DirectoryServiceImpl(DirectoryRepository directoryRepository, FileRecordService fileRecordService,
+  public DirectoryServiceImpl(DirectoryRepository directoryRepository,
       CustomDtoOneService customDtoOneService, ComputerService computerService) {
     this.directoryRepository = directoryRepository;
     this.customDtoOneService = customDtoOneService;
