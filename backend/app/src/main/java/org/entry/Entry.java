@@ -18,7 +18,6 @@ public class Entry {
   private String title;
   private boolean isFromOxam;
   private String basePath;
-  private Integer count;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Bangkok")
   private Timestamp createdAt;
   private Timestamp deletedAt;

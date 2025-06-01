@@ -33,11 +33,10 @@ public class EntryRepositoryImpl extends BaseRepository<Entry> implements EntryR
 
       ps.setString(1, entry.getTitle());
       ps.setBoolean(2, entry.isFromOxam());
-      ps.setInt(3, entry.getCount());
-      ps.setTimestamp(4, entry.getCreatedAt());
-      ps.setBoolean(5, entry.isDeleteFiles());
-      ps.setString(6, entry.getBasePath());
-      ps.setInt(7, entry.getUserId());
+      ps.setTimestamp(3, entry.getCreatedAt());
+      ps.setBoolean(4, entry.isDeleteFiles());
+      ps.setString(5, entry.getBasePath());
+      ps.setInt(6, entry.getUserId());
 
       ps.executeUpdate();
 
@@ -69,7 +68,6 @@ public class EntryRepositoryImpl extends BaseRepository<Entry> implements EntryR
             .isFromOxam(resultSet.getBoolean("is_from_oxam"))
             .createdAt(resultSet.getTimestamp("created_at"))
             .deletedAt(resultSet.getTimestamp("deleted_at"))
-            .count(resultSet.getInt("count"))
             .userId(resultSet.getInt("user_id"))
             .deleteFiles(resultSet.getBoolean("delete_files"))
             .build();
@@ -97,7 +95,6 @@ public class EntryRepositoryImpl extends BaseRepository<Entry> implements EntryR
             .isFromOxam(resultSet.getBoolean("is_from_oxam"))
             .createdAt(resultSet.getTimestamp("created_at"))
             .deletedAt(resultSet.getTimestamp("deleted_at"))
-            .count(resultSet.getInt("count"))
             .userId(resultSet.getInt("user_id"))
             .deleteFiles(resultSet.getBoolean("delete_files"))
             .build();

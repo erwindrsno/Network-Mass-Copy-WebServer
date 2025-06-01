@@ -71,7 +71,6 @@ public class EntryController {
       // Insert ke entitas entry, yang akan return id-nya
       Entry entry = Entry.builder()
           .title(title)
-          .count(count)
           .isFromOxam(false)
           .userId(userId)
           .deleteFiles(false)

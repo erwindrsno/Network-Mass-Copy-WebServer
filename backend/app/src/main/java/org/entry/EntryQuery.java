@@ -2,8 +2,8 @@ package org.entry;
 
 public class EntryQuery {
   public static final String SAVE = """
-      INSERT INTO entry(title, is_from_oxam, count, created_at, delete_files, base_path, user_id)
-      VALUES(?, ?, ?, ?, ?, ?, ?)""";
+      INSERT INTO entry(title, is_from_oxam, created_at, delete_files, base_path, user_id)
+      VALUES(?, ?, ?, ?, ?, ?)""";
 
   public static final String FIND_ALL = """
       SELECT * FROM entry WHERE deleted_at IS NULL ORDER BY created_at DESC
