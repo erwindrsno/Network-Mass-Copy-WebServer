@@ -44,7 +44,7 @@ export const apiAddComputer = async (formData, token) => {
 }
 
 export const apiDeleteComputer = async (computerId, token) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/computer/id/${computerId}`, {
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/computer/${computerId}`, {
     method: "DELETE",
     credentials: "include",
     headers: {

@@ -26,7 +26,6 @@ import com.google.inject.Injector;
 import io.javalin.Javalin;
 import io.javalin.http.HandlerType;
 import io.javalin.http.UnauthorizedResponse;
-import io.javalin.http.sse.SseClient;
 import io.javalin.json.JavalinJackson;
 
 public class App {
@@ -98,7 +97,7 @@ public class App {
         });
 
         path("/user", () -> {
-          path("/id/{id}", () -> {
+          path("/{id}", () -> {
             get(userController::getUsersById);
             delete(userController::deleteUserById);
           });
@@ -128,7 +127,7 @@ public class App {
             });
             get(computerController::getComputersByLabNum);
           });
-          path("/id/{id}", () -> {
+          path("/{id}", () -> {
             get(computerController::getComputersById);
             delete(computerController::deleteComputerById);
           });

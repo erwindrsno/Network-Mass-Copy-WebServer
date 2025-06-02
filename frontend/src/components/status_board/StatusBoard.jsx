@@ -1,30 +1,57 @@
-import { createEffect, createResource, createSignal, createMemo, onCleanup, onMount } from "solid-js";
+import { createEffect, createResource, createSignal, createMemo, onCleanup, onMount, Switch } from "solid-js";
 import { useAuthContext } from "../utils/AuthContextProvider.jsx";
 import { apiFetchComputer } from "@apis/ComputerApi.jsx";
 import toast, { Toaster } from 'solid-toast';
 
 function StatusBoard() {
   const { token, setToken } = useAuthContext();
-  const { data, setData } = createSignal([]);
+  const [data, setData] = createSignal([]);
   const [computers, { mutate, refetch }] = createResource(() => apiFetchComputer(token));
   const [labNum, setLabNum] = createSignal(1);
   const [hasChecked, setHasChecked] = createSignal(false);
-
-  const [colorReady, setColorReady] = createSignal(false);
+  const [socket, setSocket] = createSignal(null);
 
   const handleLabNumChange = (event) => {
     setLabNum(Number(event.target.value))
   }
 
-  const handlecheck = () => {
-    setHasChecked(true)
-    toast("Polling...", {
-      position: "top-center"
-    });
+  const handlecheck = (event) => {
+    event.preventDefault();
+    // Toast with a countdown timer
+    const duration = 2000
+    toast.custom((t) => {
+      const [life, setLife] = createSignal(100);
+      const startTime = Date.now();
 
-    setTimeout(() => {
-      setColorReady(true);
-    }, 2000);
+      setTimeout(() => toast.dismiss(t.id), duration);
+
+      createEffect(() => {
+        const interval = setInterval(() => {
+          const diff = Date.now() - startTime;
+          setLife(100 - (diff / duration * 100));
+        });
+        onCleanup(() => clearInterval(interval));
+      });
+
+      return (
+        <div class="bg-slate-800 p-3 rounded-md shadow-md min-w-[350px]">
+          <div class="flex gap-2">
+            <div class="flex flex-1 flex-col">
+              <div class="font-medium text-white">Checking initiated</div>
+              <div class="text-sm text-gray-50">3 seconds</div>
+            </div>
+          </div>
+          <div class="relative pt-4">
+            <div class="w-full h-1 rounded-full bg-gray-400"></div>
+            <div
+              class="h-1 top-4 absolute rounded-full bg-gray-50"
+              style={{ width: `${life()}%` }}
+            ></div>
+          </div>
+        </div>
+      );
+    }, { duration });
+    socket().send("webclient/monitor/" + labNum());
   }
 
   const filteredComputers = createMemo(() => {
@@ -41,13 +68,10 @@ function StatusBoard() {
   });
 
   onMount(() => {
-    if (!hasChecked()) {
-      return;
-    }
     const ws = new WebSocket(`${import.meta.env.VITE_WEBSOCKET_SERVER_URL}`);
     setSocket(ws);
 
-    ws.onopen = () => {
+    socket().onopen = () => {
       console.log("WebSocket connected");
 
       if (socket() && socket().readyState === WebSocket.OPEN) {
@@ -60,25 +84,27 @@ function StatusBoard() {
       }
     };
 
-    ws.onmessage = (event) => {
+    socket().onmessage = (event) => {
       const message = event.data;
 
       if (message.startsWith("monitor/")) {
         const jsonPayload = message.slice("monitor/".length);
         try {
-          const openedConnections = JSON.parse(jsonPayload);
-          setData(() => openedConnections);
+          const jsonParsed = JSON.parse(jsonPayload);
+          setData(jsonParsed);
+          console.log(data());
+          setHasChecked(true)
         } catch (error) {
           console.error("Failed to parse monitor JSON:", error);
         }
       }
     };
 
-    ws.onerror = (err) => {
+    socket().onerror = (err) => {
       console.error("WebSocket error:", err);
     };
 
-    ws.onclose = () => {
+    socket().onclose = () => {
       console.log("WebSocket closed");
     };
 
@@ -117,24 +143,21 @@ function StatusBoard() {
           <For each={filteredComputers()} fallback={<p>Loading...</p>}>
             {(item, index) => {
               const isActive = () => data().includes(item.ip_address);
+              console.log(isActive())
 
               const showColor = () => {
-                if (!hasChecked() || !colorReady()) {
+                if (!hasChecked()) {
                   return "bg-gray-300";
                 }
-                if (colorReady()) {
-                  return isActive() ? "bg-green-500 animate-ping" : "bg-red-500";
-                }
+                return isActive() ? "bg-green-500 animate-ping" : "bg-red-500";
               };
 
               return (
                 <div class="bg-sky-100 text-center flex flex-col border rounded-sm border-gray-300 relative p-0 z-40">
-                  <Show when={hasChecked() && colorReady()} >
-                    <span class="absolute top-0 right-0 flex size-3 z-50">
-                      <span class="absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-                      <span class={`relative inline-flex size-3 rounded-full ${showColor()}`}></span>
-                    </span>
-                  </Show>
+                  <span class="absolute top-0 right-0 flex size-3 z-50">
+                    <span class="absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                    <span class={`relative inline-flex size-3 rounded-full ${showColor()}`}></span>
+                  </span>
 
                   <p class="text-lg">{item.host_name}</p>
                   <p class="text-sm">{item.ip_address}</p>

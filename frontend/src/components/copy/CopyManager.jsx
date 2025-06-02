@@ -19,33 +19,33 @@ function CopyManager() {
     event.preventDefault();
     const owner = event.target.owner.value;
 
-    // const formatRecords = () => {
-    //   const result = [];
-    //
-    //   selectedComputers().forEach((computer, index) => {
-    //     const hostname = computer.host_name;
-    //     const formatPermission = (perms) => {
-    //       const permOrder = ["read", "write", "execute"];
-    //       return permOrder.map(p => perms.includes(p) ? "1" : "0").join("");
-    //     };
-    //     result.push({
-    //       hostname,
-    //       owner,
-    //       permissions: formatPermission(permission())
-    //     });
-    //   });
-    //
-    //   return result;
-    // };
+    const formatRecords = () => {
+      const result = [];
+
+      selectedComputers().forEach((computer, index) => {
+        const hostname = computer.host_name;
+        const formatPermission = (perms) => {
+          const permOrder = ["read", "write", "execute"];
+          return permOrder.map(p => perms.includes(p) ? "1" : "0").join("");
+        };
+        result.push({
+          hostname,
+          owner,
+          permissions: formatPermission(permission())
+        });
+      });
+
+      return result;
+    };
 
     try {
       let formData = new FormData();
-      // const records = formatRecords();
-      const formatPermission = (perms) => {
-        const permOrder = ["read", "write", "execute"];
-        return permOrder.map(p => perms.includes(p) ? "1" : "0").join("");
-      };
-      const records = [{ hostname: "LAB-KOST", owner: owner, permissions: formatPermission(permission()) }]
+      const records = formatRecords();
+      // const formatPermission = (perms) => {
+      //   const permOrder = ["read", "write", "execute"];
+      //   return permOrder.map(p => perms.includes(p) ? "1" : "0").join("");
+      // };
+      // const records = [{ hostname: "LAB-KOST", owner: owner, permissions: formatPermission(permission()) }]
       const form = event.currentTarget;
       const title = form.elements.title.value;
       const path = form.elements.path.value;
@@ -74,14 +74,17 @@ function CopyManager() {
       <div class="w-full justify-items-center">
         <form onSubmit={handleSubmit} class="flex gap-1.5 flex-col">
           <label for="title">Title</label>
-          <input type="text" name="title" class="outline-1 outline-gray-300 rounded-md py-0.5 px-2 font-normal w-full" required />
+          <input type="text" name="title" class="outline-1 outline-gray-300 rounded-md py-0.5 px-2 font-normal w-full" placeholder="Any title works, but make sure it is informative" required />
           <label for="path">Path</label>
           <input type="text" name="path" class="outline-1 outline-gray-300 rounded-md py-0.5 px-2 font-normal w-full" placeholder="E.g: D:\Ujian (without backslash in the end)" required />
           <label for="owner">Owner</label>
-          <input type="text" name="owner" class="outline-1 outline-gray-300 rounded-md py-0.5 px-2 font-normal w-full" required />
+          <input type="text" name="owner" class="outline-1 outline-gray-300 rounded-md py-0.5 px-2 font-normal w-full" required placeholder='"guestftis" or "i20002"' />
           <PermissionInput permission={permission} setPermission={setPermission} />
           <FileInput />
           <ComputerSelector selectedComputers={selectedComputers} setSelectedComputers={setSelectedComputers} />
+          <div class="w-full justify-items-end">
+            <p>{`Selected computers: ${selectedComputers().length}`}</p>
+          </div>
           <button type="submit" class="w-full bg-blue-600 border rounded-md py-1 text-blue-50 font-semibold hover:bg-blue-700 cursor-pointer">Add</button>
         </form>
       </div>

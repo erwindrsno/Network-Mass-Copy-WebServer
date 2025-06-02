@@ -26,8 +26,6 @@ function DeletedSingleDirectoryRecordTable() {
   const { token, setToken } = useAuthContext();
   const { role } = extractClaims(token());
   const { sse, setSse, data, setData } = useSseContext();
-  const [action, setAction] = createSignal("");
-  const [isModalToggled, toggleModal] = createSignal(false);
 
   const [fileRecordPerDir, { mutate, refetch }] = createResource(
     () => apiFetchSingleDirectory(directoryId, token)
@@ -50,7 +48,7 @@ function DeletedSingleDirectoryRecordTable() {
   return (
     <>
       <div class="shadow-md rounded-lg overflow-hidden">
-        <table class="text-sm rtl:text-right text-gray-500">
+        <table class="w-full text-sm rtl:text-right text-gray-500">
           <thead class="text-xs text-gray-700 bg-gray-300">
             <tr>
               <th scope="col" class="w-1/12 px-4 py-3 text-left">No.</th>
@@ -58,7 +56,6 @@ function DeletedSingleDirectoryRecordTable() {
               <th scope="col" class="w-1/5 py-3 text-center">Size</th>
               <th scope="col" class="w-1/6 py-3 text-center">Permissions</th>
               <th scope="col" class="w-1/6 py-3 text-center">Copied at</th>
-              <th scope="col" class="w-1/6 py-3 text-center">Deleted at</th>
             </tr>
           </thead>
           <tbody>
@@ -70,7 +67,6 @@ function DeletedSingleDirectoryRecordTable() {
                   <td class="py-3 text-center whitespace-nowrap">{(item.fileRecord.filesize / 10240).toFixed(2)} MB</td>
                   <td class="py-3 text-center whitespace-nowrap truncate">{item.fileRecord.permissions}</td>
                   <td class="py-3 text-center whitespace-nowrap justify-items-center">{formatDateTime(item.fileRecordComputer.copiedAt)}</td>
-                  <td class="py-3 text-center whitespace-nowrap justify-items-center">{formatDateTime(item.fileRecordComputer.deletedAt)}</td>
                 </tr>
               )}
             </For>

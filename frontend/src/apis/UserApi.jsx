@@ -34,7 +34,7 @@ export const apiFetchUser = async (token) => {
 }
 
 export const apiDeleteUser = async (userId, token) => {
-  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user/id/${userId}`, {
+  const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user/${userId}`, {
     method: "DELETE",
     credentials: "include",
     headers: {

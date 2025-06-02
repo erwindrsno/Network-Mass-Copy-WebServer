@@ -11,22 +11,10 @@ function ProfileDropdown() {
   const navigate = useNavigate()
 
   const handleLogout = async () => {
-    const response = await fetch(`${import.meta.env.VITE_LOCALHOST_BACKEND_URL}/user/logout`, {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Authorization": `Bearer ${token()}`
-      },
-    })
-    if (!response.ok) {
-      console.log("BAD");
-      console.log(response)
-    } else {
-      setSse(null);
-      setToken("");
-      sessionStorage.removeItem("token");
-      navigate("/")
-    }
+    setSse(null);
+    setToken("");
+    sessionStorage.removeItem("token");
+    navigate("/")
   }
 
   return (
