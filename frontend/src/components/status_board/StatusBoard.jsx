@@ -10,48 +10,11 @@ function StatusBoard() {
   const [labNum, setLabNum] = createSignal(1);
   const [hasChecked, setHasChecked] = createSignal(false);
   const [socket, setSocket] = createSignal(null);
+  const [socketStatus, setSocketStatus] = createSignal(null);
 
   const handleLabNumChange = (event) => {
     setLabNum(Number(event.target.value))
-  }
-
-  const handlecheck = (event) => {
-    event.preventDefault();
-    // Toast with a countdown timer
-    const duration = 2000
-    toast.custom((t) => {
-      const [life, setLife] = createSignal(100);
-      const startTime = Date.now();
-
-      setTimeout(() => toast.dismiss(t.id), duration);
-
-      createEffect(() => {
-        const interval = setInterval(() => {
-          const diff = Date.now() - startTime;
-          setLife(100 - (diff / duration * 100));
-        });
-        onCleanup(() => clearInterval(interval));
-      });
-
-      return (
-        <div class="bg-slate-800 p-3 rounded-md shadow-md min-w-[350px]">
-          <div class="flex gap-2">
-            <div class="flex flex-1 flex-col">
-              <div class="font-medium text-white">Checking initiated</div>
-              <div class="text-sm text-gray-50">3 seconds</div>
-            </div>
-          </div>
-          <div class="relative pt-4">
-            <div class="w-full h-1 rounded-full bg-gray-400"></div>
-            <div
-              class="h-1 top-4 absolute rounded-full bg-gray-50"
-              style={{ width: `${life()}%` }}
-            ></div>
-          </div>
-        </div>
-      );
-    }, { duration });
-    socket().send("webclient/monitor/" + labNum());
+    setHasChecked(false);
   }
 
   const filteredComputers = createMemo(() => {
@@ -75,6 +38,7 @@ function StatusBoard() {
       console.log("WebSocket connected");
 
       if (socket() && socket().readyState === WebSocket.OPEN) {
+        setSocketStatus(ws.readyState);
         console.log("And in ready state");
       } else {
         console.warn("WebSocket is not open");
@@ -116,6 +80,13 @@ function StatusBoard() {
     });
   });
 
+  createEffect(() => {
+    if (socket() && socketStatus()) {
+      console.log("executing...")
+      socket().send("webclient/monitor/" + labNum());
+    }
+  });
+
   return (
     <div class="flex flex-col gap-4">
       <select name="lab_num" onChange={handleLabNumChange} value={labNum()} class="bg-gray-50 rounded-sm border border-slate-300">
@@ -126,7 +97,6 @@ function StatusBoard() {
       </select>
 
       <div class="flex flex-row gap-4">
-        <button class="bg-green-500 px-3 py-1 rounded-sm text-white cursor-pointer" onClick={handlecheck}>Check!</button>
         <div class="w-[2px] h-full bg-gray-300"></div>
         <div class="flex flex-col">
           <p class="block">Legends:</p>
