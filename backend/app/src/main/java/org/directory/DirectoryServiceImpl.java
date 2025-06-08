@@ -66,7 +66,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     List<CustomDtoOne> listFileRecord = this.customDtoOneService.getFileRecordMetadataByEntryId(entryId);
     String title = listFileRecord.get(0).getEntry().getTitle();
     String basePath = listFileRecord.get(0).getEntry().getBasePath();
-    String dirPath = basePath + owner + " - " + title;
+    String dirPath = basePath + "\\" + owner + " - " + title;
     Integer fileCount = listFileRecord.get(0).getDirectory().getFileCount();
     Directory dir = Directory.builder()
         .path(dirPath)
@@ -84,7 +84,7 @@ public class DirectoryServiceImpl implements DirectoryService {
     try {
       List<FileRecord> toBeInsertedList = new ArrayList<>();
       for (CustomDtoOne cdo : listFileRecord) {
-        String filePath = cdo.getEntry().getBasePath() + owner + " - " + cdo.getEntry().getTitle() + "\\"
+        String filePath = cdo.getEntry().getBasePath() + "\\" + owner + " - " + cdo.getEntry().getTitle() + "\\"
             + cdo.getFileRecord().getFilename();
         FileRecord fileRecord = FileRecord.builder()
             .owner(owner)

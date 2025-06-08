@@ -75,12 +75,13 @@ public class CustomDtoQuery {
         """;
 
   public static final String FIND_FILE_RECORD_METADATA_BY_ENTRY_ID = """
-      SELECT file_name, entry.title, entry.base_path, file_record.size, file_record.permissions, directory.file_count
+      SELECT DISTINCT ON(file_name) file_name, entry.title, entry.base_path, file_record.size, file_record.permissions, directory.file_count
           FROM file_record INNER JOIN entry
           ON file_record.entry_id = entry.id
           INNER JOIN directory
           ON directory.id = file_record.directory_id
           WHERE file_record.entry_id = ?
+          ORDER BY file_name
       """;
 
   public static final String SAVE_FILE_RECORD_BY_DIRECTORY_ID = """

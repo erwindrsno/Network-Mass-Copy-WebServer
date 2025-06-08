@@ -72,6 +72,7 @@ public class FileRecordController {
     Integer fileId = Integer.parseInt(ctx.pathParam("id"));
     Integer entryId = Integer.parseInt(ctx.formParam("entry_id"));
     AccessInfo accessInfo = this.customDtoOneService.getMetadataByFileId(fileId);
-    this.wsClientService.prepareSingleDeleteMetadata(entryId, accessInfo);
+    this.wsClientService.prepareDeleteMetadata(entryId, accessInfo);
+    // this.wsClientService.prepareSingleDeleteMetadata(entryId, accessInfo);
   }
 }
