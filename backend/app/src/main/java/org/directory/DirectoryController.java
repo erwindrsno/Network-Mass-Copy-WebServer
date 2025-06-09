@@ -1,7 +1,9 @@
 package org.directory;
 
-import org.file_record.FileRecordService;
+import java.util.List;
+
 import org.joined_entry_file_filecomputer.AccessInfo;
+import org.joined_entry_file_filecomputer.CustomDtoOne;
 import org.joined_entry_file_filecomputer.CustomDtoOneService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +45,12 @@ public class DirectoryController {
 
   public void getFileRecordByDirectoryId(Context ctx) {
     Integer directoryId = Integer.parseInt(ctx.pathParam("directory_id"));
-    ctx.json(this.customDtoOneService.getFileRecordByDirectoryId(directoryId));
+    List<CustomDtoOne> listCustomDtoOne = this.customDtoOneService.getFileRecordByDirectoryId(directoryId);
+    if (listCustomDtoOne == null) {
+      ctx.status(404);
+    } else {
+      ctx.json(listCustomDtoOne).status(200);
+    }
   }
 
   public void deleteByDirectoryId(Context ctx) {
@@ -60,5 +67,6 @@ public class DirectoryController {
     String owner = ctx.formParam("owner");
     this.directoryService.createDirectoryByEntryId(entryId, labNum, hostNum,
         owner);
+    ctx.status(201);
   }
 }

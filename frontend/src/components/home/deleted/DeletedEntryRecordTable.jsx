@@ -65,7 +65,6 @@ function DeletedEntryRecordTable() {
             <tr>
               <th scope="col" class="px-4 w-3xs py-3 text-left">No.</th>
               <th scope="col" class="w-3xl py-3 text-left">Title</th>
-              <th scope="col" class="w-md py-3 text-center">File</th>
               <th scope="col" class="w-sm py-3 text-center">From OXAM</th>
               <th scope="col" class="w-sm py-3 text-center">Created at</th>
               <th scope="col" class="w-sm py-3 text-center">Deleted at</th>
@@ -78,7 +77,6 @@ function DeletedEntryRecordTable() {
                 <tr key={entry.id} class="bg-white border-b border-gray-200 hover:bg-gray-50">
                   <td class="px-4 py-3 text-left">{(paginated().currentPage - 1) * maxItems + index() + 1}</td>
                   <td class="py-3 text-left whitespace-nowrap">{entry.title}</td>
-                  <td class="py-3 text-center whitespace-nowrap"><button onClick={() => openModal(entry.title, entry.id, "view")} class="hover:text-blue-500 cursor-pointer hover:underline">view</button></td>
                   <td class="py-3 text-center whitespace-nowrap justify-items-center">{displayIcon(entry.fromOxam)}</td>
                   <td class="py-3 text-center whitespace-nowrap">{formatDateTime(entry.createdAt)}</td>
                   <td class="py-3 text-center whitespace-nowrap">{formatDateTime(entry.deletedAt)}</td>

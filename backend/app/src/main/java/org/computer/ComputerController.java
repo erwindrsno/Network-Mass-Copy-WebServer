@@ -17,7 +17,7 @@ public class ComputerController {
   }
 
   public void getComputers(Context ctx) {
-    ctx.json(this.computerService.getAllComputers());
+    ctx.json(this.computerService.getAllComputers()).status(200);
   }
 
   public void getAllLabNum(Context ctx) {
@@ -30,6 +30,7 @@ public class ComputerController {
     int lab_num = Integer.parseInt(ctx.formParam("lab_num"));
     Computer computer = new Computer(null, ip_address, host_name, lab_num);
     this.computerService.createComputer(computer);
+    ctx.status(201);
   }
 
   public void getComputersByLabNum(Context ctx) {
@@ -41,7 +42,12 @@ public class ComputerController {
   public void getComputersById(Context ctx) {
     Integer id = Integer.parseInt(ctx.pathParam("id"));
     logger.info("getComputersById id : " + id);
-    ctx.json(this.computerService.getComputersById(id));
+    Computer computer = this.computerService.getComputersById(id);
+    if (computer == null) {
+      ctx.status(404);
+    } else {
+      ctx.json(this.computerService.getComputersById(id)).status(200);
+    }
   }
 
   public void getComputersByIpAddress(Context ctx) {

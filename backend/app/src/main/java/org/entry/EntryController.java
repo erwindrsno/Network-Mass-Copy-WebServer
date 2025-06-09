@@ -1,5 +1,7 @@
 package org.entry;
 
+import java.util.List;
+
 import org.computer.ComputerService;
 import org.directory.Directory;
 import org.directory.DirectoryService;
@@ -8,6 +10,7 @@ import org.file_record.FileRecordService;
 import org.file_record_computer.FileRecordComputer;
 import org.file_record_computer.FileRecordComputerService;
 import org.joined_entry_file_filecomputer.AccessInfo;
+import org.joined_entry_file_filecomputer.CustomDtoOne;
 import org.joined_entry_file_filecomputer.CustomDtoOneService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,8 +92,6 @@ public class EntryController {
       StringBuilder baseFolder = new StringBuilder("upload/");
       String folderName = baseFolder.append(entryId).append("/").toString();
 
-      logger.info("entry id is: " + entryId);
-
       ctx.uploadedFiles("files")
           .forEach(uploadedFile -> FileUtil.streamToFile(uploadedFile.content(),
               folderName + uploadedFile.filename()));
@@ -144,28 +145,39 @@ public class EntryController {
           this.fileRecordComputerService.createFileRecordComputer(fileRecordComputer);
         }
       }
-      ctx.status(200);
+      ctx.status(201);
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
+      ctx.status(400);
     }
   }
 
   public void getAllEntries(Context ctx) {
-    ctx.json(this.entryService.getAllEntries());
+    ctx.json(this.entryService.getAllEntries()).status(200);
   }
 
   public void getAllDeletedEntries(Context ctx) {
-    ctx.json(this.entryService.getAllDeletedEntries());
+    ctx.json(this.entryService.getAllDeletedEntries()).status(200);
   }
 
   public void getFile(Context ctx) {
     Integer entryId = Integer.parseInt(ctx.pathParam("id"));
-    ctx.json(this.fileRecordService.getFileInfo(entryId));
+    List<FileRecord> listFileRecord = this.fileRecordService.getFileInfo(entryId);
+    if (listFileRecord == null) {
+      ctx.status(404);
+    } else {
+      ctx.json(this.fileRecordService.getFileInfo(entryId)).status(200);
+    }
   }
 
   public void getDirectoryRecordByEntryId(Context ctx) {
     Integer entryId = Integer.parseInt(ctx.pathParam("id"));
-    ctx.json(this.customDtoOneService.getJoinedFileRecordsDtoByEntryId(entryId));
+    List<CustomDtoOne> listCustomDtoOne = this.customDtoOneService.getJoinedFileRecordsDtoByEntryId(entryId);
+    if (listCustomDtoOne == null) {
+      ctx.status(404);
+    } else {
+      ctx.json(this.customDtoOneService.getJoinedFileRecordsDtoByEntryId(entryId)).status(200);
+    }
   }
 
   public void copyFileByEntry(Context ctx) {

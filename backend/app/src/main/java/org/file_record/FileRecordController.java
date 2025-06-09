@@ -55,9 +55,10 @@ public class FileRecordController {
         "\"");
     ctx.contentType("application/octet-stream");
     try {
-      ctx.result(inputStream);
+      ctx.result(inputStream).status(200);
     } catch (Exception e) {
       logger.error(e.getMessage());
+      ctx.status(404);
     }
   }
 

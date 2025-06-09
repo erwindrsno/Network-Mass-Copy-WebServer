@@ -19,7 +19,7 @@ public class UserController {
   }
 
   public void getAllUsers(Context ctx) {
-    ctx.json(this.userService.getAllUsers());
+    ctx.json(this.userService.getAllUsers()).status(200);
   }
 
   public void insertUser(Context ctx) {
@@ -37,7 +37,7 @@ public class UserController {
     if (isSucceed) {
       ctx.result("user creation OK").status(201);
     } else {
-      ctx.result("username already exists.").status(406);
+      ctx.result("username already exists.").status(400);
     }
   }
 
@@ -85,7 +85,7 @@ public class UserController {
     if (isDeleted) {
       ctx.status(200).result("OK");
     } else {
-      ctx.status(200).result("NOT OK");
+      ctx.status(404).result("NOT OK");
     }
   }
 
@@ -107,7 +107,7 @@ public class UserController {
     if (isValidated) {
       ctx.status(200);
     } else {
-      ctx.status(401);
+      ctx.status(403);
     }
   }
 
