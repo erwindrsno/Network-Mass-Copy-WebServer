@@ -112,7 +112,7 @@ public class EntryController {
 
         // untuk tiap owner, dibkin direktorinya
         Directory dirPerOwner = Directory.builder()
-            .path(entry.getBasePath() + "\\" + owner + " - " + title)
+            .path(entry.getBasePath() + owner + " - " + title)
             .copied(0)
             .owner(owner)
             .fileCount(ctx.uploadedFiles("files").size())
@@ -121,7 +121,7 @@ public class EntryController {
         Integer directoryId = this.directoryService.createDirectory(dirPerOwner);
 
         for (UploadedFile uploadedFile : ctx.uploadedFiles("files")) {
-          String filePath = entry.getBasePath() + "\\" + owner + " - " + title + "\\" +
+          String filePath = entry.getBasePath() + owner + " - " + title + "\\" +
               uploadedFile.filename();
 
           FileRecord fileRecord = FileRecord.builder()
@@ -205,6 +205,7 @@ public class EntryController {
       throw new UnauthorizedResponse("Unauthorized! Not superadmin.");
     }
     this.entryService.softDeleteEntryById(entryId);
+    ctx.status(200);
   }
 
   public void takeownFileByEntry(Context ctx) {
