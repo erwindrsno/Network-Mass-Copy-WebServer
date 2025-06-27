@@ -11,7 +11,7 @@ export const apiAddDirectory = async (encodedForm, token) => {
 
   if (!response.ok && response.status === 401) {
     console.log("UNAUTH!")
-  } else if (response.ok && response.status === 200) {
+  } else if (response.ok && response.status === 201) {
     return { success: true };
   }
 }

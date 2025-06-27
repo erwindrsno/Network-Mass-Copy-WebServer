@@ -81,7 +81,7 @@ public class EntryController {
 
       if (ctx.path().equals("/entry/oxam")) {
         entry.setFromOxam(true);
-        entry.setBasePath("D:\\Ujian\\");
+        entry.setBasePath("D:\\Ujian");
       } else {
         String basePath = ctx.formParam("path").toString();
         entry.setBasePath(basePath);
@@ -112,7 +112,7 @@ public class EntryController {
 
         // untuk tiap owner, dibkin direktorinya
         Directory dirPerOwner = Directory.builder()
-            .path(entry.getBasePath() + owner + " - " + title)
+            .path(entry.getBasePath() + "\\" + owner + " - " + title)
             .copied(0)
             .owner(owner)
             .fileCount(ctx.uploadedFiles("files").size())
@@ -121,7 +121,7 @@ public class EntryController {
         Integer directoryId = this.directoryService.createDirectory(dirPerOwner);
 
         for (UploadedFile uploadedFile : ctx.uploadedFiles("files")) {
-          String filePath = entry.getBasePath() + owner + " - " + title + "\\" +
+          String filePath = entry.getBasePath() + "\\" + owner + " - " + title + "\\" +
               uploadedFile.filename();
 
           FileRecord fileRecord = FileRecord.builder()

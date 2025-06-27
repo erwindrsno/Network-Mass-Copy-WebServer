@@ -38,7 +38,7 @@ export const apiAddComputer = async (formData, token) => {
   })
   if (!response.ok || response.status === 401) {
     console.log("UNAUTH! or SOmething went wrong")
-  } else if (response.ok && response.status === 200) {
+  } else if (response.ok && response.status === 201) {
     return { success: true };
   }
 }

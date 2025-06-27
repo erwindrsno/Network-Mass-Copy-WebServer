@@ -183,20 +183,19 @@ public class WebSocketClientServiceImpl implements WebSocketClientService {
     }
   }
 
-  // @Override
-  // public void prepareSingleDeleteMetadata(Integer entryId, AccessInfo
-  // accessInfo) {
-  // try {
-  // Context context = Context.builder()
-  // .entryId(entryId)
-  // .listFai(accessInfo.getListFai())
-  // .listDai(accessInfo.getListDai())
-  // .build();
-  //
-  // logger.info("try deleting...");
-  // this.wsClient.setContextAndInitSend(context, "single-delete");
-  // } catch (Exception e) {
-  // logger.error(e.getMessage(), e);
-  // }
-  // }
+  @Override
+  public void prepareSingleDeleteMetadata(Integer entryId, AccessInfo accessInfo) {
+    try {
+      Context context = Context.builder()
+          .entryId(entryId)
+          .listFai(accessInfo.getListFai())
+          .listDai(accessInfo.getListDai())
+          .build();
+
+      logger.info("try deleting...");
+      this.wsClient.setContextAndInitSend(context, "single-delete");
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+    }
+  }
 }
